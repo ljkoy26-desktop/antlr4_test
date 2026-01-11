@@ -1,7 +1,5 @@
 #pragma once
 
-// antlr 4 ÀÇ 
-
 
 /*
 * 

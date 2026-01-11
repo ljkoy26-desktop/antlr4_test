@@ -1,55 +1,16 @@
-﻿
-// ANTLR4TESTDlg.cpp: 구현 파일
-//
-
-#include "pch.h"
+﻿#include "pch.h"
 #include "framework.h"
 #include "ANTLR4TEST.h"
 #include "ANTLR4TESTDlg.h"
 #include "afxdialogex.h"
 
-#include "AntlrProxy.h"
+// #include "AntlrProxy.h"
+
+#include "../Common/Include/AntlrProxy.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
-
-
-// 응용 프로그램 정보에 사용되는 CAboutDlg 대화 상자입니다.
-
-class CAboutDlg : public CDialogEx
-{
-public:
-	CAboutDlg();
-
-// 대화 상자 데이터입니다.
-#ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ABOUTBOX };
-#endif
-
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);    // DDX/DDV 지원입니다.
-
-// 구현입니다.
-protected:
-	DECLARE_MESSAGE_MAP()
-};
-
-CAboutDlg::CAboutDlg() : CDialogEx(IDD_ABOUTBOX)
-{
-}
-
-void CAboutDlg::DoDataExchange(CDataExchange* pDX)
-{
-	CDialogEx::DoDataExchange(pDX);
-}
-
-BEGIN_MESSAGE_MAP(CAboutDlg, CDialogEx)
-END_MESSAGE_MAP()
-
-
-// CANTLR4TESTDlg 대화 상자
-
 
 
 CANTLR4TESTDlg::CANTLR4TESTDlg(CWnd* pParent /*=nullptr*/)
@@ -108,15 +69,7 @@ BOOL CANTLR4TESTDlg::OnInitDialog()
 
 void CANTLR4TESTDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
-	if ((nID & 0xFFF0) == IDM_ABOUTBOX)
-	{
-		CAboutDlg dlgAbout;
-		dlgAbout.DoModal();
-	}
-	else
-	{
-		CDialogEx::OnSysCommand(nID, lParam);
-	}
+	CDialogEx::OnSysCommand(nID, lParam);
 }
 
 // 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면

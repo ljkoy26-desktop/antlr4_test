@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="소스 파일">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="헤더 파일">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="리소스 파일">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="MySQL">
+      <UniqueIdentifier>{b7adc7cf-a6c3-4b41-974a-649eff8be570}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLLexer.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLLexerBase.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLParser.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLParserBase.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLParserBaseVisitor.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\MySQLParserVisitor.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\SqlMode.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\MySQL\SqlModes.h">
+      <Filter>MySQL</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\MySQL\MySQLLexer.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\MySQLLexerBase.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\MySQLParser.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\MySQLParserBase.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\MySQLParserBaseVisitor.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\MySQLParserVisitor.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\MySQL\SqlModes.cpp">
+      <Filter>MySQL</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\MySQL\MySQLLexer.interp">
+      <Filter>MySQL</Filter>
+    </None>
+    <None Include="Source\MySQL\MySQLLexer.tokens">
+      <Filter>MySQL</Filter>
+    </None>
+    <None Include="Source\MySQL\MySQLParser.interp">
+      <Filter>MySQL</Filter>
+    </None>
+    <None Include="Source\MySQL\MySQLParser.tokens">
+      <Filter>MySQL</Filter>
+    </None>
+    <None Include="Source\MySQL\transformGrammar.py">
+      <Filter>MySQL</Filter>
+    </None>
+  </ItemGroup>
+</Project>
