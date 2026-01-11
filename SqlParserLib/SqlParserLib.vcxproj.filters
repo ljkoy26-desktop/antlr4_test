@@ -16,6 +16,15 @@
     <Filter Include="MySQL">
       <UniqueIdentifier>{b7adc7cf-a6c3-4b41-974a-649eff8be570}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Oracle">
+      <UniqueIdentifier>{6ee51271-2995-4ac5-b13d-d4cc444a9666}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="PostgreSQL">
+      <UniqueIdentifier>{73ef6195-b035-48ba-bae7-8c762554390e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQL Server">
+      <UniqueIdentifier>{f04092f5-183f-4560-816b-ca849e8533d3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
