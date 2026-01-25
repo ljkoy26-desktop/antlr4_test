@@ -1,31 +1,24 @@
-﻿
-// ANTLR4TESTDlg.h: 헤더 파일
-//
+﻿#pragma once
 
-#pragma once
-
-
-// CANTLR4TESTDlg 대화 상자
 class CANTLR4TESTDlg : public CDialogEx
 {
-// 생성입니다.
 public:
-	CANTLR4TESTDlg(CWnd* pParent = nullptr);	// 표준 생성자입니다.
+	CANTLR4TESTDlg(CWnd* pParent = nullptr);
 
-// 대화 상자 데이터입니다.
 #ifdef AFX_DESIGN_TIME
 	enum { IDD = IDD_ANTLR4TEST_DIALOG };
 #endif
 
-	protected:
-	virtual void DoDataExchange(CDataExchange* pDX);	// DDX/DDV 지원입니다.
+protected:
+	virtual void DoDataExchange(CDataExchange* pDX);
 
 
-// 구현입니다.
+	void AddTraceLog(LPCTSTR lpszFormat, ...);
+
 protected:
 	HICON m_hIcon;
 
-	// 생성된 메시지 맵 함수
+
 	virtual BOOL OnInitDialog();
 	afx_msg void OnSysCommand(UINT nID, LPARAM lParam);
 	afx_msg void OnPaint();

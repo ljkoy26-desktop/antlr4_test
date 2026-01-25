@@ -36,15 +36,10 @@ BEGIN_MESSAGE_MAP(CANTLR4TESTDlg, CDialogEx)
 END_MESSAGE_MAP()
 
 
-// CANTLR4TESTDlg 메시지 처리기
-
 BOOL CANTLR4TESTDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
-	// 시스템 메뉴에 "정보..." 메뉴 항목을 추가합니다.
-
-	// IDM_ABOUTBOX는 시스템 명령 범위에 있어야 합니다.
 	ASSERT((IDM_ABOUTBOX & 0xFFF0) == IDM_ABOUTBOX);
 	ASSERT(IDM_ABOUTBOX < 0xF000);
 
@@ -62,30 +57,25 @@ BOOL CANTLR4TESTDlg::OnInitDialog()
 		}
 	}
 
-	// 이 대화 상자의 아이콘을 설정합니다.  응용 프로그램의 주 창이 대화 상자가 아닐 경우에는
-	//  프레임워크가 이 작업을 자동으로 수행합니다.
+
 	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
 	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
 
-	// TODO: 여기에 추가 초기화 작업을 추가합니다.
+	SetDlgItemText(IDC_EDIT_SQL, _T("select* from scott.emp7;"));
 
-	return TRUE;  // 포커스를 컨트롤에 설정하지 않으면 TRUE를 반환합니다.
+
+	return TRUE;
 }
 
 void CANTLR4TESTDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	CDialogEx::OnSysCommand(nID, lParam);
 }
-
-// 대화 상자에 최소화 단추를 추가할 경우 아이콘을 그리려면
-//  아래 코드가 필요합니다.  문서/뷰 모델을 사용하는 MFC 애플리케이션의 경우에는
-//  프레임워크에서 이 작업을 자동으로 수행합니다.
-
 void CANTLR4TESTDlg::OnPaint()
 {
 	if (IsIconic())
 	{
-		CPaintDC dc(this); // 그리기를 위한 디바이스 컨텍스트입니다.
+		CPaintDC dc(this);
 
 		SendMessage(WM_ICONERASEBKGND, reinterpret_cast<WPARAM>(dc.GetSafeHdc()), 0);
 
@@ -106,8 +96,6 @@ void CANTLR4TESTDlg::OnPaint()
 	}
 }
 
-// 사용자가 최소화된 창을 끄는 동안에 커서가 표시되도록 시스템에서
-//  이 함수를 호출합니다.
 HCURSOR CANTLR4TESTDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
@@ -116,7 +104,13 @@ HCURSOR CANTLR4TESTDlg::OnQueryDragIcon()
 
 
 void CANTLR4TESTDlg::OnBnClickedButtonParse()
-{// 1. UI에서 SQL 가져오기
+{
+
+	// 1. UI에서 SQL 가져오기
+
+
+
+
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
 
@@ -155,15 +149,37 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 		// 4. 결과 확인
 		size_t errorCount = parser.getNumberOfSyntaxErrors();
 
-		if (errorCount == 0) {
-			CString msg;
-			msg.Format(_T("파싱 성공! \n구조: %s"), CString(tree->toStringTree(&parser).c_str()));
-			AfxMessageBox(msg);
+		if (errorCount == 0)
+		{
+
+
+			std::string s = tree->toStringTree(&parser);
+			CStringA sTraceA = s.c_str();
+			CString sTrace = (CString)sTraceA;
+
+			AddTraceLog(sTrace);
+
+
+			//GetDlgItem(IDC_EDIT_TRACE)->SetWindowText()
+
+			//SetDlgItemText(IDC_EDIT_TRACE, sTrace);
+			//SetDlgItemText(IDC_EDIT_TRACE, _T("\r\n"));
 		}
-		else {
-			CString msg;
-			msg.Format(_T("파싱 실패..\n오류 개수: %d"), errorCount);
-			AfxMessageBox(msg);
+		else
+		{
+
+
+			std::string s = tree->toStringTree(&parser);
+			CStringA sTraceA = s.c_str();
+
+
+
+			CString sTrace;
+			sTrace.Format(_T("파싱 실패..\n오류 개수: %d"), errorCount);
+			AddTraceLog(sTrace);
+
+			//SetDlgItemText(IDC_EDIT_TRACE, sTrace);
+			//SetDlgItemText(IDC_EDIT_TRACE, _T("\r\n"));
 		}
 	}
 	catch (const std::exception& e) {
@@ -175,4 +191,30 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 	catch (...) {
 		AfxMessageBox(_T("알 수 없는 에러 발생"));
 	}
+}
+
+void CANTLR4TESTDlg::AddTraceLog(LPCTSTR lpszFormat, ...)
+{
+	// 1. 가변 인자 문자열 구성
+	CString strLog;
+	va_list args;
+	va_start(args, lpszFormat);
+	strLog.FormatV(lpszFormat, args);
+	va_end(args);
+
+	strLog += _T("\r\n");
+
+	// 2. 컨트롤 포인터 가져오기 및 안전성 검사
+	CEdit* pEditTrace = (CEdit*)GetDlgItem(IDC_EDIT_TRACE);
+	if (pEditTrace == nullptr) return; // 컨트롤을 찾을 수 없으면 중단
+
+	// 3. 커서를 마지막 위치로 이동
+	int nLength = pEditTrace->GetWindowTextLength();
+	pEditTrace->SetSel(nLength, nLength);
+
+	// 4. 선택 영역에 텍스트 삽입
+	pEditTrace->ReplaceSel(strLog);
+
+	// 5. 스크롤을 마지막으로 이동 (WM_ 추가)
+	pEditTrace->SendMessage(WM_VSCROLL, SB_BOTTOM, NULL);
 }
