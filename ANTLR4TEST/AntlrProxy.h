@@ -38,4 +38,5 @@ MFC 소스(Dlg.cpp)에서는 <antlr4 - runtime.h> 대신 "AntlrProxy.h" 만 include 합니
 #undef NO_ERROR
 //#undef TRUE
 //#undef FALSE
-#include <antlr4-runtime/antlr4-runtime.h>
+//#include <antlr4-runtime/antlr4-runtime.h>
+#include <antlr4-runtime.h>
