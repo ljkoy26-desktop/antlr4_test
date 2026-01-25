@@ -5,8 +5,9 @@
 
 
 #include "antlr4-runtime.h"
-#include "MySQLParserBase.h" // <--- ¡Ú¡Ú¡Ú ÀÌ ÁÙÀ» Á÷Á¢ Ãß°¡ÇÏ¼¼¿ä! ¡Ú¡Ú¡Ú
-#include "MySQLParserVisitor.h"
+#include "MySQLParserBase.h"
+// VisitorëŠ” ìˆœí™˜ ì˜ì¡´ì„± ë°©ì§€ë¥¼ ìœ„í•´ ì—¬ê¸°ì„œ í¬í•¨í•˜ì§€ ì•ŠìŒ
+// #include "MySQLParserVisitor.h"
 
 
 namespace antlrcpptest {

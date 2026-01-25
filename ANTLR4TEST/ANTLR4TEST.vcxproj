@@ -116,10 +116,12 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;../vcpkg/installed/x64-windows/include/antlr4-runtime;C:\...\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;$(SolutionDir)x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalDependencies>antlr4-runtime.lib;SqlParserLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -168,12 +170,14 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;../vcpkg/installed/x64-windows/include/antlr4-runtime;C:\...\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\lib;$(SolutionDir)x64\Release</AdditionalLibraryDirectories>
+      <AdditionalDependencies>antlr4-runtime.lib;SqlParserLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
@@ -213,6 +217,11 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="res\ANTLR4TEST.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SqlParserLib\SqlParserLib.vcxproj">
+      <Project>{5b004e7a-8f7d-4a72-b657-ac720ef44d42}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -1,29 +1,23 @@
 #pragma once
 
-// 1. Windows ¸ÅÅ©·Î Ãæµ¹ ¹æÁö
+// 1. Windows ë§¤í¬ë¡œ ì¶©ëŒ ë°©ì§€
 #undef min
 #undef max
 #undef ERROR
 #undef NO_ERROR
 
-// 2. ANTLR ·±Å¸ÀÓ Çì´õ
+// 2. ANTLR ëŸ°íƒ€ì„ í—¤ë”
 #include <antlr4-runtime.h>
 
-// 3. [ÇÙ½É] Àü¹æ ¼±¾ğ (Forward Declaration)
-// ÄÄÆÄÀÏ·¯¿¡°Ô MySQLParser°¡ Å¬·¡½ºÀÓÀ» ¹Ì¸® ¾Ë·Á¼­ Visitor¿ÍÀÇ Ãæµ¹À» ¹æÁöÇÕ´Ï´Ù.
-namespace antlrcpptest {
-    class MySQLParser;
-}
-
-// 4. ºÎ¸ğ Å¬·¡½ºµé (Base Å¬·¡½º)
+// 3. ë¶€ëª¨ í´ë˜ìŠ¤ë“¤ (Base í´ë˜ìŠ¤)
 #include "MySQL/MySQLLexerBase.h"
 #include "MySQL/MySQLParserBase.h"
 
-// 5. ·º¼­¿Í ÆÄ¼­
+// 4. ë ‰ì„œì™€ íŒŒì„œ (ë°˜ë“œì‹œ Parserê°€ Visitorë³´ë‹¤ ë¨¼ì €!)
 #include "MySQL/MySQLLexer.h"
 #include "MySQL/MySQLParser.h"
 
-// 6. ºñÁöÅÍ (ÇÊ¿äÇÑ °æ¿ì¿¡¸¸ Parser µÚ¿¡ À§Ä¡)
-// º¸Åë Parser.h°¡ ³»ºÎÀûÀ¸·Î Visitor¸¦ ÂüÁ¶ÇÏ¹Ç·Î ¿¡·¯°¡ ³ª¸é ¾Æ·¡ ¼ø¼­¸¦ À¯ÁöÇÏ¼¼¿ä.
+// 5. ë¹„ì§€í„° (í•„ìš”í•œ ê²½ìš°ì—ë§Œ Parser ë’¤ì— ìœ„ì¹˜)
+// ì£¼ì˜: Parser.hê°€ ì™„ì „íˆ ì •ì˜ëœ í›„ì—ë§Œ Visitorë¥¼ í¬í•¨í•´ì•¼ í•©ë‹ˆë‹¤.
 #include "MySQL/MySQLParserVisitor.h"
 #include "MySQL/MySQLParserBaseVisitor.h"

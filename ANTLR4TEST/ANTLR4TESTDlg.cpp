@@ -4,63 +4,14 @@
 #include "ANTLR4TESTDlg.h"
 #include "afxdialogex.h"
 
-// 1. 모든 ANTLR 관련 설정은 이 하나로 끝냅니다.
+// 모든 ANTLR 관련 설정은 이 하나로 끝냅니다.
 #include "../Common/Include/AntlrProxy.h"
 
-// 2. 네임스페이스 사용
+// 네임스페이스 사용
 using namespace antlr4;
 using namespace antlrcpptest;
 
-// 3. [주의] DEBUG_NEW는 반드시 ANTLR 헤더들 "아래"에 있어야 합니다.
-#ifdef _DEBUG
-#define new DEBUG_NEW
-#endif
-
-
-
-
-#include "pch.h"
-#include "framework.h"
-#include "ANTLR4TEST.h"
-#include "ANTLR4TESTDlg.h"
-#include "afxdialogex.h"
-
-// #include "AntlrProxy.h"
-
-#include "../Common/Include/AntlrProxy.h"
-
-// =========================================================
-// [중요] Windows 매크로와 ANTLR 충돌 방지
-// 반드시 ANTLR 헤더보다 먼저 해제해야 합니다.
-// =========================================================
-#undef min
-#undef max
-#undef ERROR
-#undef NO_ERROR
-
-//// 1. ANTLR 런타임
-//#include <antlr4-runtime.h>
-//
-//// 2. 부모 클래스들 (Base 클래스)
-//#include "MySQL/MySQLLexerBase.h"
-//#include "MySQL/MySQLParserBase.h"
-//
-//// 3. 렉서와 파서 (반드시 Parser가 Visitor보다 먼저!)
-//#include "MySQL/MySQLLexer.h"
-//#include "MySQL/MySQLParser.h"
-//
-//// 4. 비지터 (필요한 경우에만 Parser 뒤에 위치)
-//#include "MySQL/MySQLParserVisitor.h"
-//#include "MySQL/MySQLParserBaseVisitor.h"
-
-
-
-// 
-// 네임스페이스 사용 (편의상)
-using namespace antlr4;
-using namespace antlrcpptest; // Grammer 변환 시 지정했던 패키지명
-
-
+// [주의] DEBUG_NEW는 반드시 ANTLR 헤더들 "아래"에 있어야 합니다.
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif

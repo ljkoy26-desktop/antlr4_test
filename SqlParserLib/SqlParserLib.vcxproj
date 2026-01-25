@@ -118,7 +118,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Grammars\oracle_gen;$(ProjectDir)..\Grammars\sqlserver_gen;$(ProjectDir)Source\MySQL;$(ProjectDir)..\Grammars\postgres_gen;../vcpkg/installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Grammer\oracle_gen;$(ProjectDir)..\Grammer\sqlserver_gen;$(ProjectDir)Source\MySQL;$(ProjectDir)..\Grammer\postgres_gen;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
@@ -137,7 +137,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Grammars\oracle_gen;$(ProjectDir)..\Grammars\sqlserver_gen;$(ProjectDir)Source\MySQL;$(ProjectDir)..\Grammars\postgres_gen;../vcpkg/installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)..\Grammer\oracle_gen;$(ProjectDir)..\Grammer\sqlserver_gen;$(ProjectDir)Source\MySQL;$(ProjectDir)..\Grammer\postgres_gen;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
