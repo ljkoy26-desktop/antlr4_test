@@ -58,8 +58,8 @@ BOOL CANTLR4TESTDlg::OnInitDialog()
 	}
 
 
-	SetIcon(m_hIcon, TRUE);			// 큰 아이콘을 설정합니다.
-	SetIcon(m_hIcon, FALSE);		// 작은 아이콘을 설정합니다.
+	SetIcon(m_hIcon, TRUE);
+	SetIcon(m_hIcon, FALSE);
 
 	SetDlgItemText(IDC_EDIT_SQL, _T("select* from scott.emp7;"));
 
@@ -101,15 +101,9 @@ HCURSOR CANTLR4TESTDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-
-
 void CANTLR4TESTDlg::OnBnClickedButtonParse()
 {
-
 	// 1. UI에서 SQL 가져오기
-
-
-
 
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
@@ -151,35 +145,20 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 
 		if (errorCount == 0)
 		{
-
-
 			std::string s = tree->toStringTree(&parser);
 			CStringA sTraceA = s.c_str();
 			CString sTrace = (CString)sTraceA;
 
 			AddTraceLog(sTrace);
-
-
-			//GetDlgItem(IDC_EDIT_TRACE)->SetWindowText()
-
-			//SetDlgItemText(IDC_EDIT_TRACE, sTrace);
-			//SetDlgItemText(IDC_EDIT_TRACE, _T("\r\n"));
 		}
 		else
 		{
-
-
 			std::string s = tree->toStringTree(&parser);
 			CStringA sTraceA = s.c_str();
-
-
 
 			CString sTrace;
 			sTrace.Format(_T("파싱 실패..\n오류 개수: %d"), errorCount);
 			AddTraceLog(sTrace);
-
-			//SetDlgItemText(IDC_EDIT_TRACE, sTrace);
-			//SetDlgItemText(IDC_EDIT_TRACE, _T("\r\n"));
 		}
 	}
 	catch (const std::exception& e) {
