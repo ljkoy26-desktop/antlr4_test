@@ -160,6 +160,12 @@
     <ClInclude Include="Source\MySQL\MySQLParserVisitor.h" />
     <ClInclude Include="Source\MySQL\SqlMode.h" />
     <ClInclude Include="Source\MySQL\SqlModes.h" />
+    <ClInclude Include="Source\Oracle\PlSqlLexer.h" />
+    <ClInclude Include="Source\Oracle\PlSqlLexerBase.h" />
+    <ClInclude Include="Source\Oracle\PlSqlParser.h" />
+    <ClInclude Include="Source\Oracle\PlSqlParserBase.h" />
+    <ClInclude Include="Source\Oracle\PlSqlParserBaseVisitor.h" />
+    <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp" />
@@ -169,6 +175,10 @@
     <ClCompile Include="Source\MySQL\MySQLParserBaseVisitor.cpp" />
     <ClCompile Include="Source\MySQL\MySQLParserVisitor.cpp" />
     <ClCompile Include="Source\MySQL\SqlModes.cpp" />
+    <ClCompile Include="Source\Oracle\PlSqlLexer.cpp" />
+    <ClCompile Include="Source\Oracle\PlSqlParser.cpp" />
+    <ClCompile Include="Source\Oracle\PlSqlParserBaseVisitor.cpp" />
+    <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\MySQL\MySQLLexer.interp" />
@@ -176,6 +186,14 @@
     <None Include="Source\MySQL\MySQLParser.interp" />
     <None Include="Source\MySQL\MySQLParser.tokens" />
     <None Include="Source\MySQL\transformGrammar.py" />
+    <None Include="Source\Oracle\PlSqlLexer.interp" />
+    <None Include="Source\Oracle\PlSqlLexer.tokens" />
+    <None Include="Source\Oracle\PlSqlParser.interp" />
+    <None Include="Source\Oracle\PlSqlParser.tokens" />
+    <None Include="Source\Oracle\transformGrammar.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Source\Oracle\st.CMakeLists.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

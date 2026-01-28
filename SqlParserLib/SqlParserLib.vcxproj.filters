@@ -54,6 +54,24 @@
     <ClInclude Include="Source\MySQL\SqlModes.h">
       <Filter>MySQL</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlLexer.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlLexerBase.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParser.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserBase.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserBaseVisitor.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp">
@@ -77,6 +95,18 @@
     <ClCompile Include="Source\MySQL\SqlModes.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlLexer.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParser.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParserBaseVisitor.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\MySQL\MySQLLexer.interp">
@@ -94,5 +124,25 @@
     <None Include="Source\MySQL\transformGrammar.py">
       <Filter>MySQL</Filter>
     </None>
+    <None Include="Source\Oracle\PlSqlLexer.interp">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlLexer.tokens">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlParser.interp">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlParser.tokens">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\transformGrammar.py">
+      <Filter>Oracle</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="Source\Oracle\st.CMakeLists.txt">
+      <Filter>Oracle</Filter>
+    </Text>
   </ItemGroup>
 </Project>
