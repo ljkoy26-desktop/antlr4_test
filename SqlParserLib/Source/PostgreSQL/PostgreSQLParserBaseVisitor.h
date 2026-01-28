@@ -8,8 +8,6 @@
 #include "PostgreSQLParserVisitor.h"
 
 
-namespace antlrcpptest {
-
 /**
  * This class provides an empty implementation of PostgreSQLParserVisitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
@@ -2916,4 +2914,3 @@ public:
 
 };
 
-}  // namespace antlrcpptest

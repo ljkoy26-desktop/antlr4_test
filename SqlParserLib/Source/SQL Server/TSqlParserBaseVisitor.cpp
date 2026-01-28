@@ -5,5 +5,3 @@
 #include "TSqlParserBaseVisitor.h"
 
 
-using namespace antlrcpptest;
-

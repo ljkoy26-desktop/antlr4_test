@@ -7,7 +7,6 @@
 #include "antlr4-runtime.h"
 
 
-namespace antlrcpptest {
 
 
 class  TSqlParser : public antlr4::Parser {
@@ -19639,4 +19638,3 @@ public:
 private:
 };
 
-}  // namespace antlrcpptest

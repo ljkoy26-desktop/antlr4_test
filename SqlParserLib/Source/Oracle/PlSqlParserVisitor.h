@@ -8,7 +8,6 @@
 #include "PlSqlParser.h"
 
 
-namespace antlrcpptest {
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -2439,4 +2438,3 @@ public:
 
 };
 
-}  // namespace antlrcpptest

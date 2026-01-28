@@ -5,5 +5,3 @@
 #include "PlSqlParserVisitor.h"
 
 
-using namespace antlrcpptest;
-

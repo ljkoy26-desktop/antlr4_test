@@ -7,7 +7,6 @@
 #include "antlr4-runtime.h"
 
 
-namespace antlrcpptest {
 
 
 class  TSqlLexer : public antlr4::Lexer {
@@ -322,4 +321,3 @@ private:
 
 };
 
-}  // namespace antlrcpptest

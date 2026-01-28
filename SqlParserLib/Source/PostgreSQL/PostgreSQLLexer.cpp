@@ -7,7 +7,6 @@
 
 using namespace antlr4;
 
-using namespace antlrcpptest;
 
 
 using namespace antlr4;

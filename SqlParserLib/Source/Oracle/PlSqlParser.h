@@ -7,7 +7,6 @@
 #include "antlr4-runtime.h"
 
 
-namespace antlrcpptest {
 
 
 class  PlSqlParser : public PlSqlParserBase {
@@ -29975,4 +29974,3 @@ public:
 private:
 };
 
-}  // namespace antlrcpptest

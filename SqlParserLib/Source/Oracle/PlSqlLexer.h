@@ -7,7 +7,6 @@
 #include "antlr4-runtime.h"
 
 
-namespace antlrcpptest {
 
 
 class  PlSqlLexer : public PlSqlLexerBase {
@@ -652,4 +651,3 @@ private:
 
 };
 
-}  // namespace antlrcpptest
