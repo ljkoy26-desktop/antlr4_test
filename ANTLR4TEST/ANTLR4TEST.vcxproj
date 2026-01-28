@@ -116,7 +116,7 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -174,7 +174,7 @@
       <PreprocessorDefinitions>_WINDOWS;NDEBUG;NOMINMAX;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)vcpkg\installed\x64-windows\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
