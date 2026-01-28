@@ -13,13 +13,11 @@
 #include <queue>
 
 /** The base lexer class provides a number of functions needed in actions in the lexer (grammar). */
-namespace antlrcpptest
+class MySQLLexerBase : public antlr4::Lexer
 {
-    class MySQLLexerBase : public antlr4::Lexer
-    {
 
     public:
-        MySQLLexerBase(antlr4::CharStream* input);
+        MySQLLexerBase(antlr4::CharStream * input);
         int serverVersion;
         std::set<SqlMode> sqlModes;
 
@@ -56,7 +54,7 @@ namespace antlrcpptest
         bool isSqlModeActive(SqlMode mode);
         void reset();
         std::unique_ptr<antlr4::Token> nextToken() override;
-        antlr4::Token* emit() override;
+        antlr4::Token * emit() override;
 
     protected:
         bool checkMySQLVersion(std::string text);
@@ -129,5 +127,4 @@ namespace antlrcpptest
         void startInVersionComment();
         void endInVersionComment();
         bool isInVersionComment();
-    };
-}
+};

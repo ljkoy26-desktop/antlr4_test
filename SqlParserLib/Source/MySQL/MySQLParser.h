@@ -6,11 +6,7 @@
 
 #include "antlr4-runtime.h"
 #include "MySQLParserBase.h"
-// Visitor는 순환 의존성 방지를 위해 여기서 포함하지 않음
-// #include "MySQLParserVisitor.h"
 
-
-namespace antlrcpptest {
 
 
 class  MySQLParser : public MySQLParserBase {
@@ -15833,4 +15829,3 @@ public:
 private:
 };
 
-}  // namespace antlrcpptest

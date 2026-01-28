@@ -5,5 +5,3 @@
 #include "MySQLParserBaseVisitor.h"
 
 
-using namespace antlrcpptest;
-

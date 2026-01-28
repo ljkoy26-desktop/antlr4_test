@@ -5,12 +5,10 @@
 
 
 #include "antlr4-runtime.h"
-#include "MySQLLexerBase.h" // <--- ★★★ 이 줄을 직접 추가하세요! ★★★
+#include "MySQLLexerBase.h"
 
 
-namespace antlrcpptest {
 
-    
 class  MySQLLexer : public MySQLLexerBase {
 public:
   enum {
@@ -460,4 +458,3 @@ private:
 
 };
 
-}  // namespace antlrcpptest
