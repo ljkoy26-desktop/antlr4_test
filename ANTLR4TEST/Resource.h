@@ -10,6 +10,8 @@
 #define IDC_BUTTON_PARSE                1001
 #define IDC_EDIT_TRACE                  1002
 #define IDC_BUTTON_TYPE                 1003
+#define IDC_BUTTON_MULTI                1004
+#define IDC_BUTTON_TOKEN                1005
 
 // Next default values for new objects
 // 
