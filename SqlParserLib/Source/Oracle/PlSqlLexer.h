@@ -5,9 +5,7 @@
 
 
 #include "antlr4-runtime.h"
-
-
-
+#include "PlSqlLexerBase.h"
 
 class  PlSqlLexer : public PlSqlLexerBase {
 public:

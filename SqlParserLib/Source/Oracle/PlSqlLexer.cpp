@@ -14042,7 +14042,7 @@ bool PlSqlLexer::sempred(RuleContext *context, size_t ruleIndex, size_t predicat
 
 bool PlSqlLexer::REMARK_COMMENTSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 0: return this.IsNewlineAtPos(-4);
+    case 0: return this->IsNewlineAtPos(-4);
 
   default:
     break;
@@ -14052,7 +14052,7 @@ bool PlSqlLexer::REMARK_COMMENTSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool PlSqlLexer::PROMPT_MESSAGESempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 1: return this.IsNewlineAtPos(-4);
+    case 1: return this->IsNewlineAtPos(-4);
 
   default:
     break;

@@ -3,7 +3,7 @@
 
 
 #include "MySQLLexer.h"
-
+#include "MySQLLexerBase.h"
 
 using namespace antlr4;
 
@@ -4546,7 +4546,7 @@ bool MySQLLexer::sempred(RuleContext *context, size_t ruleIndex, size_t predicat
 
 void MySQLLexer::LOGICAL_OR_OPERATORAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 0:  this.doLogicalOr();  break;
+    case 0:  this->doLogicalOr();  break;
 
   default:
     break;
@@ -4555,7 +4555,7 @@ void MySQLLexer::LOGICAL_OR_OPERATORAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::INT_NUMBERAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 1:  this.doIntNumber();  break;
+    case 1:  this->doIntNumber();  break;
 
   default:
     break;
@@ -4564,7 +4564,7 @@ void MySQLLexer::INT_NUMBERAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::DOT_IDENTIFIERAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 2:  this.emitDot();  break;
+    case 2:  this->emitDot();  break;
 
   default:
     break;
@@ -4573,7 +4573,7 @@ void MySQLLexer::DOT_IDENTIFIERAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::ADDDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 3:  this.doAdddate();  break;
+    case 3:  this->doAdddate();  break;
 
   default:
     break;
@@ -4582,7 +4582,7 @@ void MySQLLexer::ADDDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::BIT_AND_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 4:  this.doBitAnd();  break;
+    case 4:  this->doBitAnd();  break;
 
   default:
     break;
@@ -4591,7 +4591,7 @@ void MySQLLexer::BIT_AND_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::BIT_OR_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 5:  this.doBitOr();  break;
+    case 5:  this->doBitOr();  break;
 
   default:
     break;
@@ -4600,7 +4600,7 @@ void MySQLLexer::BIT_OR_SYMBOLAction(antlr4::RuleContext *context, size_t action
 
 void MySQLLexer::BIT_XOR_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 6:  this.doBitXor();  break;
+    case 6:  this->doBitXor();  break;
 
   default:
     break;
@@ -4609,7 +4609,7 @@ void MySQLLexer::BIT_XOR_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::CAST_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 7:  this.doCast();  break;
+    case 7:  this->doCast();  break;
 
   default:
     break;
@@ -4618,7 +4618,7 @@ void MySQLLexer::CAST_SYMBOLAction(antlr4::RuleContext *context, size_t actionIn
 
 void MySQLLexer::COUNT_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 8:  this.doCount();  break;
+    case 8:  this->doCount();  break;
 
   default:
     break;
@@ -4627,7 +4627,7 @@ void MySQLLexer::COUNT_SYMBOLAction(antlr4::RuleContext *context, size_t actionI
 
 void MySQLLexer::CURDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 9:  this.doCurdate();  break;
+    case 9:  this->doCurdate();  break;
 
   default:
     break;
@@ -4636,7 +4636,7 @@ void MySQLLexer::CURDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::CURRENT_DATE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 10:  this.doCurrentDate();  break;
+    case 10:  this->doCurrentDate();  break;
 
   default:
     break;
@@ -4645,7 +4645,7 @@ void MySQLLexer::CURRENT_DATE_SYMBOLAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::CURRENT_TIME_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 11:  this.doCurrentTime();  break;
+    case 11:  this->doCurrentTime();  break;
 
   default:
     break;
@@ -4654,7 +4654,7 @@ void MySQLLexer::CURRENT_TIME_SYMBOLAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::CURTIME_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 12:  this.doCurtime();  break;
+    case 12:  this->doCurtime();  break;
 
   default:
     break;
@@ -4663,7 +4663,7 @@ void MySQLLexer::CURTIME_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::DATE_ADD_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 13:  this.doDateAdd();  break;
+    case 13:  this->doDateAdd();  break;
 
   default:
     break;
@@ -4672,7 +4672,7 @@ void MySQLLexer::DATE_ADD_SYMBOLAction(antlr4::RuleContext *context, size_t acti
 
 void MySQLLexer::DATE_SUB_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 14:  this.doDateSub();  break;
+    case 14:  this->doDateSub();  break;
 
   default:
     break;
@@ -4681,7 +4681,7 @@ void MySQLLexer::DATE_SUB_SYMBOLAction(antlr4::RuleContext *context, size_t acti
 
 void MySQLLexer::EXTRACT_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 15:  this.doExtract();  break;
+    case 15:  this->doExtract();  break;
 
   default:
     break;
@@ -4690,7 +4690,7 @@ void MySQLLexer::EXTRACT_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::GROUP_CONCAT_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 16:  this.doGroupConcat();  break;
+    case 16:  this->doGroupConcat();  break;
 
   default:
     break;
@@ -4699,7 +4699,7 @@ void MySQLLexer::GROUP_CONCAT_SYMBOLAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::MAX_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 17:  this.doMax();  break;
+    case 17:  this->doMax();  break;
 
   default:
     break;
@@ -4708,7 +4708,7 @@ void MySQLLexer::MAX_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::MID_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 18:  this.doMid();  break;
+    case 18:  this->doMid();  break;
 
   default:
     break;
@@ -4717,7 +4717,7 @@ void MySQLLexer::MID_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::MIN_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 19:  this.doMin();  break;
+    case 19:  this->doMin();  break;
 
   default:
     break;
@@ -4726,7 +4726,7 @@ void MySQLLexer::MIN_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::NOT_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 20:  this.doNot();  break;
+    case 20:  this->doNot();  break;
 
   default:
     break;
@@ -4735,7 +4735,7 @@ void MySQLLexer::NOT_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::NOW_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 21:  this.doNow();  break;
+    case 21:  this->doNow();  break;
 
   default:
     break;
@@ -4744,7 +4744,7 @@ void MySQLLexer::NOW_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::POSITION_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 22:  this.doPosition();  break;
+    case 22:  this->doPosition();  break;
 
   default:
     break;
@@ -4753,7 +4753,7 @@ void MySQLLexer::POSITION_SYMBOLAction(antlr4::RuleContext *context, size_t acti
 
 void MySQLLexer::SESSION_USER_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 23:  this.doSessionUser();  break;
+    case 23:  this->doSessionUser();  break;
 
   default:
     break;
@@ -4762,7 +4762,7 @@ void MySQLLexer::SESSION_USER_SYMBOLAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::STDDEV_SAMP_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 24:  this.doStddevSamp();  break;
+    case 24:  this->doStddevSamp();  break;
 
   default:
     break;
@@ -4771,7 +4771,7 @@ void MySQLLexer::STDDEV_SAMP_SYMBOLAction(antlr4::RuleContext *context, size_t a
 
 void MySQLLexer::STDDEV_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 25:  this.doStddev();  break;
+    case 25:  this->doStddev();  break;
 
   default:
     break;
@@ -4780,7 +4780,7 @@ void MySQLLexer::STDDEV_SYMBOLAction(antlr4::RuleContext *context, size_t action
 
 void MySQLLexer::STDDEV_POP_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 26:  this.doStddevPop();  break;
+    case 26:  this->doStddevPop();  break;
 
   default:
     break;
@@ -4789,7 +4789,7 @@ void MySQLLexer::STDDEV_POP_SYMBOLAction(antlr4::RuleContext *context, size_t ac
 
 void MySQLLexer::STD_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 27:  this.doStd();  break;
+    case 27:  this->doStd();  break;
 
   default:
     break;
@@ -4798,7 +4798,7 @@ void MySQLLexer::STD_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::SUBDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 28:  this.doSubdate();  break;
+    case 28:  this->doSubdate();  break;
 
   default:
     break;
@@ -4807,7 +4807,7 @@ void MySQLLexer::SUBDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::SUBSTR_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 29:  this.doSubstr();  break;
+    case 29:  this->doSubstr();  break;
 
   default:
     break;
@@ -4816,7 +4816,7 @@ void MySQLLexer::SUBSTR_SYMBOLAction(antlr4::RuleContext *context, size_t action
 
 void MySQLLexer::SUBSTRING_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 30:  this.doSubstring();  break;
+    case 30:  this->doSubstring();  break;
 
   default:
     break;
@@ -4825,7 +4825,7 @@ void MySQLLexer::SUBSTRING_SYMBOLAction(antlr4::RuleContext *context, size_t act
 
 void MySQLLexer::SUM_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 31:  this.doSum();  break;
+    case 31:  this->doSum();  break;
 
   default:
     break;
@@ -4834,7 +4834,7 @@ void MySQLLexer::SUM_SYMBOLAction(antlr4::RuleContext *context, size_t actionInd
 
 void MySQLLexer::SYSDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 32:  this.doSysdate();  break;
+    case 32:  this->doSysdate();  break;
 
   default:
     break;
@@ -4843,7 +4843,7 @@ void MySQLLexer::SYSDATE_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::SYSTEM_USER_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 33:  this.doSystemUser();  break;
+    case 33:  this->doSystemUser();  break;
 
   default:
     break;
@@ -4852,7 +4852,7 @@ void MySQLLexer::SYSTEM_USER_SYMBOLAction(antlr4::RuleContext *context, size_t a
 
 void MySQLLexer::TRIM_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 34:  this.doTrim();  break;
+    case 34:  this->doTrim();  break;
 
   default:
     break;
@@ -4861,7 +4861,7 @@ void MySQLLexer::TRIM_SYMBOLAction(antlr4::RuleContext *context, size_t actionIn
 
 void MySQLLexer::VARIANCE_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 35:  this.doVariance();  break;
+    case 35:  this->doVariance();  break;
 
   default:
     break;
@@ -4870,7 +4870,7 @@ void MySQLLexer::VARIANCE_SYMBOLAction(antlr4::RuleContext *context, size_t acti
 
 void MySQLLexer::VAR_POP_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 36:  this.doVarPop();  break;
+    case 36:  this->doVarPop();  break;
 
   default:
     break;
@@ -4879,7 +4879,7 @@ void MySQLLexer::VAR_POP_SYMBOLAction(antlr4::RuleContext *context, size_t actio
 
 void MySQLLexer::VAR_SAMP_SYMBOLAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 37:  this.doVarSamp();  break;
+    case 37:  this->doVarSamp();  break;
 
   default:
     break;
@@ -4888,7 +4888,7 @@ void MySQLLexer::VAR_SAMP_SYMBOLAction(antlr4::RuleContext *context, size_t acti
 
 void MySQLLexer::UNDERSCORE_CHARSETAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 38:  this.doUnderscoreCharset();  break;
+    case 38:  this->doUnderscoreCharset();  break;
 
   default:
     break;
@@ -4897,7 +4897,7 @@ void MySQLLexer::UNDERSCORE_CHARSETAction(antlr4::RuleContext *context, size_t a
 
 void MySQLLexer::MYSQL_COMMENT_STARTAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 39:  this.startInVersionComment();  break;
+    case 39:  this->startInVersionComment();  break;
 
   default:
     break;
@@ -4906,7 +4906,7 @@ void MySQLLexer::MYSQL_COMMENT_STARTAction(antlr4::RuleContext *context, size_t 
 
 void MySQLLexer::VERSION_COMMENT_ENDAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 40:  this.endInVersionComment();  break;
+    case 40:  this->endInVersionComment();  break;
 
   default:
     break;
@@ -4916,7 +4916,7 @@ void MySQLLexer::VERSION_COMMENT_ENDAction(antlr4::RuleContext *context, size_t 
 
 bool MySQLLexer::MASTER_AUTO_POSITION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 0: return this.isServerVersionLt80024();
+    case 0: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4926,7 +4926,7 @@ bool MySQLLexer::MASTER_AUTO_POSITION_SYMBOLSempred(antlr4::RuleContext *_localc
 
 bool MySQLLexer::MASTER_BIND_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 1: return this.isServerVersionLt80024();
+    case 1: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4936,7 +4936,7 @@ bool MySQLLexer::MASTER_BIND_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::MASTER_CONNECT_RETRY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 2: return this.isServerVersionLt80024();
+    case 2: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4946,7 +4946,7 @@ bool MySQLLexer::MASTER_CONNECT_RETRY_SYMBOLSempred(antlr4::RuleContext *_localc
 
 bool MySQLLexer::MASTER_DELAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 3: return this.isServerVersionLt80024();
+    case 3: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4956,7 +4956,7 @@ bool MySQLLexer::MASTER_DELAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size
 
 bool MySQLLexer::MASTER_HOST_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 4: return this.isServerVersionLt80024();
+    case 4: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4966,7 +4966,7 @@ bool MySQLLexer::MASTER_HOST_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::MASTER_LOG_FILE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 5: return this.isServerVersionLt80024();
+    case 5: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4976,7 +4976,7 @@ bool MySQLLexer::MASTER_LOG_FILE_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::MASTER_LOG_POS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 6: return this.isServerVersionLt80024();
+    case 6: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4986,7 +4986,7 @@ bool MySQLLexer::MASTER_LOG_POS_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::MASTER_PASSWORD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 7: return this.isServerVersionLt80024();
+    case 7: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -4996,7 +4996,7 @@ bool MySQLLexer::MASTER_PASSWORD_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::MASTER_PORT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 8: return this.isServerVersionLt80024();
+    case 8: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5006,7 +5006,7 @@ bool MySQLLexer::MASTER_PORT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::MASTER_RETRY_COUNT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 9: return this.isServerVersionLt80024();
+    case 9: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5016,7 +5016,7 @@ bool MySQLLexer::MASTER_RETRY_COUNT_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::MASTER_SSL_CAPATH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 10: return this.isServerVersionLt80024();
+    case 10: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5026,7 +5026,7 @@ bool MySQLLexer::MASTER_SSL_CAPATH_SYMBOLSempred(antlr4::RuleContext *_localctx,
 
 bool MySQLLexer::MASTER_SSL_CA_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 11: return this.isServerVersionLt80024();
+    case 11: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5036,7 +5036,7 @@ bool MySQLLexer::MASTER_SSL_CA_SYMBOLSempred(antlr4::RuleContext *_localctx, siz
 
 bool MySQLLexer::MASTER_SSL_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 12: return this.isServerVersionLt80024();
+    case 12: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5046,7 +5046,7 @@ bool MySQLLexer::MASTER_SSL_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::MASTER_SSL_CIPHER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 13: return this.isServerVersionLt80024();
+    case 13: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5056,7 +5056,7 @@ bool MySQLLexer::MASTER_SSL_CIPHER_SYMBOLSempred(antlr4::RuleContext *_localctx,
 
 bool MySQLLexer::MASTER_SSL_CRL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 14: return this.isServerVersionLt80024();
+    case 14: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5066,7 +5066,7 @@ bool MySQLLexer::MASTER_SSL_CRL_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::MASTER_SSL_CRLPATH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 15: return this.isServerVersionLt80024();
+    case 15: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5076,7 +5076,7 @@ bool MySQLLexer::MASTER_SSL_CRLPATH_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::MASTER_SSL_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 16: return this.isServerVersionLt80024();
+    case 16: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5086,7 +5086,7 @@ bool MySQLLexer::MASTER_SSL_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::MASTER_SSL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 17: return this.isServerVersionLt80024();
+    case 17: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5096,7 +5096,7 @@ bool MySQLLexer::MASTER_SSL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::MASTER_SSL_VERIFY_SERVER_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 18: return this.isServerVersionLt80024();
+    case 18: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5106,7 +5106,7 @@ bool MySQLLexer::MASTER_SSL_VERIFY_SERVER_CERT_SYMBOLSempred(antlr4::RuleContext
 
 bool MySQLLexer::MASTER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 19: return this.isServerVersionLt80024();
+    case 19: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5116,7 +5116,7 @@ bool MySQLLexer::MASTER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::MASTER_TLS_VERSION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 20: return this.isServerVersionLt80024();
+    case 20: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5126,7 +5126,7 @@ bool MySQLLexer::MASTER_TLS_VERSION_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::MASTER_USER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 21: return this.isServerVersionLt80024();
+    case 21: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5136,7 +5136,7 @@ bool MySQLLexer::MASTER_USER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::MASTER_HEARTBEAT_PERIOD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 22: return this.isServerVersionLt80024();
+    case 22: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5146,7 +5146,7 @@ bool MySQLLexer::MASTER_HEARTBEAT_PERIOD_SYMBOLSempred(antlr4::RuleContext *_loc
 
 bool MySQLLexer::UDF_RETURNS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 23: return this.isServerVersionLt80031();
+    case 23: return this->isServerVersionLt80031();
 
   default:
     break;
@@ -5156,7 +5156,7 @@ bool MySQLLexer::UDF_RETURNS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::REMOTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 24: return this.isServerVersionLt80014();
+    case 24: return this->isServerVersionLt80014();
 
   default:
     break;
@@ -5166,7 +5166,7 @@ bool MySQLLexer::REMOTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::GET_MASTER_PUBLIC_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 25: return this.isServerVersionLt80024();
+    case 25: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -5176,7 +5176,7 @@ bool MySQLLexer::GET_MASTER_PUBLIC_KEY_SYMBOLSempred(antlr4::RuleContext *_local
 
 bool MySQLLexer::RESTART_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 26: return this.isServerVersionGe80011();
+    case 26: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -5186,7 +5186,7 @@ bool MySQLLexer::RESTART_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::DEFINITION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 27: return this.isServerVersionGe80011();
+    case 27: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -5196,7 +5196,7 @@ bool MySQLLexer::DEFINITION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::DESCRIPTION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 28: return this.isServerVersionGe80011();
+    case 28: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -5206,7 +5206,7 @@ bool MySQLLexer::DESCRIPTION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::ORGANIZATION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 29: return this.isServerVersionGe80011();
+    case 29: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -5216,7 +5216,7 @@ bool MySQLLexer::ORGANIZATION_SYMBOLSempred(antlr4::RuleContext *_localctx, size
 
 bool MySQLLexer::REFERENCE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 30: return this.isServerVersionGe80011();
+    case 30: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -5226,7 +5226,7 @@ bool MySQLLexer::REFERENCE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::OPTIONAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 31: return this.isServerVersionGe80013();
+    case 31: return this->isServerVersionGe80013();
 
   default:
     break;
@@ -5236,7 +5236,7 @@ bool MySQLLexer::OPTIONAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::SECONDARY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 32: return this.isServerVersionGe80016();
+    case 32: return this->isServerVersionGe80016();
 
   default:
     break;
@@ -5246,7 +5246,7 @@ bool MySQLLexer::SECONDARY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::SECONDARY_ENGINE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 33: return this.isServerVersionGe80013();
+    case 33: return this->isServerVersionGe80013();
 
   default:
     break;
@@ -5256,7 +5256,7 @@ bool MySQLLexer::SECONDARY_ENGINE_SYMBOLSempred(antlr4::RuleContext *_localctx, 
 
 bool MySQLLexer::SECONDARY_LOAD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 34: return this.isServerVersionGe80013();
+    case 34: return this->isServerVersionGe80013();
 
   default:
     break;
@@ -5266,7 +5266,7 @@ bool MySQLLexer::SECONDARY_LOAD_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::SECONDARY_UNLOAD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 35: return this.isServerVersionGe80013();
+    case 35: return this->isServerVersionGe80013();
 
   default:
     break;
@@ -5276,7 +5276,7 @@ bool MySQLLexer::SECONDARY_UNLOAD_SYMBOLSempred(antlr4::RuleContext *_localctx, 
 
 bool MySQLLexer::ACTIVE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 36: return this.isServerVersionGe80014();
+    case 36: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -5286,7 +5286,7 @@ bool MySQLLexer::ACTIVE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::INACTIVE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 37: return this.isServerVersionGe80014();
+    case 37: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -5296,7 +5296,7 @@ bool MySQLLexer::INACTIVE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::LATERAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 38: return this.isServerVersionGe80014();
+    case 38: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -5306,7 +5306,7 @@ bool MySQLLexer::LATERAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::RETAIN_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 39: return this.isServerVersionGe80014();
+    case 39: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -5316,7 +5316,7 @@ bool MySQLLexer::RETAIN_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::OLD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 40: return this.isServerVersionGe80014();
+    case 40: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -5326,7 +5326,7 @@ bool MySQLLexer::OLD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predic
 
 bool MySQLLexer::NETWORK_NAMESPACE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 41: return this.isServerVersionGe80017();
+    case 41: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -5336,7 +5336,7 @@ bool MySQLLexer::NETWORK_NAMESPACE_SYMBOLSempred(antlr4::RuleContext *_localctx,
 
 bool MySQLLexer::ENFORCED_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 42: return this.isServerVersionGe80017();
+    case 42: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -5346,7 +5346,7 @@ bool MySQLLexer::ENFORCED_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::ARRAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 43: return this.isServerVersionGe80017();
+    case 43: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -5356,7 +5356,7 @@ bool MySQLLexer::ARRAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pred
 
 bool MySQLLexer::OJ_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 44: return this.isServerVersionGe80017();
+    case 44: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -5366,7 +5366,7 @@ bool MySQLLexer::OJ_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predica
 
 bool MySQLLexer::MEMBER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 45: return this.isServerVersionGe80017();
+    case 45: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -5376,7 +5376,7 @@ bool MySQLLexer::MEMBER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::RANDOM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 46: return this.isServerVersionGe80018();
+    case 46: return this->isServerVersionGe80018();
 
   default:
     break;
@@ -5386,7 +5386,7 @@ bool MySQLLexer::RANDOM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::MASTER_COMPRESSION_ALGORITHM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 47: return this.isMasterCompressionAlgorithm();
+    case 47: return this->isMasterCompressionAlgorithm();
 
   default:
     break;
@@ -5396,7 +5396,7 @@ bool MySQLLexer::MASTER_COMPRESSION_ALGORITHM_SYMBOLSempred(antlr4::RuleContext 
 
 bool MySQLLexer::MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 48: return this.serverVersion >= 80018;
+    case 48: return this->serverVersion >= 80018;
 
   default:
     break;
@@ -5406,7 +5406,7 @@ bool MySQLLexer::MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOLSempred(antlr4::RuleContext
 
 bool MySQLLexer::PRIVILEGE_CHECKS_USER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 49: return this.serverVersion >= 80018;
+    case 49: return this->serverVersion >= 80018;
 
   default:
     break;
@@ -5416,7 +5416,7 @@ bool MySQLLexer::PRIVILEGE_CHECKS_USER_SYMBOLSempred(antlr4::RuleContext *_local
 
 bool MySQLLexer::MASTER_TLS_CIPHERSUITES_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 50: return this.serverVersion >= 80018;
+    case 50: return this->serverVersion >= 80018;
 
   default:
     break;
@@ -5426,7 +5426,7 @@ bool MySQLLexer::MASTER_TLS_CIPHERSUITES_SYMBOLSempred(antlr4::RuleContext *_loc
 
 bool MySQLLexer::REQUIRE_ROW_FORMAT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 51: return this.serverVersion >= 80019;
+    case 51: return this->serverVersion >= 80019;
 
   default:
     break;
@@ -5436,7 +5436,7 @@ bool MySQLLexer::REQUIRE_ROW_FORMAT_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::PASSWORD_LOCK_TIME_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 52: return this.serverVersion >= 80019;
+    case 52: return this->serverVersion >= 80019;
 
   default:
     break;
@@ -5446,7 +5446,7 @@ bool MySQLLexer::PASSWORD_LOCK_TIME_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::FAILED_LOGIN_ATTEMPTS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 53: return this.serverVersion >= 80019;
+    case 53: return this->serverVersion >= 80019;
 
   default:
     break;
@@ -5456,7 +5456,7 @@ bool MySQLLexer::FAILED_LOGIN_ATTEMPTS_SYMBOLSempred(antlr4::RuleContext *_local
 
 bool MySQLLexer::REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 54: return this.serverVersion >= 80019;
+    case 54: return this->serverVersion >= 80019;
 
   default:
     break;
@@ -5466,7 +5466,7 @@ bool MySQLLexer::REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOLSempred(antlr4::RuleConte
 
 bool MySQLLexer::STREAM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 55: return this.serverVersion >= 80020;
+    case 55: return this->serverVersion >= 80020;
 
   default:
     break;
@@ -5476,7 +5476,7 @@ bool MySQLLexer::STREAM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::OFF_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 56: return this.serverVersion >= 80019;
+    case 56: return this->serverVersion >= 80019;
 
   default:
     break;
@@ -5486,7 +5486,7 @@ bool MySQLLexer::OFF_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predic
 
 bool MySQLLexer::RETURNING_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 57: return this.isServerVersionGe80021();
+    case 57: return this->isServerVersionGe80021();
 
   default:
     break;
@@ -5496,7 +5496,7 @@ bool MySQLLexer::RETURNING_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::JSON_VALUE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 58: return this.isServerVersionGe80024();
+    case 58: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5506,7 +5506,7 @@ bool MySQLLexer::JSON_VALUE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::TLS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 59: return this.isServerVersionGe80021();
+    case 59: return this->isServerVersionGe80021();
 
   default:
     break;
@@ -5516,7 +5516,7 @@ bool MySQLLexer::TLS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predic
 
 bool MySQLLexer::ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 60: return this.isServerVersionGe80024();
+    case 60: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5526,7 +5526,7 @@ bool MySQLLexer::ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::ENGINE_ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 61: return this.isServerVersionGe80024();
+    case 61: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5536,7 +5536,7 @@ bool MySQLLexer::ENGINE_ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_localctx, 
 
 bool MySQLLexer::SECONDARY_ENGINE_ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 62: return this.isServerVersionGe80024();
+    case 62: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5546,7 +5546,7 @@ bool MySQLLexer::SECONDARY_ENGINE_ATTRIBUTE_SYMBOLSempred(antlr4::RuleContext *_
 
 bool MySQLLexer::SOURCE_CONNECTION_AUTO_FAILOVER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 63: return this.isServerVersionGe80024();
+    case 63: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5556,7 +5556,7 @@ bool MySQLLexer::SOURCE_CONNECTION_AUTO_FAILOVER_SYMBOLSempred(antlr4::RuleConte
 
 bool MySQLLexer::ZONE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 64: return this.isServerVersionGe80022();
+    case 64: return this->isServerVersionGe80022();
 
   default:
     break;
@@ -5566,7 +5566,7 @@ bool MySQLLexer::ZONE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predi
 
 bool MySQLLexer::GRAMMAR_SELECTOR_DERIVED_EXPRSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 65: return this.isServerVersionGe80024();
+    case 65: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5576,7 +5576,7 @@ bool MySQLLexer::GRAMMAR_SELECTOR_DERIVED_EXPRSempred(antlr4::RuleContext *_loca
 
 bool MySQLLexer::REPLICA_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 66: return this.isServerVersionGe80022();
+    case 66: return this->isServerVersionGe80022();
 
   default:
     break;
@@ -5586,7 +5586,7 @@ bool MySQLLexer::REPLICA_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::REPLICAS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 67: return this.isServerVersionGe80022();
+    case 67: return this->isServerVersionGe80022();
 
   default:
     break;
@@ -5596,7 +5596,7 @@ bool MySQLLexer::REPLICAS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 68: return this.isServerVersionGe80024();
+    case 68: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5606,7 +5606,7 @@ bool MySQLLexer::ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS_SYMBOLSempred(antlr4::Ru
 
 bool MySQLLexer::GET_SOURCE_PUBLIC_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 69: return this.isServerVersionGe80024();
+    case 69: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -5616,7 +5616,7 @@ bool MySQLLexer::GET_SOURCE_PUBLIC_KEY_SYMBOLSempred(antlr4::RuleContext *_local
 
 bool MySQLLexer::SOURCE_AUTO_POSITION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 70: return this.isServerVersionGe80023();
+    case 70: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5626,7 +5626,7 @@ bool MySQLLexer::SOURCE_AUTO_POSITION_SYMBOLSempred(antlr4::RuleContext *_localc
 
 bool MySQLLexer::SOURCE_BIND_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 71: return this.isServerVersionGe80023();
+    case 71: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5636,7 +5636,7 @@ bool MySQLLexer::SOURCE_BIND_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::SOURCE_COMPRESSION_ALGORITHM_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 72: return this.isServerVersionGe80023();
+    case 72: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5646,7 +5646,7 @@ bool MySQLLexer::SOURCE_COMPRESSION_ALGORITHM_SYMBOLSempred(antlr4::RuleContext 
 
 bool MySQLLexer::SOURCE_CONNECT_RETRY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 73: return this.isServerVersionGe80023();
+    case 73: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5656,7 +5656,7 @@ bool MySQLLexer::SOURCE_CONNECT_RETRY_SYMBOLSempred(antlr4::RuleContext *_localc
 
 bool MySQLLexer::SOURCE_DELAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 74: return this.isServerVersionGe80023();
+    case 74: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5666,7 +5666,7 @@ bool MySQLLexer::SOURCE_DELAY_SYMBOLSempred(antlr4::RuleContext *_localctx, size
 
 bool MySQLLexer::SOURCE_HEARTBEAT_PERIOD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 75: return this.isServerVersionGe80023();
+    case 75: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5676,7 +5676,7 @@ bool MySQLLexer::SOURCE_HEARTBEAT_PERIOD_SYMBOLSempred(antlr4::RuleContext *_loc
 
 bool MySQLLexer::SOURCE_HOST_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 76: return this.isServerVersionGe80023();
+    case 76: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5686,7 +5686,7 @@ bool MySQLLexer::SOURCE_HOST_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::SOURCE_LOG_FILE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 77: return this.isServerVersionGe80023();
+    case 77: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5696,7 +5696,7 @@ bool MySQLLexer::SOURCE_LOG_FILE_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::SOURCE_LOG_POS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 78: return this.isServerVersionGe80023();
+    case 78: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5706,7 +5706,7 @@ bool MySQLLexer::SOURCE_LOG_POS_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::SOURCE_PASSWORD_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 79: return this.isServerVersionGe80023();
+    case 79: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5716,7 +5716,7 @@ bool MySQLLexer::SOURCE_PASSWORD_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::SOURCE_PORT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 80: return this.isServerVersionGe80023();
+    case 80: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5726,7 +5726,7 @@ bool MySQLLexer::SOURCE_PORT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::SOURCE_PUBLIC_KEY_PATH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 81: return this.isServerVersionGe80023();
+    case 81: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5736,7 +5736,7 @@ bool MySQLLexer::SOURCE_PUBLIC_KEY_PATH_SYMBOLSempred(antlr4::RuleContext *_loca
 
 bool MySQLLexer::SOURCE_RETRY_COUNT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 82: return this.isServerVersionGe80023();
+    case 82: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5746,7 +5746,7 @@ bool MySQLLexer::SOURCE_RETRY_COUNT_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::SOURCE_SSL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 83: return this.isServerVersionGe80023();
+    case 83: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5756,7 +5756,7 @@ bool MySQLLexer::SOURCE_SSL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::SOURCE_SSL_CA_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 84: return this.isServerVersionGe80023();
+    case 84: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5766,7 +5766,7 @@ bool MySQLLexer::SOURCE_SSL_CA_SYMBOLSempred(antlr4::RuleContext *_localctx, siz
 
 bool MySQLLexer::SOURCE_SSL_CAPATH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 85: return this.isServerVersionGe80023();
+    case 85: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5776,7 +5776,7 @@ bool MySQLLexer::SOURCE_SSL_CAPATH_SYMBOLSempred(antlr4::RuleContext *_localctx,
 
 bool MySQLLexer::SOURCE_SSL_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 86: return this.isServerVersionGe80023();
+    case 86: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5786,7 +5786,7 @@ bool MySQLLexer::SOURCE_SSL_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, s
 
 bool MySQLLexer::SOURCE_SSL_CIPHER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 87: return this.isServerVersionGe80023();
+    case 87: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5796,7 +5796,7 @@ bool MySQLLexer::SOURCE_SSL_CIPHER_SYMBOLSempred(antlr4::RuleContext *_localctx,
 
 bool MySQLLexer::SOURCE_SSL_CRL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 88: return this.isServerVersionGe80023();
+    case 88: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5806,7 +5806,7 @@ bool MySQLLexer::SOURCE_SSL_CRL_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::SOURCE_SSL_CRLPATH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 89: return this.isServerVersionGe80023();
+    case 89: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5816,7 +5816,7 @@ bool MySQLLexer::SOURCE_SSL_CRLPATH_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::SOURCE_SSL_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 90: return this.isServerVersionGe80023();
+    case 90: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5826,7 +5826,7 @@ bool MySQLLexer::SOURCE_SSL_KEY_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::SOURCE_SSL_VERIFY_SERVER_CERT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 91: return this.isServerVersionGe80023();
+    case 91: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5836,7 +5836,7 @@ bool MySQLLexer::SOURCE_SSL_VERIFY_SERVER_CERT_SYMBOLSempred(antlr4::RuleContext
 
 bool MySQLLexer::SOURCE_TLS_CIPHERSUITES_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 92: return this.isServerVersionGe80023();
+    case 92: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5846,7 +5846,7 @@ bool MySQLLexer::SOURCE_TLS_CIPHERSUITES_SYMBOLSempred(antlr4::RuleContext *_loc
 
 bool MySQLLexer::SOURCE_TLS_VERSION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 93: return this.isServerVersionGe80023();
+    case 93: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5856,7 +5856,7 @@ bool MySQLLexer::SOURCE_TLS_VERSION_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::SOURCE_USER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 94: return this.isServerVersionGe80023();
+    case 94: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5866,7 +5866,7 @@ bool MySQLLexer::SOURCE_USER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::SOURCE_ZSTD_COMPRESSION_LEVEL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 95: return this.isServerVersionGe80023();
+    case 95: return this->isServerVersionGe80023();
 
   default:
     break;
@@ -5876,7 +5876,7 @@ bool MySQLLexer::SOURCE_ZSTD_COMPRESSION_LEVEL_SYMBOLSempred(antlr4::RuleContext
 
 bool MySQLLexer::ST_COLLECT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 96: return this.serverVersion >= 80025;
+    case 96: return this->serverVersion >= 80025;
 
   default:
     break;
@@ -5886,7 +5886,7 @@ bool MySQLLexer::ST_COLLECT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::KEYRING_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 97: return this.serverVersion >= 80025;
+    case 97: return this->serverVersion >= 80025;
 
   default:
     break;
@@ -5896,7 +5896,7 @@ bool MySQLLexer::KEYRING_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::AUTHENTICATION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 98: return this.serverVersion >= 80027;
+    case 98: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5906,7 +5906,7 @@ bool MySQLLexer::AUTHENTICATION_SYMBOLSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::FACTOR_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 99: return this.serverVersion >= 80027;
+    case 99: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5916,7 +5916,7 @@ bool MySQLLexer::FACTOR_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::FINISH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 100: return this.serverVersion >= 80027;
+    case 100: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5926,7 +5926,7 @@ bool MySQLLexer::FINISH_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::INITIATE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 101: return this.serverVersion >= 80027;
+    case 101: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5936,7 +5936,7 @@ bool MySQLLexer::INITIATE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::REGISTRATION_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 102: return this.serverVersion >= 80027;
+    case 102: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5946,7 +5946,7 @@ bool MySQLLexer::REGISTRATION_SYMBOLSempred(antlr4::RuleContext *_localctx, size
 
 bool MySQLLexer::UNREGISTER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 103: return this.serverVersion >= 80027;
+    case 103: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5956,7 +5956,7 @@ bool MySQLLexer::UNREGISTER_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::INITIAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 104: return this.serverVersion >= 80027;
+    case 104: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5966,7 +5966,7 @@ bool MySQLLexer::INITIAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::CHALLENGE_RESPONSE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 105: return this.serverVersion >= 80027;
+    case 105: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5976,7 +5976,7 @@ bool MySQLLexer::CHALLENGE_RESPONSE_SYMBOLSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::GTID_ONLY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 106: return this.serverVersion >= 80027;
+    case 106: return this->serverVersion >= 80027;
 
   default:
     break;
@@ -5986,7 +5986,7 @@ bool MySQLLexer::GTID_ONLY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::INTERSECT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 107: return this.serverVersion >= 80031;
+    case 107: return this->serverVersion >= 80031;
 
   default:
     break;
@@ -5996,7 +5996,7 @@ bool MySQLLexer::INTERSECT_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::BULK_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 108: return this.serverVersion >= 80032;
+    case 108: return this->serverVersion >= 80032;
 
   default:
     break;
@@ -6006,7 +6006,7 @@ bool MySQLLexer::BULK_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predi
 
 bool MySQLLexer::URL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 109: return this.serverVersion >= 80032;
+    case 109: return this->serverVersion >= 80032;
 
   default:
     break;
@@ -6016,7 +6016,7 @@ bool MySQLLexer::URL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predic
 
 bool MySQLLexer::GENERATE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 110: return this.serverVersion >= 80032;
+    case 110: return this->serverVersion >= 80032;
 
   default:
     break;
@@ -6026,7 +6026,7 @@ bool MySQLLexer::GENERATE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::PARSE_TREE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 111: return this.serverVersion >= 80100;
+    case 111: return this->serverVersion >= 80100;
 
   default:
     break;
@@ -6036,7 +6036,7 @@ bool MySQLLexer::PARSE_TREE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t
 
 bool MySQLLexer::LOG_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 112: return this.serverVersion >= 80032;
+    case 112: return this->serverVersion >= 80032;
 
   default:
     break;
@@ -6046,7 +6046,7 @@ bool MySQLLexer::LOG_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predic
 
 bool MySQLLexer::GTIDS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 113: return this.serverVersion >= 80032;
+    case 113: return this->serverVersion >= 80032;
 
   default:
     break;
@@ -6056,7 +6056,7 @@ bool MySQLLexer::GTIDS_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pred
 
 bool MySQLLexer::PARALLEL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 114: return this.serverVersion >= 80200;
+    case 114: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6066,7 +6066,7 @@ bool MySQLLexer::PARALLEL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t p
 
 bool MySQLLexer::S3_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 115: return this.serverVersion >= 80200;
+    case 115: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6076,7 +6076,7 @@ bool MySQLLexer::S3_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predica
 
 bool MySQLLexer::QUALIFY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 116: return this.serverVersion >= 80200;
+    case 116: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6086,7 +6086,7 @@ bool MySQLLexer::QUALIFY_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pr
 
 bool MySQLLexer::AUTO_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 117: return this.serverVersion >= 80200;
+    case 117: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6096,7 +6096,7 @@ bool MySQLLexer::AUTO_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predi
 
 bool MySQLLexer::MANUAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 118: return this.serverVersion >= 80200;
+    case 118: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6106,7 +6106,7 @@ bool MySQLLexer::MANUAL_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool MySQLLexer::BERNOULLI_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 119: return this.serverVersion >= 80200;
+    case 119: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6116,7 +6116,7 @@ bool MySQLLexer::BERNOULLI_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t 
 
 bool MySQLLexer::TABLESAMPLE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 120: return this.serverVersion >= 80200;
+    case 120: return this->serverVersion >= 80200;
 
   default:
     break;
@@ -6126,7 +6126,7 @@ bool MySQLLexer::TABLESAMPLE_SYMBOLSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::DOLLAR_QUOTED_STRING_TEXTSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 121: return this.doDollarQuotedStringText();
+    case 121: return this->doDollarQuotedStringText();
 
   default:
     break;
@@ -6136,7 +6136,7 @@ bool MySQLLexer::DOLLAR_QUOTED_STRING_TEXTSempred(antlr4::RuleContext *_localctx
 
 bool MySQLLexer::BACK_TICK_QUOTED_IDSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 122: return this.isBackTickQuotedId();
+    case 122: return this->isBackTickQuotedId();
 
   default:
     break;
@@ -6146,7 +6146,7 @@ bool MySQLLexer::BACK_TICK_QUOTED_IDSempred(antlr4::RuleContext *_localctx, size
 
 bool MySQLLexer::DOUBLE_QUOTED_TEXTSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 123: return this.isDoubleQuotedText();
+    case 123: return this->isDoubleQuotedText();
 
   default:
     break;
@@ -6156,7 +6156,7 @@ bool MySQLLexer::DOUBLE_QUOTED_TEXTSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::SINGLE_QUOTED_TEXTSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 124: return this.isSingleQuotedText();
+    case 124: return this->isSingleQuotedText();
 
   default:
     break;
@@ -6166,7 +6166,7 @@ bool MySQLLexer::SINGLE_QUOTED_TEXTSempred(antlr4::RuleContext *_localctx, size_
 
 bool MySQLLexer::VERSION_COMMENT_STARTSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 125: return this.isVersionComment();
+    case 125: return this->isVersionComment();
 
   default:
     break;
@@ -6176,7 +6176,7 @@ bool MySQLLexer::VERSION_COMMENT_STARTSempred(antlr4::RuleContext *_localctx, si
 
 bool MySQLLexer::VERSION_COMMENT_ENDSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 126: return this.isInVersionComment();
+    case 126: return this->isInVersionComment();
 
   default:
     break;

@@ -5665,7 +5665,7 @@ MySQLParser::AlterStatementContext* MySQLParser::alterStatement() {
     case 8: {
       setState(1618);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(1619);
       alterUndoTablespace();
       break;
@@ -6914,7 +6914,7 @@ MySQLParser::StandaloneAlterCommandsContext* MySQLParser::standaloneAlterCommand
       enterOuterAlt(_localctx, 4);
       setState(1753);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(1754);
       _la = _input->LA(1);
       if (!(_la == MySQLParser::SECONDARY_LOAD_SYMBOL
@@ -8058,7 +8058,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       case 5: {
         setState(1928);
 
-        if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+        if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
         setState(1929);
         match(MySQLParser::CHECK_SYMBOL);
         setState(1930);
@@ -8069,7 +8069,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       case 6: {
         setState(1931);
 
-        if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+        if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
         setState(1932);
         match(MySQLParser::CONSTRAINT_SYMBOL);
         setState(1933);
@@ -8134,7 +8134,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
         case 1: {
           setState(1947);
 
-          if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+          if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
           setState(1948);
           exprWithParentheses();
           break;
@@ -8163,7 +8163,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       case 3: {
         setState(1954);
 
-        if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+        if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
         setState(1955);
         match(MySQLParser::SET_SYMBOL);
         setState(1956);
@@ -8194,7 +8194,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       enterOuterAlt(_localctx, 10);
       setState(1964);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(1965);
       match(MySQLParser::ALTER_SYMBOL);
       setState(1966);
@@ -8210,7 +8210,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       enterOuterAlt(_localctx, 11);
       setState(1970);
 
-      if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+      if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
       setState(1971);
       match(MySQLParser::ALTER_SYMBOL);
       setState(1972);
@@ -8295,7 +8295,7 @@ MySQLParser::AlterListItemContext* MySQLParser::alterListItem() {
       case 1: {
         setState(1996);
 
-        if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+        if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
         setState(1997);
         match(MySQLParser::DEFAULT_SYMBOL);
         break;
@@ -9179,7 +9179,7 @@ MySQLParser::AlterTablespaceContext* MySQLParser::alterTablespace() {
     case 3: {
       setState(2078);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(2079);
       alterTablespaceOptions();
       break;
@@ -9645,7 +9645,7 @@ MySQLParser::AlterTablespaceOptionContext* MySQLParser::alterTablespaceOption() 
       enterOuterAlt(_localctx, 7);
       setState(2122);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(2123);
       tsOptionEngineAttribute();
       break;
@@ -10208,7 +10208,7 @@ MySQLParser::AlterInstanceStatementContext* MySQLParser::alterInstanceStatement(
       enterOuterAlt(_localctx, 2);
       setState(2171);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(2195);
       _errHandler->sync(this);
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 98, _ctx)) {
@@ -10491,7 +10491,7 @@ MySQLParser::CreateStatementContext* MySQLParser::createStatement() {
     case 14: {
       setState(2213);
 
-      if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+      if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
       setState(2214);
       createSpatialReference();
       break;
@@ -10500,7 +10500,7 @@ MySQLParser::CreateStatementContext* MySQLParser::createStatement() {
     case 15: {
       setState(2215);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(2216);
       createUndoTablespace();
       break;
@@ -10677,7 +10677,7 @@ MySQLParser::CreateDatabaseOptionContext* MySQLParser::createDatabaseOption() {
       enterOuterAlt(_localctx, 3);
       setState(2232);
 
-      if (!(this.isServerVersionGe80016())) throw FailedPredicateException(this, "this.isServerVersionGe80016()");
+      if (!(this->isServerVersionGe80016())) throw FailedPredicateException(this, "this.isServerVersionGe80016()");
       setState(2233);
       defaultEncryption();
       break;
@@ -11703,7 +11703,7 @@ MySQLParser::StoredRoutineBodyContext* MySQLParser::storedRoutineBody() {
       enterOuterAlt(_localctx, 2);
       setState(2339);
 
-      if (!(this.isStoredRoutineBody())) throw FailedPredicateException(this, "this.isStoredRoutineBody()");
+      if (!(this->isStoredRoutineBody())) throw FailedPredicateException(this, "this.isStoredRoutineBody()");
       setState(2340);
       match(MySQLParser::AS_SYMBOL);
       setState(2341);
@@ -12297,7 +12297,7 @@ MySQLParser::RoutineOptionContext* MySQLParser::routineOption() {
         case 2: {
           setState(2403);
 
-          if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+          if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
           setState(2404);
           identifier();
           break;
@@ -13640,7 +13640,7 @@ MySQLParser::TsDataFileNameContext* MySQLParser::tsDataFileName() {
       enterOuterAlt(_localctx, 2);
       setState(2566);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(2569);
       _errHandler->sync(this);
 
@@ -13956,7 +13956,7 @@ MySQLParser::TablespaceOptionContext* MySQLParser::tablespaceOption() {
       enterOuterAlt(_localctx, 10);
       setState(2595);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(2596);
       tsOptionEncryption();
       break;
@@ -16174,7 +16174,7 @@ MySQLParser::DropStatementContext* MySQLParser::dropStatement() {
     case 13: {
       setState(2819);
 
-      if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+      if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
       setState(2820);
       dropSpatialReference();
       break;
@@ -16183,7 +16183,7 @@ MySQLParser::DropStatementContext* MySQLParser::dropStatement() {
     case 14: {
       setState(2821);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(2822);
       dropUndoTablespace();
       break;
@@ -17990,7 +17990,7 @@ MySQLParser::DeleteStatementContext* MySQLParser::deleteStatement() {
         case 1: {
           setState(2995);
 
-          if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+          if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
           setState(2996);
           tableAlias();
           break;
@@ -19491,7 +19491,7 @@ MySQLParser::ValuesReferenceContext* MySQLParser::valuesReference() {
     enterOuterAlt(_localctx, 1);
     setState(3156);
 
-    if (!(this.isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
+    if (!(this->isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
     setState(3157);
     match(MySQLParser::AS_SYMBOL);
     setState(3158);
@@ -20095,7 +20095,7 @@ MySQLParser::LoadFromContext* MySQLParser::loadFrom() {
     enterOuterAlt(_localctx, 1);
     setState(3224);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3225);
     match(MySQLParser::FROM_SYMBOL);
    
@@ -20167,7 +20167,7 @@ MySQLParser::LoadSourceTypeContext* MySQLParser::loadSourceType() {
       enterOuterAlt(_localctx, 2);
       setState(3228);
 
-      if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+      if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
       setState(3229);
       _la = _input->LA(1);
       if (!(_la == MySQLParser::URL_SYMBOL
@@ -20242,7 +20242,7 @@ MySQLParser::SourceCountContext* MySQLParser::sourceCount() {
     enterOuterAlt(_localctx, 1);
     setState(3232);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3238);
     _errHandler->sync(this);
     switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 277, _ctx)) {
@@ -20326,7 +20326,7 @@ MySQLParser::SourceOrderContext* MySQLParser::sourceOrder() {
     enterOuterAlt(_localctx, 1);
     setState(3240);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3241);
     match(MySQLParser::IN_SYMBOL);
     setState(3242);
@@ -20815,7 +20815,7 @@ MySQLParser::LoadAlgorithmContext* MySQLParser::loadAlgorithm() {
     enterOuterAlt(_localctx, 1);
     setState(3288);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3289);
     match(MySQLParser::ALGORITHM_SYMBOL);
     setState(3290);
@@ -20879,7 +20879,7 @@ MySQLParser::LoadParallelContext* MySQLParser::loadParallel() {
     enterOuterAlt(_localctx, 1);
     setState(3293);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3294);
     match(MySQLParser::PARALLEL_SYMBOL);
     setState(3295);
@@ -20943,7 +20943,7 @@ MySQLParser::LoadMemoryContext* MySQLParser::loadMemory() {
     enterOuterAlt(_localctx, 1);
     setState(3298);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3299);
     match(MySQLParser::MEMORY_SYMBOL);
     setState(3300);
@@ -21318,7 +21318,7 @@ MySQLParser::SelectStatementWithIntoContext* MySQLParser::selectStatementWithInt
       enterOuterAlt(_localctx, 4);
       setState(3340);
 
-      if (!(this.isSelectStatementWithInto())) throw FailedPredicateException(this, "this.isSelectStatementWithInto()");
+      if (!(this->isSelectStatementWithInto())) throw FailedPredicateException(this, "this.isSelectStatementWithInto()");
       setState(3341);
       queryExpressionParens();
       setState(3342);
@@ -21557,7 +21557,7 @@ MySQLParser::QueryExpressionBodyContext* MySQLParser::queryExpressionBody() {
         case 2: {
           setState(3361);
 
-          if (!(this.isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
+          if (!(this->isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
           setState(3362);
           _la = _input->LA(1);
           if (!(_la == MySQLParser::EXCEPT_SYMBOL || _la == MySQLParser::INTERSECT_SYMBOL)) {
@@ -21742,7 +21742,7 @@ MySQLParser::QueryPrimaryContext* MySQLParser::queryPrimary() {
       enterOuterAlt(_localctx, 2);
       setState(3382);
 
-      if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+      if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
       setState(3383);
       tableValueConstructor();
       break;
@@ -21752,7 +21752,7 @@ MySQLParser::QueryPrimaryContext* MySQLParser::queryPrimary() {
       enterOuterAlt(_localctx, 3);
       setState(3384);
 
-      if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+      if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
       setState(3385);
       explicitTable();
       break;
@@ -22787,7 +22787,7 @@ MySQLParser::QualifyClauseContext* MySQLParser::qualifyClause() {
     enterOuterAlt(_localctx, 1);
     setState(3480);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(3481);
     match(MySQLParser::QUALIFY_SYMBOL);
     setState(3482);
@@ -24041,7 +24041,7 @@ MySQLParser::GroupByClauseContext* MySQLParser::groupByClause() {
       enterOuterAlt(_localctx, 2);
       setState(3596);
 
-      if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+      if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
       setState(3597);
       match(MySQLParser::GROUP_SYMBOL);
       setState(3598);
@@ -24741,7 +24741,7 @@ MySQLParser::LockingClauseListContext* MySQLParser::lockingClauseList() {
     enterOuterAlt(_localctx, 1);
     setState(3651);
 
-    if (!(this.isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
+    if (!(this->isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
     setState(3653); 
     _errHandler->sync(this);
     _la = _input->LA(1);
@@ -25434,7 +25434,7 @@ MySQLParser::TableReferenceContext* MySQLParser::tableReference() {
       case 1: {
         setState(3709);
 
-        if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+        if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
         setState(3710);
         identifier();
         break;
@@ -26090,7 +26090,7 @@ MySQLParser::TableFactorContext* MySQLParser::tableFactor() {
       enterOuterAlt(_localctx, 5);
       setState(3783);
 
-      if (!(this.isServerVersionGe80004())) throw FailedPredicateException(this, "this.isServerVersionGe80004()");
+      if (!(this->isServerVersionGe80004())) throw FailedPredicateException(this, "this.isServerVersionGe80004()");
       setState(3784);
       tableFunction();
       break;
@@ -26395,7 +26395,7 @@ MySQLParser::DerivedTableContext* MySQLParser::derivedTable() {
       enterOuterAlt(_localctx, 2);
       setState(3814);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(3815);
       match(MySQLParser::LATERAL_SYMBOL);
       setState(3816);
@@ -26821,7 +26821,7 @@ MySQLParser::JtColumnContext* MySQLParser::jtColumn() {
       case 1: {
         setState(3860);
 
-        if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+        if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
         setState(3861);
         collate();
         break;
@@ -27366,7 +27366,7 @@ MySQLParser::TableAliasContext* MySQLParser::tableAlias() {
     case 2: {
       setState(3909);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(3910);
       match(MySQLParser::EQUAL_OPERATOR);
       break;
@@ -29980,7 +29980,7 @@ MySQLParser::MasterOrBinaryLogsAndGtidsContext* MySQLParser::masterOrBinaryLogsA
       enterOuterAlt(_localctx, 2);
       setState(4197);
 
-      if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+      if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
       setState(4198);
       match(MySQLParser::BINARY_SYMBOL);
       setState(4199);
@@ -30211,7 +30211,7 @@ MySQLParser::ChangeReplicationSourceContext* MySQLParser::changeReplicationSourc
       enterOuterAlt(_localctx, 2);
       setState(4217);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(4218);
       match(MySQLParser::REPLICATION_SYMBOL);
       setState(4219);
@@ -30935,7 +30935,7 @@ MySQLParser::SourceDefinitionContext* MySQLParser::sourceDefinition() {
       enterOuterAlt(_localctx, 31);
       setState(4352);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(4353);
       match(MySQLParser::SOURCE_CONNECTION_AUTO_FAILOVER_SYMBOL);
       setState(4354);
@@ -30949,7 +30949,7 @@ MySQLParser::SourceDefinitionContext* MySQLParser::sourceDefinition() {
       enterOuterAlt(_localctx, 32);
       setState(4356);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(4357);
       match(MySQLParser::ASSIGN_GTIDS_TO_ANONYMOUS_TRANSACTIONS_SYMBOL);
       setState(4358);
@@ -30963,7 +30963,7 @@ MySQLParser::SourceDefinitionContext* MySQLParser::sourceDefinition() {
       enterOuterAlt(_localctx, 33);
       setState(4360);
 
-      if (!(this.isServerVersionGe80027())) throw FailedPredicateException(this, "this.isServerVersionGe80027()");
+      if (!(this->isServerVersionGe80027())) throw FailedPredicateException(this, "this.isServerVersionGe80027()");
       setState(4361);
       match(MySQLParser::GTID_ONLY_SYMBOL);
       setState(4362);
@@ -35556,7 +35556,7 @@ MySQLParser::CloneStatementContext* MySQLParser::cloneStatement() {
     case 3: {
       setState(4712);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(4713);
       match(MySQLParser::INSTANCE_SYMBOL);
       setState(4714);
@@ -36043,7 +36043,7 @@ MySQLParser::AlterUserStatementContext* MySQLParser::alterUserStatement() {
       case 1: {
         setState(4758);
 
-        if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+        if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
         setState(4759);
         createUserList();
         break;
@@ -36052,7 +36052,7 @@ MySQLParser::AlterUserStatementContext* MySQLParser::alterUserStatement() {
       case 2: {
         setState(4760);
 
-        if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+        if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
         setState(4761);
         alterUserList();
         break;
@@ -36424,7 +36424,7 @@ MySQLParser::AlterUserContext* MySQLParser::alterUser() {
       enterOuterAlt(_localctx, 1);
       setState(4808);
 
-      if (!(this.isServerVersionLt80025())) throw FailedPredicateException(this, "this.isServerVersionLt80025()");
+      if (!(this->isServerVersionLt80025())) throw FailedPredicateException(this, "this.isServerVersionLt80025()");
       setState(4809);
       oldAlterUser();
       break;
@@ -36434,7 +36434,7 @@ MySQLParser::AlterUserContext* MySQLParser::alterUser() {
       enterOuterAlt(_localctx, 2);
       setState(4810);
 
-      if (!(this.isServerVersionGe80025())) throw FailedPredicateException(this, "this.isServerVersionGe80025()");
+      if (!(this->isServerVersionGe80025())) throw FailedPredicateException(this, "this.isServerVersionGe80025()");
 
       setState(4811);
       user();
@@ -37333,7 +37333,7 @@ MySQLParser::CreateUserTailContext* MySQLParser::createUserTail() {
     case 1: {
       setState(4970);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(4971);
       userAttributes();
       break;
@@ -37958,7 +37958,7 @@ MySQLParser::AccountLockPasswordExpireOptionsContext* MySQLParser::accountLockPa
         case 4: {
           setState(5027);
 
-          if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+          if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
           setState(5028);
           match(MySQLParser::REQUIRE_SYMBOL);
           setState(5029);
@@ -38507,7 +38507,7 @@ MySQLParser::GrantTargetListContext* MySQLParser::grantTargetList() {
       enterOuterAlt(_localctx, 1);
       setState(5102);
 
-      if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+      if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
       setState(5103);
       createUserList();
       break;
@@ -38517,7 +38517,7 @@ MySQLParser::GrantTargetListContext* MySQLParser::grantTargetList() {
       enterOuterAlt(_localctx, 2);
       setState(5104);
 
-      if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+      if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
       setState(5105);
       userList();
       break;
@@ -38867,7 +38867,7 @@ MySQLParser::VersionedRequireClauseContext* MySQLParser::versionedRequireClause(
     enterOuterAlt(_localctx, 1);
     setState(5130);
 
-    if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+    if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
     setState(5131);
     requireClause();
    
@@ -39089,7 +39089,7 @@ MySQLParser::RevokeStatementContext* MySQLParser::revokeStatement() {
     case 1: {
       setState(5149);
 
-      if (!(this.isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
+      if (!(this->isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
       setState(5150);
       ifExists();
       break;
@@ -39217,7 +39217,7 @@ MySQLParser::RevokeStatementContext* MySQLParser::revokeStatement() {
     case 1: {
       setState(5190);
 
-      if (!(this.isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
+      if (!(this->isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
       setState(5191);
       ignoreUnknownUser();
       break;
@@ -39917,7 +39917,7 @@ MySQLParser::GrantIdentifierContext* MySQLParser::grantIdentifier() {
       enterOuterAlt(_localctx, 4);
       setState(5259);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(5260);
       schemaRef();
       setState(5261);
@@ -40190,7 +40190,7 @@ MySQLParser::GrantOptionContext* MySQLParser::grantOption() {
       enterOuterAlt(_localctx, 2);
       setState(5286);
 
-      if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+      if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
       setState(5295);
       _errHandler->sync(this);
       switch (_input->LA(1)) {
@@ -40841,7 +40841,7 @@ MySQLParser::HistogramAutoUpdateContext* MySQLParser::histogramAutoUpdate() {
     enterOuterAlt(_localctx, 1);
     setState(5380);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(5381);
     _la = _input->LA(1);
     if (!(_la == MySQLParser::AUTO_SYMBOL
@@ -40955,7 +40955,7 @@ MySQLParser::HistogramUpdateParamContext* MySQLParser::histogramUpdateParam() {
       enterOuterAlt(_localctx, 2);
       setState(5390);
 
-      if (!(this.isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
+      if (!(this->isServerVersionGe80031())) throw FailedPredicateException(this, "this.isServerVersionGe80031()");
       setState(5391);
       match(MySQLParser::USING_SYMBOL);
       setState(5392);
@@ -41025,7 +41025,7 @@ MySQLParser::HistogramNumBucketsContext* MySQLParser::histogramNumBuckets() {
     enterOuterAlt(_localctx, 1);
     setState(5396);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(5397);
     match(MySQLParser::WITH_SYMBOL);
     setState(5398);
@@ -41795,7 +41795,7 @@ MySQLParser::InstallSetValueListContext* MySQLParser::installSetValueList() {
     enterOuterAlt(_localctx, 1);
     setState(5458);
 
-    if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+    if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
     setState(5459);
     match(MySQLParser::SET_SYMBOL);
     setState(5460);
@@ -42078,7 +42078,7 @@ MySQLParser::StartOptionValueListContext* MySQLParser::startOptionValueList() {
       case 3: {
         setState(5499);
 
-        if (!(this.isServerVersionLt80014())) throw FailedPredicateException(this, "this.isServerVersionLt80014()");
+        if (!(this->isServerVersionLt80014())) throw FailedPredicateException(this, "this.isServerVersionLt80014()");
         setState(5500);
         match(MySQLParser::PASSWORD_SYMBOL);
         setState(5501);
@@ -42100,7 +42100,7 @@ MySQLParser::StartOptionValueListContext* MySQLParser::startOptionValueList() {
       enterOuterAlt(_localctx, 5);
       setState(5507);
 
-      if (!(this.isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
+      if (!(this->isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
       setState(5508);
       match(MySQLParser::PASSWORD_SYMBOL);
       setState(5511);
@@ -42663,7 +42663,7 @@ MySQLParser::OptionValueNoOptionTypeContext* MySQLParser::optionValueNoOptionTyp
       case 3: {
         setState(5578);
 
-        if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+        if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
         setState(5579);
         match(MySQLParser::DEFAULT_SYMBOL);
         break;
@@ -43679,7 +43679,7 @@ MySQLParser::ShowParseTreeStatementContext* MySQLParser::showParseTreeStatement(
     enterOuterAlt(_localctx, 1);
     setState(5671);
 
-    if (!(this.isServerVersionGe80100())) throw FailedPredicateException(this, "this.isServerVersionGe80100()");
+    if (!(this->isServerVersionGe80100())) throw FailedPredicateException(this, "this.isServerVersionGe80100()");
     setState(5672);
     match(MySQLParser::SHOW_SYMBOL);
     setState(5673);
@@ -49735,7 +49735,7 @@ MySQLParser::UtilityStatementContext* MySQLParser::utilityStatement() {
       enterOuterAlt(_localctx, 5);
       setState(6215);
 
-      if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+      if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
       setState(6216);
       restartServer();
       break;
@@ -49949,7 +49949,7 @@ MySQLParser::ExplainStatementContext* MySQLParser::explainStatement() {
     case 1: {
       setState(6229);
 
-      if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+      if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
       setState(6230);
       match(MySQLParser::FOR_SYMBOL);
       setState(6231);
@@ -50048,7 +50048,7 @@ MySQLParser::ExplainOptionsContext* MySQLParser::explainOptions() {
       case 1: {
         setState(6240);
 
-        if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+        if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
         setState(6241);
         explainInto();
         break;
@@ -50064,7 +50064,7 @@ MySQLParser::ExplainOptionsContext* MySQLParser::explainOptions() {
       enterOuterAlt(_localctx, 2);
       setState(6244);
 
-      if (!(this.isServerVersionLt80012())) throw FailedPredicateException(this, "this.isServerVersionLt80012()");
+      if (!(this->isServerVersionLt80012())) throw FailedPredicateException(this, "this.isServerVersionLt80012()");
       setState(6245);
       match(MySQLParser::EXTENDED_SYMBOL);
       break;
@@ -50074,7 +50074,7 @@ MySQLParser::ExplainOptionsContext* MySQLParser::explainOptions() {
       enterOuterAlt(_localctx, 3);
       setState(6246);
 
-      if (!(this.isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
+      if (!(this->isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
       setState(6247);
       match(MySQLParser::ANALYZE_SYMBOL);
       break;
@@ -50084,7 +50084,7 @@ MySQLParser::ExplainOptionsContext* MySQLParser::explainOptions() {
       enterOuterAlt(_localctx, 4);
       setState(6248);
 
-      if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+      if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
       setState(6249);
       match(MySQLParser::ANALYZE_SYMBOL);
       setState(6250);
@@ -51184,7 +51184,7 @@ MySQLParser::PredicateContext* MySQLParser::predicate() {
     case 2: {
       setState(6334);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(6335);
       match(MySQLParser::MEMBER_SYMBOL);
       setState(6337);
@@ -52995,7 +52995,7 @@ MySQLParser::ArrayCastContext* MySQLParser::arrayCast() {
     enterOuterAlt(_localctx, 1);
     setState(6535);
 
-    if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+    if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
     setState(6536);
     match(MySQLParser::ARRAY_SYMBOL);
    
@@ -53838,7 +53838,7 @@ MySQLParser::WindowFunctionCallContext* MySQLParser::windowFunctionCall() {
         case 2: {
           setState(6645);
 
-          if (!(this.isServerVersionLt80024())) throw FailedPredicateException(this, "this.isServerVersionLt80024()");
+          if (!(this->isServerVersionLt80024())) throw FailedPredicateException(this, "this.isServerVersionLt80024()");
           setState(6646);
           simpleExprWithParentheses();
           break;
@@ -54186,7 +54186,7 @@ MySQLParser::TablesampleClauseContext* MySQLParser::tablesampleClause() {
     enterOuterAlt(_localctx, 1);
     setState(6695);
 
-    if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+    if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
     setState(6696);
     match(MySQLParser::TABLESAMPLE_SYMBOL);
     setState(6697);
@@ -54360,7 +54360,7 @@ MySQLParser::LeadLagInfoContext* MySQLParser::leadLagInfo() {
     case 3: {
       setState(6710);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(6711);
       stableInteger();
       break;
@@ -55891,7 +55891,7 @@ MySQLParser::RuntimeFunctionCallContext* MySQLParser::runtimeFunctionCall() {
       enterOuterAlt(_localctx, 26);
       setState(6919);
 
-      if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+      if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
       setState(6920);
       match(MySQLParser::LOG_SYMBOL);
       setState(6921);
@@ -56190,7 +56190,7 @@ MySQLParser::RuntimeFunctionCallContext* MySQLParser::runtimeFunctionCall() {
       enterOuterAlt(_localctx, 44);
       setState(7005);
 
-      if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+      if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
       setState(7006);
       match(MySQLParser::PASSWORD_SYMBOL);
       setState(7007);
@@ -57904,7 +57904,7 @@ MySQLParser::LvalueVariableContext* MySQLParser::lvalueVariable() {
       case 2: {
         setState(7229);
 
-        if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+        if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
         setState(7230);
         lValueIdentifier();
         setState(7232);
@@ -58441,7 +58441,7 @@ MySQLParser::CastTypeContext* MySQLParser::castType() {
       enterOuterAlt(_localctx, 7);
       setState(7277);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7278);
       match(MySQLParser::YEAR_SYMBOL);
       break;
@@ -58518,7 +58518,7 @@ MySQLParser::CastTypeContext* MySQLParser::castType() {
       enterOuterAlt(_localctx, 12);
       setState(7292);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(7293);
       realType();
       break;
@@ -58528,7 +58528,7 @@ MySQLParser::CastTypeContext* MySQLParser::castType() {
       enterOuterAlt(_localctx, 13);
       setState(7294);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(7295);
       match(MySQLParser::FLOAT_SYMBOL);
       setState(7297);
@@ -58551,7 +58551,7 @@ MySQLParser::CastTypeContext* MySQLParser::castType() {
       enterOuterAlt(_localctx, 14);
       setState(7299);
 
-      if (!(this.isServerVersionGe80027())) throw FailedPredicateException(this, "this.isServerVersionGe80027()");
+      if (!(this->isServerVersionGe80027())) throw FailedPredicateException(this, "this.isServerVersionGe80027()");
       setState(7300);
       _la = _input->LA(1);
       if (!(_la == MySQLParser::GEOMETRYCOLLECTION_SYMBOL || _la == MySQLParser::LINESTRING_SYMBOL || ((((_la - 374) & ~ 0x3fULL) == 0) &&
@@ -63145,7 +63145,7 @@ MySQLParser::CheckOrReferencesContext* MySQLParser::checkOrReferences() {
       enterOuterAlt(_localctx, 1);
       setState(7668);
 
-      if (!(this.isServerVersionLt80016())) throw FailedPredicateException(this, "this.isServerVersionLt80016()");
+      if (!(this->isServerVersionLt80016())) throw FailedPredicateException(this, "this.isServerVersionLt80016()");
       setState(7669);
       checkConstraint();
       break;
@@ -63270,7 +63270,7 @@ MySQLParser::ConstraintEnforcementContext* MySQLParser::constraintEnforcement() 
     enterOuterAlt(_localctx, 1);
     setState(7676);
 
-    if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+    if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
     setState(7678);
     _errHandler->sync(this);
 
@@ -64120,7 +64120,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 2);
       setState(7793);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(7794);
       match(MySQLParser::NOT_SYMBOL);
       setState(7795);
@@ -64144,7 +64144,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       case 2: {
         setState(7798);
 
-        if (!(this.isServerVersionGe80013())) throw FailedPredicateException(this, "this.isServerVersionGe80013()");
+        if (!(this->isServerVersionGe80013())) throw FailedPredicateException(this, "this.isServerVersionGe80013()");
         setState(7799);
         exprWithParentheses();
         break;
@@ -64280,7 +64280,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 14);
       setState(7829);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(7831);
       _errHandler->sync(this);
 
@@ -64298,7 +64298,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 15);
       setState(7834);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(7835);
       constraintEnforcement();
       break;
@@ -64308,7 +64308,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 16);
       setState(7836);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7837);
       antlrcpp::downCast<ColumnAttributeContext *>(_localctx)->value = match(MySQLParser::ENGINE_ATTRIBUTE_SYMBOL);
       setState(7839);
@@ -64333,7 +64333,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 17);
       setState(7842);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7843);
       antlrcpp::downCast<ColumnAttributeContext *>(_localctx)->value = match(MySQLParser::SECONDARY_ENGINE_ATTRIBUTE_SYMBOL);
       setState(7845);
@@ -64358,7 +64358,7 @@ MySQLParser::ColumnAttributeContext* MySQLParser::columnAttribute() {
       enterOuterAlt(_localctx, 18);
       setState(7848);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7849);
       visibility();
       break;
@@ -65369,7 +65369,7 @@ MySQLParser::KeyPartOrExpressionContext* MySQLParser::keyPartOrExpression() {
       enterOuterAlt(_localctx, 2);
       setState(7945);
 
-      if (!(this.isServerVersionGe80013())) throw FailedPredicateException(this, "this.isServerVersionGe80013()");
+      if (!(this->isServerVersionGe80013())) throw FailedPredicateException(this, "this.isServerVersionGe80013()");
       setState(7946);
       exprWithParentheses();
       setState(7948);
@@ -65641,7 +65641,7 @@ MySQLParser::CommonIndexOptionContext* MySQLParser::commonIndexOption() {
       enterOuterAlt(_localctx, 4);
       setState(7966);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7967);
       match(MySQLParser::ENGINE_ATTRIBUTE_SYMBOL);
       setState(7969);
@@ -65666,7 +65666,7 @@ MySQLParser::CommonIndexOptionContext* MySQLParser::commonIndexOption() {
       enterOuterAlt(_localctx, 5);
       setState(7972);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(7973);
       match(MySQLParser::SECONDARY_ENGINE_ATTRIBUTE_SYMBOL);
       setState(7975);
@@ -67963,7 +67963,7 @@ MySQLParser::CharsetNameContext* MySQLParser::charsetName() {
       enterOuterAlt(_localctx, 3);
       setState(8217);
 
-      if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+      if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
       setState(8218);
       match(MySQLParser::DEFAULT_SYMBOL);
       break;
@@ -68040,7 +68040,7 @@ MySQLParser::CollationNameContext* MySQLParser::collationName() {
       enterOuterAlt(_localctx, 2);
       setState(8222);
 
-      if (!(this.isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
+      if (!(this->isServerVersionLt80011())) throw FailedPredicateException(this, "this.isServerVersionLt80011()");
       setState(8223);
       match(MySQLParser::DEFAULT_SYMBOL);
       break;
@@ -68050,7 +68050,7 @@ MySQLParser::CollationNameContext* MySQLParser::collationName() {
       enterOuterAlt(_localctx, 3);
       setState(8224);
 
-      if (!(this.isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
+      if (!(this->isServerVersionGe80018())) throw FailedPredicateException(this, "this.isServerVersionGe80018()");
       setState(8225);
       match(MySQLParser::BINARY_SYMBOL);
       break;
@@ -68694,7 +68694,7 @@ MySQLParser::CreateTableOptionContext* MySQLParser::createTableOption() {
       enterOuterAlt(_localctx, 2);
       setState(8262);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(8263);
       antlrcpp::downCast<CreateTableOptionContext *>(_localctx)->option = match(MySQLParser::SECONDARY_ENGINE_SYMBOL);
       setState(8265);
@@ -69189,7 +69189,7 @@ MySQLParser::CreateTableOptionContext* MySQLParser::createTableOption() {
       enterOuterAlt(_localctx, 26);
       setState(8380);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(8381);
       antlrcpp::downCast<CreateTableOptionContext *>(_localctx)->option = match(MySQLParser::START_SYMBOL);
       setState(8382);
@@ -69201,7 +69201,7 @@ MySQLParser::CreateTableOptionContext* MySQLParser::createTableOption() {
       enterOuterAlt(_localctx, 27);
       setState(8383);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(8384);
       antlrcpp::downCast<CreateTableOptionContext *>(_localctx)->option = match(MySQLParser::ENGINE_ATTRIBUTE_SYMBOL);
       setState(8386);
@@ -69226,7 +69226,7 @@ MySQLParser::CreateTableOptionContext* MySQLParser::createTableOption() {
       enterOuterAlt(_localctx, 28);
       setState(8389);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(8390);
       antlrcpp::downCast<CreateTableOptionContext *>(_localctx)->option = match(MySQLParser::SECONDARY_ENGINE_ATTRIBUTE_SYMBOL);
       setState(8392);
@@ -69251,7 +69251,7 @@ MySQLParser::CreateTableOptionContext* MySQLParser::createTableOption() {
       enterOuterAlt(_localctx, 29);
       setState(8395);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(8396);
       tsOptionAutoextendSize();
       break;
@@ -71318,7 +71318,7 @@ MySQLParser::PersistedVariableIdentifierContext* MySQLParser::persistedVariableI
       enterOuterAlt(_localctx, 2);
       setState(8631);
 
-      if (!(this.isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
+      if (!(this->isServerVersionGe80032())) throw FailedPredicateException(this, "this.isServerVersionGe80032()");
       setState(8635);
       _errHandler->sync(this);
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1097, _ctx)) {
@@ -76744,7 +76744,7 @@ MySQLParser::PureIdentifierContext* MySQLParser::pureIdentifier() {
       enterOuterAlt(_localctx, 2);
       setState(9003);
 
-      if (!(this.isPureIdentifier())) throw FailedPredicateException(this, "this.isPureIdentifier()");
+      if (!(this->isPureIdentifier())) throw FailedPredicateException(this, "this.isPureIdentifier()");
       setState(9004);
       match(MySQLParser::DOUBLE_QUOTED_TEXT);
       break;
@@ -77449,7 +77449,7 @@ MySQLParser::Real_ulonglong_numberContext* MySQLParser::real_ulonglong_number() 
       enterOuterAlt(_localctx, 2);
       setState(9044);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(9045);
       match(MySQLParser::HEX_NUMBER);
       break;
@@ -77625,7 +77625,7 @@ MySQLParser::SignedLiteralOrNullContext* MySQLParser::signedLiteralOrNull() {
       enterOuterAlt(_localctx, 2);
       setState(9058);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(9059);
       nullAsLiteral();
       break;
@@ -77838,7 +77838,7 @@ MySQLParser::LiteralOrNullContext* MySQLParser::literalOrNull() {
       enterOuterAlt(_localctx, 2);
       setState(9074);
 
-      if (!(this.isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
+      if (!(this->isServerVersionGe80024())) throw FailedPredicateException(this, "this.isServerVersionGe80024()");
       setState(9075);
       nullAsLiteral();
       break;
@@ -78046,7 +78046,7 @@ MySQLParser::TextStringLiteralContext* MySQLParser::textStringLiteral() {
       enterOuterAlt(_localctx, 2);
       setState(9092);
 
-      if (!(this.isTextStringLiteral())) throw FailedPredicateException(this, "this.isTextStringLiteral()");
+      if (!(this->isTextStringLiteral())) throw FailedPredicateException(this, "this.isTextStringLiteral()");
       setState(9093);
       antlrcpp::downCast<TextStringLiteralContext *>(_localctx)->value = match(MySQLParser::DOUBLE_QUOTED_TEXT);
       break;
@@ -78200,7 +78200,7 @@ MySQLParser::TextStringHashContext* MySQLParser::textStringHash() {
       enterOuterAlt(_localctx, 2);
       setState(9102);
 
-      if (!(this.isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
+      if (!(this->isServerVersionGe80017())) throw FailedPredicateException(this, "this.isServerVersionGe80017()");
       setState(9103);
       match(MySQLParser::HEX_NUMBER);
       break;
@@ -79774,7 +79774,7 @@ MySQLParser::IdentifierKeywordContext* MySQLParser::identifierKeyword() {
       enterOuterAlt(_localctx, 1);
       setState(9196);
 
-      if (!(this.isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
+      if (!(this->isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
       setState(9203);
       _errHandler->sync(this);
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1164, _ctx)) {
@@ -79805,7 +79805,7 @@ MySQLParser::IdentifierKeywordContext* MySQLParser::identifierKeyword() {
       case 5: {
         setState(9201);
 
-        if (!(this.isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
+        if (!(this->isServerVersionGe80011())) throw FailedPredicateException(this, "this.isServerVersionGe80011()");
         setState(9202);
         match(MySQLParser::RESTART_SYMBOL);
         break;
@@ -80228,7 +80228,7 @@ MySQLParser::LabelKeywordContext* MySQLParser::labelKeyword() {
       enterOuterAlt(_localctx, 1);
       setState(9218);
 
-      if (!(this.isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
+      if (!(this->isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
       setState(9229);
       _errHandler->sync(this);
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1167, _ctx)) {
@@ -82220,7 +82220,7 @@ MySQLParser::IdentifierKeywordsUnambiguousContext* MySQLParser::identifierKeywor
       enterOuterAlt(_localctx, 2);
       setState(9241);
 
-      if (!(this.isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
+      if (!(this->isServerVersionGe80019())) throw FailedPredicateException(this, "this.isServerVersionGe80019()");
       setState(9242);
       _la = _input->LA(1);
       if (!(_la == MySQLParser::TIMESTAMP_SYMBOL
@@ -82240,7 +82240,7 @@ MySQLParser::IdentifierKeywordsUnambiguousContext* MySQLParser::identifierKeywor
       enterOuterAlt(_localctx, 3);
       setState(9243);
 
-      if (!(this.isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
+      if (!(this->isServerVersionGe80200())) throw FailedPredicateException(this, "this.isServerVersionGe80200()");
       setState(9244);
       _la = _input->LA(1);
       if (!(((((_la - 804) & ~ 0x3fULL) == 0) &&
@@ -82326,7 +82326,7 @@ MySQLParser::RoleKeywordContext* MySQLParser::roleKeyword() {
       enterOuterAlt(_localctx, 1);
       setState(9247);
 
-      if (!(this.isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
+      if (!(this->isServerVersionLt80017())) throw FailedPredicateException(this, "this.isServerVersionLt80017()");
       setState(9250);
       _errHandler->sync(this);
       switch (getInterpreter<atn::ParserATNSimulator>()->adaptivePredict(_input, 1171, _ctx)) {
@@ -84256,7 +84256,7 @@ MySQLParser::RoleOrLabelKeywordContext* MySQLParser::roleOrLabelKeyword() {
       enterOuterAlt(_localctx, 2);
       setState(9270);
 
-      if (!(this.isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
+      if (!(this->isServerVersionGe80014())) throw FailedPredicateException(this, "this.isServerVersionGe80014()");
       setState(9271);
       match(MySQLParser::ADMIN_SYMBOL);
       break;
@@ -84375,7 +84375,7 @@ bool MySQLParser::sempred(RuleContext *context, size_t ruleIndex, size_t predica
 
 bool MySQLParser::alterStatementSempred(AlterStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 0: return this.isServerVersionGe80014();
+    case 0: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84385,7 +84385,7 @@ bool MySQLParser::alterStatementSempred(AlterStatementContext *_localctx, size_t
 
 bool MySQLParser::standaloneAlterCommandsSempred(StandaloneAlterCommandsContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 1: return this.isServerVersionGe80014();
+    case 1: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84395,13 +84395,13 @@ bool MySQLParser::standaloneAlterCommandsSempred(StandaloneAlterCommandsContext 
 
 bool MySQLParser::alterListItemSempred(AlterListItemContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 2: return this.isServerVersionGe80017();
-    case 3: return this.isServerVersionGe80019();
-    case 4: return this.isServerVersionGe80014();
-    case 5: return this.isServerVersionGe80024();
-    case 6: return this.isServerVersionGe80017();
-    case 7: return this.isServerVersionGe80019();
-    case 8: return this.isServerVersionGe80014();
+    case 2: return this->isServerVersionGe80017();
+    case 3: return this->isServerVersionGe80019();
+    case 4: return this->isServerVersionGe80014();
+    case 5: return this->isServerVersionGe80024();
+    case 6: return this->isServerVersionGe80017();
+    case 7: return this->isServerVersionGe80019();
+    case 8: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84411,7 +84411,7 @@ bool MySQLParser::alterListItemSempred(AlterListItemContext *_localctx, size_t p
 
 bool MySQLParser::alterTablespaceSempred(AlterTablespaceContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 9: return this.isServerVersionGe80014();
+    case 9: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84421,7 +84421,7 @@ bool MySQLParser::alterTablespaceSempred(AlterTablespaceContext *_localctx, size
 
 bool MySQLParser::alterTablespaceOptionSempred(AlterTablespaceOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 10: return this.isServerVersionGe80024();
+    case 10: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -84431,7 +84431,7 @@ bool MySQLParser::alterTablespaceOptionSempred(AlterTablespaceOptionContext *_lo
 
 bool MySQLParser::alterInstanceStatementSempred(AlterInstanceStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 11: return this.isServerVersionGe80024();
+    case 11: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -84441,8 +84441,8 @@ bool MySQLParser::alterInstanceStatementSempred(AlterInstanceStatementContext *_
 
 bool MySQLParser::createStatementSempred(CreateStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 12: return this.isServerVersionGe80011();
-    case 13: return this.isServerVersionGe80014();
+    case 12: return this->isServerVersionGe80011();
+    case 13: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84452,7 +84452,7 @@ bool MySQLParser::createStatementSempred(CreateStatementContext *_localctx, size
 
 bool MySQLParser::createDatabaseOptionSempred(CreateDatabaseOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 14: return this.isServerVersionGe80016();
+    case 14: return this->isServerVersionGe80016();
 
   default:
     break;
@@ -84462,7 +84462,7 @@ bool MySQLParser::createDatabaseOptionSempred(CreateDatabaseOptionContext *_loca
 
 bool MySQLParser::storedRoutineBodySempred(StoredRoutineBodyContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 15: return this.isStoredRoutineBody();
+    case 15: return this->isStoredRoutineBody();
 
   default:
     break;
@@ -84472,7 +84472,7 @@ bool MySQLParser::storedRoutineBodySempred(StoredRoutineBodyContext *_localctx, 
 
 bool MySQLParser::routineOptionSempred(RoutineOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 16: return this.isServerVersionGe80032();
+    case 16: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -84482,7 +84482,7 @@ bool MySQLParser::routineOptionSempred(RoutineOptionContext *_localctx, size_t p
 
 bool MySQLParser::tsDataFileNameSempred(TsDataFileNameContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 17: return this.isServerVersionGe80014();
+    case 17: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84492,7 +84492,7 @@ bool MySQLParser::tsDataFileNameSempred(TsDataFileNameContext *_localctx, size_t
 
 bool MySQLParser::tablespaceOptionSempred(TablespaceOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 18: return this.isServerVersionGe80014();
+    case 18: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84502,8 +84502,8 @@ bool MySQLParser::tablespaceOptionSempred(TablespaceOptionContext *_localctx, si
 
 bool MySQLParser::dropStatementSempred(DropStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 19: return this.isServerVersionGe80011();
-    case 20: return this.isServerVersionGe80014();
+    case 19: return this->isServerVersionGe80011();
+    case 20: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84513,7 +84513,7 @@ bool MySQLParser::dropStatementSempred(DropStatementContext *_localctx, size_t p
 
 bool MySQLParser::deleteStatementSempred(DeleteStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 21: return this.isServerVersionGe80017();
+    case 21: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -84523,7 +84523,7 @@ bool MySQLParser::deleteStatementSempred(DeleteStatementContext *_localctx, size
 
 bool MySQLParser::valuesReferenceSempred(ValuesReferenceContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 22: return this.isServerVersionGe80018();
+    case 22: return this->isServerVersionGe80018();
 
   default:
     break;
@@ -84533,7 +84533,7 @@ bool MySQLParser::valuesReferenceSempred(ValuesReferenceContext *_localctx, size
 
 bool MySQLParser::loadFromSempred(LoadFromContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 23: return this.isServerVersionGe80200();
+    case 23: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84543,7 +84543,7 @@ bool MySQLParser::loadFromSempred(LoadFromContext *_localctx, size_t predicateIn
 
 bool MySQLParser::loadSourceTypeSempred(LoadSourceTypeContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 24: return this.isServerVersionGe80200();
+    case 24: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84553,7 +84553,7 @@ bool MySQLParser::loadSourceTypeSempred(LoadSourceTypeContext *_localctx, size_t
 
 bool MySQLParser::sourceCountSempred(SourceCountContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 25: return this.isServerVersionGe80200();
+    case 25: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84563,7 +84563,7 @@ bool MySQLParser::sourceCountSempred(SourceCountContext *_localctx, size_t predi
 
 bool MySQLParser::sourceOrderSempred(SourceOrderContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 26: return this.isServerVersionGe80200();
+    case 26: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84573,7 +84573,7 @@ bool MySQLParser::sourceOrderSempred(SourceOrderContext *_localctx, size_t predi
 
 bool MySQLParser::loadAlgorithmSempred(LoadAlgorithmContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 27: return this.isServerVersionGe80200();
+    case 27: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84583,7 +84583,7 @@ bool MySQLParser::loadAlgorithmSempred(LoadAlgorithmContext *_localctx, size_t p
 
 bool MySQLParser::loadParallelSempred(LoadParallelContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 28: return this.isServerVersionGe80200();
+    case 28: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84593,7 +84593,7 @@ bool MySQLParser::loadParallelSempred(LoadParallelContext *_localctx, size_t pre
 
 bool MySQLParser::loadMemorySempred(LoadMemoryContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 29: return this.isServerVersionGe80200();
+    case 29: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84603,7 +84603,7 @@ bool MySQLParser::loadMemorySempred(LoadMemoryContext *_localctx, size_t predica
 
 bool MySQLParser::selectStatementWithIntoSempred(SelectStatementWithIntoContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 30: return this.isSelectStatementWithInto();
+    case 30: return this->isSelectStatementWithInto();
 
   default:
     break;
@@ -84613,7 +84613,7 @@ bool MySQLParser::selectStatementWithIntoSempred(SelectStatementWithIntoContext 
 
 bool MySQLParser::queryExpressionBodySempred(QueryExpressionBodyContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 31: return this.isServerVersionGe80031();
+    case 31: return this->isServerVersionGe80031();
 
   default:
     break;
@@ -84623,8 +84623,8 @@ bool MySQLParser::queryExpressionBodySempred(QueryExpressionBodyContext *_localc
 
 bool MySQLParser::queryPrimarySempred(QueryPrimaryContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 32: return this.isServerVersionGe80019();
-    case 33: return this.isServerVersionGe80019();
+    case 32: return this->isServerVersionGe80019();
+    case 33: return this->isServerVersionGe80019();
 
   default:
     break;
@@ -84634,7 +84634,7 @@ bool MySQLParser::queryPrimarySempred(QueryPrimaryContext *_localctx, size_t pre
 
 bool MySQLParser::qualifyClauseSempred(QualifyClauseContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 34: return this.isServerVersionGe80200();
+    case 34: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84644,7 +84644,7 @@ bool MySQLParser::qualifyClauseSempred(QualifyClauseContext *_localctx, size_t p
 
 bool MySQLParser::groupByClauseSempred(GroupByClauseContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 35: return this.isServerVersionGe80032();
+    case 35: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -84654,7 +84654,7 @@ bool MySQLParser::groupByClauseSempred(GroupByClauseContext *_localctx, size_t p
 
 bool MySQLParser::lockingClauseListSempred(LockingClauseListContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 36: return this.isServerVersionGe80031();
+    case 36: return this->isServerVersionGe80031();
 
   default:
     break;
@@ -84664,7 +84664,7 @@ bool MySQLParser::lockingClauseListSempred(LockingClauseListContext *_localctx, 
 
 bool MySQLParser::tableReferenceSempred(TableReferenceContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 37: return this.isServerVersionGe80017();
+    case 37: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -84674,7 +84674,7 @@ bool MySQLParser::tableReferenceSempred(TableReferenceContext *_localctx, size_t
 
 bool MySQLParser::tableFactorSempred(TableFactorContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 38: return this.isServerVersionGe80004();
+    case 38: return this->isServerVersionGe80004();
 
   default:
     break;
@@ -84684,7 +84684,7 @@ bool MySQLParser::tableFactorSempred(TableFactorContext *_localctx, size_t predi
 
 bool MySQLParser::derivedTableSempred(DerivedTableContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 39: return this.isServerVersionGe80014();
+    case 39: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84694,7 +84694,7 @@ bool MySQLParser::derivedTableSempred(DerivedTableContext *_localctx, size_t pre
 
 bool MySQLParser::jtColumnSempred(JtColumnContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 40: return this.isServerVersionGe80014();
+    case 40: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84704,7 +84704,7 @@ bool MySQLParser::jtColumnSempred(JtColumnContext *_localctx, size_t predicateIn
 
 bool MySQLParser::tableAliasSempred(TableAliasContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 41: return this.isServerVersionGe80017();
+    case 41: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -84714,7 +84714,7 @@ bool MySQLParser::tableAliasSempred(TableAliasContext *_localctx, size_t predica
 
 bool MySQLParser::masterOrBinaryLogsAndGtidsSempred(MasterOrBinaryLogsAndGtidsContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 42: return this.isServerVersionGe80032();
+    case 42: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -84724,7 +84724,7 @@ bool MySQLParser::masterOrBinaryLogsAndGtidsSempred(MasterOrBinaryLogsAndGtidsCo
 
 bool MySQLParser::changeReplicationSourceSempred(ChangeReplicationSourceContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 43: return this.isServerVersionGe80024();
+    case 43: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -84734,9 +84734,9 @@ bool MySQLParser::changeReplicationSourceSempred(ChangeReplicationSourceContext 
 
 bool MySQLParser::sourceDefinitionSempred(SourceDefinitionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 44: return this.isServerVersionGe80024();
-    case 45: return this.isServerVersionGe80024();
-    case 46: return this.isServerVersionGe80027();
+    case 44: return this->isServerVersionGe80024();
+    case 45: return this->isServerVersionGe80024();
+    case 46: return this->isServerVersionGe80027();
 
   default:
     break;
@@ -84746,7 +84746,7 @@ bool MySQLParser::sourceDefinitionSempred(SourceDefinitionContext *_localctx, si
 
 bool MySQLParser::cloneStatementSempred(CloneStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 47: return this.isServerVersionGe80014();
+    case 47: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84756,8 +84756,8 @@ bool MySQLParser::cloneStatementSempred(CloneStatementContext *_localctx, size_t
 
 bool MySQLParser::alterUserStatementSempred(AlterUserStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 48: return this.isServerVersionGe80014();
-    case 49: return this.isServerVersionGe80014();
+    case 48: return this->isServerVersionGe80014();
+    case 49: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84767,8 +84767,8 @@ bool MySQLParser::alterUserStatementSempred(AlterUserStatementContext *_localctx
 
 bool MySQLParser::alterUserSempred(AlterUserContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 50: return this.isServerVersionLt80025();
-    case 51: return this.isServerVersionGe80025();
+    case 50: return this->isServerVersionLt80025();
+    case 51: return this->isServerVersionGe80025();
 
   default:
     break;
@@ -84778,7 +84778,7 @@ bool MySQLParser::alterUserSempred(AlterUserContext *_localctx, size_t predicate
 
 bool MySQLParser::createUserTailSempred(CreateUserTailContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 52: return this.isServerVersionGe80024();
+    case 52: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -84788,7 +84788,7 @@ bool MySQLParser::createUserTailSempred(CreateUserTailContext *_localctx, size_t
 
 bool MySQLParser::accountLockPasswordExpireOptionsSempred(AccountLockPasswordExpireOptionsContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 53: return this.isServerVersionGe80014();
+    case 53: return this->isServerVersionGe80014();
 
   default:
     break;
@@ -84798,8 +84798,8 @@ bool MySQLParser::accountLockPasswordExpireOptionsSempred(AccountLockPasswordExp
 
 bool MySQLParser::grantTargetListSempred(GrantTargetListContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 54: return this.isServerVersionLt80011();
-    case 55: return this.isServerVersionGe80011();
+    case 54: return this->isServerVersionLt80011();
+    case 55: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -84809,7 +84809,7 @@ bool MySQLParser::grantTargetListSempred(GrantTargetListContext *_localctx, size
 
 bool MySQLParser::versionedRequireClauseSempred(VersionedRequireClauseContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 56: return this.isServerVersionLt80011();
+    case 56: return this->isServerVersionLt80011();
 
   default:
     break;
@@ -84819,8 +84819,8 @@ bool MySQLParser::versionedRequireClauseSempred(VersionedRequireClauseContext *_
 
 bool MySQLParser::revokeStatementSempred(RevokeStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 57: return this.isServerVersionGe80031();
-    case 58: return this.isServerVersionGe80031();
+    case 57: return this->isServerVersionGe80031();
+    case 58: return this->isServerVersionGe80031();
 
   default:
     break;
@@ -84830,7 +84830,7 @@ bool MySQLParser::revokeStatementSempred(RevokeStatementContext *_localctx, size
 
 bool MySQLParser::grantIdentifierSempred(GrantIdentifierContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 59: return this.isServerVersionGe80017();
+    case 59: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -84840,7 +84840,7 @@ bool MySQLParser::grantIdentifierSempred(GrantIdentifierContext *_localctx, size
 
 bool MySQLParser::grantOptionSempred(GrantOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 60: return this.isServerVersionLt80011();
+    case 60: return this->isServerVersionLt80011();
 
   default:
     break;
@@ -84850,7 +84850,7 @@ bool MySQLParser::grantOptionSempred(GrantOptionContext *_localctx, size_t predi
 
 bool MySQLParser::histogramAutoUpdateSempred(HistogramAutoUpdateContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 61: return this.isServerVersionGe80200();
+    case 61: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84860,7 +84860,7 @@ bool MySQLParser::histogramAutoUpdateSempred(HistogramAutoUpdateContext *_localc
 
 bool MySQLParser::histogramUpdateParamSempred(HistogramUpdateParamContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 62: return this.isServerVersionGe80031();
+    case 62: return this->isServerVersionGe80031();
 
   default:
     break;
@@ -84870,7 +84870,7 @@ bool MySQLParser::histogramUpdateParamSempred(HistogramUpdateParamContext *_loca
 
 bool MySQLParser::histogramNumBucketsSempred(HistogramNumBucketsContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 63: return this.isServerVersionGe80200();
+    case 63: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -84880,7 +84880,7 @@ bool MySQLParser::histogramNumBucketsSempred(HistogramNumBucketsContext *_localc
 
 bool MySQLParser::installSetValueListSempred(InstallSetValueListContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 64: return this.isServerVersionGe80032();
+    case 64: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -84890,8 +84890,8 @@ bool MySQLParser::installSetValueListSempred(InstallSetValueListContext *_localc
 
 bool MySQLParser::startOptionValueListSempred(StartOptionValueListContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 65: return this.isServerVersionLt80014();
-    case 66: return this.isServerVersionGe80018();
+    case 65: return this->isServerVersionLt80014();
+    case 66: return this->isServerVersionGe80018();
 
   default:
     break;
@@ -84901,7 +84901,7 @@ bool MySQLParser::startOptionValueListSempred(StartOptionValueListContext *_loca
 
 bool MySQLParser::optionValueNoOptionTypeSempred(OptionValueNoOptionTypeContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 67: return this.isServerVersionGe80011();
+    case 67: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -84911,7 +84911,7 @@ bool MySQLParser::optionValueNoOptionTypeSempred(OptionValueNoOptionTypeContext 
 
 bool MySQLParser::showParseTreeStatementSempred(ShowParseTreeStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 68: return this.isServerVersionGe80100();
+    case 68: return this->isServerVersionGe80100();
 
   default:
     break;
@@ -84921,7 +84921,7 @@ bool MySQLParser::showParseTreeStatementSempred(ShowParseTreeStatementContext *_
 
 bool MySQLParser::utilityStatementSempred(UtilityStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 69: return this.isServerVersionGe80011();
+    case 69: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -84931,7 +84931,7 @@ bool MySQLParser::utilityStatementSempred(UtilityStatementContext *_localctx, si
 
 bool MySQLParser::explainStatementSempred(ExplainStatementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 70: return this.isServerVersionGe80032();
+    case 70: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -84941,10 +84941,10 @@ bool MySQLParser::explainStatementSempred(ExplainStatementContext *_localctx, si
 
 bool MySQLParser::explainOptionsSempred(ExplainOptionsContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 71: return this.isServerVersionGe80032();
-    case 72: return this.isServerVersionLt80012();
-    case 73: return this.isServerVersionGe80018();
-    case 74: return this.isServerVersionGe80019();
+    case 71: return this->isServerVersionGe80032();
+    case 72: return this->isServerVersionLt80012();
+    case 73: return this->isServerVersionGe80018();
+    case 74: return this->isServerVersionGe80019();
 
   default:
     break;
@@ -84978,7 +84978,7 @@ bool MySQLParser::boolPriSempred(BoolPriContext *_localctx, size_t predicateInde
 
 bool MySQLParser::predicateSempred(PredicateContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 81: return this.isServerVersionGe80017();
+    case 81: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85015,7 +85015,7 @@ bool MySQLParser::simpleExprSempred(SimpleExprContext *_localctx, size_t predica
 
 bool MySQLParser::arrayCastSempred(ArrayCastContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 91: return this.isServerVersionGe80017();
+    case 91: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85025,7 +85025,7 @@ bool MySQLParser::arrayCastSempred(ArrayCastContext *_localctx, size_t predicate
 
 bool MySQLParser::windowFunctionCallSempred(WindowFunctionCallContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 92: return this.isServerVersionLt80024();
+    case 92: return this->isServerVersionLt80024();
 
   default:
     break;
@@ -85035,7 +85035,7 @@ bool MySQLParser::windowFunctionCallSempred(WindowFunctionCallContext *_localctx
 
 bool MySQLParser::tablesampleClauseSempred(TablesampleClauseContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 93: return this.isServerVersionGe80200();
+    case 93: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -85045,7 +85045,7 @@ bool MySQLParser::tablesampleClauseSempred(TablesampleClauseContext *_localctx, 
 
 bool MySQLParser::leadLagInfoSempred(LeadLagInfoContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 94: return this.isServerVersionGe80024();
+    case 94: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85055,8 +85055,8 @@ bool MySQLParser::leadLagInfoSempred(LeadLagInfoContext *_localctx, size_t predi
 
 bool MySQLParser::runtimeFunctionCallSempred(RuntimeFunctionCallContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 95: return this.isServerVersionGe80032();
-    case 96: return this.isServerVersionLt80011();
+    case 95: return this->isServerVersionGe80032();
+    case 96: return this->isServerVersionLt80011();
 
   default:
     break;
@@ -85066,7 +85066,7 @@ bool MySQLParser::runtimeFunctionCallSempred(RuntimeFunctionCallContext *_localc
 
 bool MySQLParser::lvalueVariableSempred(LvalueVariableContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 97: return this.isServerVersionGe80017();
+    case 97: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85076,10 +85076,10 @@ bool MySQLParser::lvalueVariableSempred(LvalueVariableContext *_localctx, size_t
 
 bool MySQLParser::castTypeSempred(CastTypeContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 98: return this.isServerVersionGe80024();
-    case 99: return this.isServerVersionGe80017();
-    case 100: return this.isServerVersionGe80017();
-    case 101: return this.isServerVersionGe80027();
+    case 98: return this->isServerVersionGe80024();
+    case 99: return this->isServerVersionGe80017();
+    case 100: return this->isServerVersionGe80017();
+    case 101: return this->isServerVersionGe80027();
 
   default:
     break;
@@ -85089,7 +85089,7 @@ bool MySQLParser::castTypeSempred(CastTypeContext *_localctx, size_t predicateIn
 
 bool MySQLParser::checkOrReferencesSempred(CheckOrReferencesContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 102: return this.isServerVersionLt80016();
+    case 102: return this->isServerVersionLt80016();
 
   default:
     break;
@@ -85099,7 +85099,7 @@ bool MySQLParser::checkOrReferencesSempred(CheckOrReferencesContext *_localctx, 
 
 bool MySQLParser::constraintEnforcementSempred(ConstraintEnforcementContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 103: return this.isServerVersionGe80017();
+    case 103: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85109,13 +85109,13 @@ bool MySQLParser::constraintEnforcementSempred(ConstraintEnforcementContext *_lo
 
 bool MySQLParser::columnAttributeSempred(ColumnAttributeContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 104: return this.isServerVersionGe80014();
-    case 105: return this.isServerVersionGe80013();
-    case 106: return this.isServerVersionGe80017();
-    case 107: return this.isServerVersionGe80017();
-    case 108: return this.isServerVersionGe80024();
-    case 109: return this.isServerVersionGe80024();
-    case 110: return this.isServerVersionGe80024();
+    case 104: return this->isServerVersionGe80014();
+    case 105: return this->isServerVersionGe80013();
+    case 106: return this->isServerVersionGe80017();
+    case 107: return this->isServerVersionGe80017();
+    case 108: return this->isServerVersionGe80024();
+    case 109: return this->isServerVersionGe80024();
+    case 110: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85125,7 +85125,7 @@ bool MySQLParser::columnAttributeSempred(ColumnAttributeContext *_localctx, size
 
 bool MySQLParser::keyPartOrExpressionSempred(KeyPartOrExpressionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 111: return this.isServerVersionGe80013();
+    case 111: return this->isServerVersionGe80013();
 
   default:
     break;
@@ -85135,8 +85135,8 @@ bool MySQLParser::keyPartOrExpressionSempred(KeyPartOrExpressionContext *_localc
 
 bool MySQLParser::commonIndexOptionSempred(CommonIndexOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 112: return this.isServerVersionGe80024();
-    case 113: return this.isServerVersionGe80024();
+    case 112: return this->isServerVersionGe80024();
+    case 113: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85146,7 +85146,7 @@ bool MySQLParser::commonIndexOptionSempred(CommonIndexOptionContext *_localctx, 
 
 bool MySQLParser::charsetNameSempred(CharsetNameContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 114: return this.isServerVersionLt80011();
+    case 114: return this->isServerVersionLt80011();
 
   default:
     break;
@@ -85156,8 +85156,8 @@ bool MySQLParser::charsetNameSempred(CharsetNameContext *_localctx, size_t predi
 
 bool MySQLParser::collationNameSempred(CollationNameContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 115: return this.isServerVersionLt80011();
-    case 116: return this.isServerVersionGe80018();
+    case 115: return this->isServerVersionLt80011();
+    case 116: return this->isServerVersionGe80018();
 
   default:
     break;
@@ -85167,11 +85167,11 @@ bool MySQLParser::collationNameSempred(CollationNameContext *_localctx, size_t p
 
 bool MySQLParser::createTableOptionSempred(CreateTableOptionContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 117: return this.isServerVersionGe80014();
-    case 118: return this.isServerVersionGe80024();
-    case 119: return this.isServerVersionGe80024();
-    case 120: return this.isServerVersionGe80024();
-    case 121: return this.isServerVersionGe80024();
+    case 117: return this->isServerVersionGe80014();
+    case 118: return this->isServerVersionGe80024();
+    case 119: return this->isServerVersionGe80024();
+    case 120: return this->isServerVersionGe80024();
+    case 121: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85181,7 +85181,7 @@ bool MySQLParser::createTableOptionSempred(CreateTableOptionContext *_localctx, 
 
 bool MySQLParser::persistedVariableIdentifierSempred(PersistedVariableIdentifierContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 122: return this.isServerVersionGe80032();
+    case 122: return this->isServerVersionGe80032();
 
   default:
     break;
@@ -85191,7 +85191,7 @@ bool MySQLParser::persistedVariableIdentifierSempred(PersistedVariableIdentifier
 
 bool MySQLParser::pureIdentifierSempred(PureIdentifierContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 123: return this.isPureIdentifier();
+    case 123: return this->isPureIdentifier();
 
   default:
     break;
@@ -85201,7 +85201,7 @@ bool MySQLParser::pureIdentifierSempred(PureIdentifierContext *_localctx, size_t
 
 bool MySQLParser::real_ulonglong_numberSempred(Real_ulonglong_numberContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 124: return this.isServerVersionGe80017();
+    case 124: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85211,7 +85211,7 @@ bool MySQLParser::real_ulonglong_numberSempred(Real_ulonglong_numberContext *_lo
 
 bool MySQLParser::signedLiteralOrNullSempred(SignedLiteralOrNullContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 125: return this.isServerVersionGe80024();
+    case 125: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85221,7 +85221,7 @@ bool MySQLParser::signedLiteralOrNullSempred(SignedLiteralOrNullContext *_localc
 
 bool MySQLParser::literalOrNullSempred(LiteralOrNullContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 126: return this.isServerVersionGe80024();
+    case 126: return this->isServerVersionGe80024();
 
   default:
     break;
@@ -85231,7 +85231,7 @@ bool MySQLParser::literalOrNullSempred(LiteralOrNullContext *_localctx, size_t p
 
 bool MySQLParser::textStringLiteralSempred(TextStringLiteralContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 127: return this.isTextStringLiteral();
+    case 127: return this->isTextStringLiteral();
 
   default:
     break;
@@ -85241,7 +85241,7 @@ bool MySQLParser::textStringLiteralSempred(TextStringLiteralContext *_localctx, 
 
 bool MySQLParser::textStringHashSempred(TextStringHashContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 128: return this.isServerVersionGe80017();
+    case 128: return this->isServerVersionGe80017();
 
   default:
     break;
@@ -85251,8 +85251,8 @@ bool MySQLParser::textStringHashSempred(TextStringHashContext *_localctx, size_t
 
 bool MySQLParser::identifierKeywordSempred(IdentifierKeywordContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 129: return this.isServerVersionLt80017();
-    case 130: return this.isServerVersionGe80011();
+    case 129: return this->isServerVersionLt80017();
+    case 130: return this->isServerVersionGe80011();
 
   default:
     break;
@@ -85262,7 +85262,7 @@ bool MySQLParser::identifierKeywordSempred(IdentifierKeywordContext *_localctx, 
 
 bool MySQLParser::labelKeywordSempred(LabelKeywordContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 131: return this.isServerVersionLt80017();
+    case 131: return this->isServerVersionLt80017();
 
   default:
     break;
@@ -85272,8 +85272,8 @@ bool MySQLParser::labelKeywordSempred(LabelKeywordContext *_localctx, size_t pre
 
 bool MySQLParser::identifierKeywordsUnambiguousSempred(IdentifierKeywordsUnambiguousContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 132: return this.isServerVersionGe80019();
-    case 133: return this.isServerVersionGe80200();
+    case 132: return this->isServerVersionGe80019();
+    case 133: return this->isServerVersionGe80200();
 
   default:
     break;
@@ -85283,7 +85283,7 @@ bool MySQLParser::identifierKeywordsUnambiguousSempred(IdentifierKeywordsUnambig
 
 bool MySQLParser::roleKeywordSempred(RoleKeywordContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 134: return this.isServerVersionLt80017();
+    case 134: return this->isServerVersionLt80017();
 
   default:
     break;
@@ -85293,7 +85293,7 @@ bool MySQLParser::roleKeywordSempred(RoleKeywordContext *_localctx, size_t predi
 
 bool MySQLParser::roleOrLabelKeywordSempred(RoleOrLabelKeywordContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 135: return this.isServerVersionGe80014();
+    case 135: return this->isServerVersionGe80014();
 
   default:
     break;
