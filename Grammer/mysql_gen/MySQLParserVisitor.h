@@ -8,6 +8,7 @@
 #include "MySQLParser.h"
 
 
+namespace antlrcpp_mysql {
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -1608,3 +1609,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_mysql

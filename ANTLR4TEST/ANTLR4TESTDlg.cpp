@@ -9,7 +9,6 @@
 
 // 네임스페이스 사용
 using namespace antlr4;
-// using namespace antlrcpptest;
 
 // [주의] DEBUG_NEW는 반드시 ANTLR 헤더들 "아래"에 있어야 합니다.
 #ifdef _DEBUG

@@ -11,6 +11,8 @@
 #include <algorithm>
 #include <iostream>
 
+using namespace antlrcpp_mysql;
+
 MySQLLexerBase::MySQLLexerBase(antlr4::CharStream * input) : antlr4::Lexer(input)
 {
     this->serverVersion = 80200;

@@ -8,6 +8,7 @@
 
 
 using namespace antlrcpp;
+using namespace antlrcpp_mysql;
 
 using namespace antlr4;
 

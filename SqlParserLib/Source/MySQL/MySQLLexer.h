@@ -7,7 +7,7 @@
 #include "antlr4-runtime.h"
 #include "MySQLLexerBase.h"
 
-
+namespace antlrcpp_mysql {
 
 
 class  MySQLLexer : public MySQLLexerBase {
@@ -459,3 +459,4 @@ private:
 
 };
 
+}  // namespace antlrcpp_mysql

@@ -3,10 +3,11 @@
 
 
 #include "MySQLLexer.h"
-#include "MySQLLexerBase.h"
+
 
 using namespace antlr4;
 
+using namespace antlrcpp_mysql;
 
 
 using namespace antlr4;

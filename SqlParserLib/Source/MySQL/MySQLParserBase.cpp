@@ -15,6 +15,7 @@
 #include "SqlModes.h"
 #include "MySQLParserBase.h"
 
+using namespace antlrcpp_mysql;
 
 MySQLParserBase::MySQLParserBase(antlr4::TokenStream* input) : Parser(input)
 {

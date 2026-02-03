@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_mysql {
 
 
 class  MySQLParser : public MySQLParserBase {
@@ -15829,3 +15830,4 @@ public:
 private:
 };
 
+}  // namespace antlrcpp_mysql
