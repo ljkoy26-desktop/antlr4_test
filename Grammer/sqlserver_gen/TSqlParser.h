@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_sqlserver {
 
 
 class  TSqlParser : public antlr4::Parser {
@@ -19638,3 +19639,4 @@ public:
 private:
 };
 
+}  // namespace antlrcpp_sqlserver

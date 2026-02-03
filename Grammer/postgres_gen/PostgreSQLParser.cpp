@@ -8,6 +8,7 @@
 
 
 using namespace antlrcpp;
+using namespace antlrcpp_postgresql;
 
 using namespace antlr4;
 

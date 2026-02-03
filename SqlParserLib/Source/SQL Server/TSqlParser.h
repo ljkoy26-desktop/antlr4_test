@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_sqlserver {
 
 
 class  TSqlParser : public antlr4::Parser {
@@ -244,7 +245,7 @@ public:
     TRY = 1005, TRY_CAST = 1006, TSEQUAL = 1007, TSQL = 1008, TWO_DIGIT_YEAR_CUTOFF = 1009, 
     TYPE = 1010, TYPEPROPERTY = 1011, TYPE_ID = 1012, TYPE_NAME = 1013, 
     TYPE_WARNING = 1014, UNBOUNDED = 1015, UNCHECKED = 1016, UNCOMMITTED = 1017, 
-    UNICODE = 1018, UNION = 1019, UNIQUE = 1020, UNKNOWN = 1021, UNLIMITED = 1022, 
+    UNICODE33 = 1018, UNION = 1019, UNIQUE = 1020, UNKNOWN = 1021, UNLIMITED = 1022, 
     UNLOCK = 1023, UNMASK = 1024, UNPIVOT = 1025, UNSAFE = 1026, UOW = 1027, 
     UPDATE = 1028, UPDATETEXT = 1029, UPDLOCK = 1030, UPPER = 1031, URL = 1032, 
     USE = 1033, USED = 1034, USER = 1035, USER_ID = 1036, USER_NAME = 1037, 
@@ -15633,7 +15634,7 @@ public:
     UNICODEContext(Built_in_functionsContext *ctx);
 
     TSqlParser::ExpressionContext *ncharacter_expression = nullptr;
-    antlr4::tree::TerminalNode *UNICODE();
+    antlr4::tree::TerminalNode *UNICODE33();
     antlr4::tree::TerminalNode *LR_BRACKET();
     antlr4::tree::TerminalNode *RR_BRACKET();
     ExpressionContext *expression();
@@ -19159,7 +19160,7 @@ public:
     antlr4::tree::TerminalNode *TYPEPROPERTY();
     antlr4::tree::TerminalNode *UNBOUNDED();
     antlr4::tree::TerminalNode *UNCOMMITTED();
-    antlr4::tree::TerminalNode *UNICODE();
+    antlr4::tree::TerminalNode *UNICODE33();
     antlr4::tree::TerminalNode *UNKNOWN();
     antlr4::tree::TerminalNode *UNLIMITED();
     antlr4::tree::TerminalNode *UNMASK();
@@ -19638,3 +19639,4 @@ public:
 private:
 };
 
+}  // namespace antlrcpp_sqlserver

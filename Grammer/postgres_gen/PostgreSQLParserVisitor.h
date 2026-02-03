@@ -8,6 +8,7 @@
 #include "PostgreSQLParser.h"
 
 
+namespace antlrcpp_postgresql {
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -1470,3 +1471,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_postgresql

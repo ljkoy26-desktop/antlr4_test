@@ -7,6 +7,7 @@
 
 using namespace antlr4;
 
+using namespace antlrcpp_postgresql;
 
 
 using namespace antlr4;
@@ -2575,7 +2576,7 @@ bool PostgreSQLLexer::sempred(RuleContext *context, size_t ruleIndex, size_t pre
 
 void PostgreSQLLexer::OperatorAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 0: this.HandleLessLessGreaterGreater(); break;
+    case 0: this->HandleLessLessGreaterGreater(); break;
 
   default:
     break;
@@ -2584,7 +2585,7 @@ void PostgreSQLLexer::OperatorAction(antlr4::RuleContext *context, size_t action
 
 void PostgreSQLLexer::BeginDollarStringConstantAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 1: this.PushTag(); break;
+    case 1: this->PushTag(); break;
 
   default:
     break;
@@ -2593,7 +2594,7 @@ void PostgreSQLLexer::BeginDollarStringConstantAction(antlr4::RuleContext *conte
 
 void PostgreSQLLexer::NumericFailAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 2: this.HandleNumericFail(); break;
+    case 2: this->HandleNumericFail(); break;
 
   default:
     break;
@@ -2602,7 +2603,7 @@ void PostgreSQLLexer::NumericFailAction(antlr4::RuleContext *context, size_t act
 
 void PostgreSQLLexer::UnterminatedBlockCommentAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 3: this.UnterminatedBlockCommentDebugAssert(); break;
+    case 3: this->UnterminatedBlockCommentDebugAssert(); break;
 
   default:
     break;
@@ -2611,7 +2612,7 @@ void PostgreSQLLexer::UnterminatedBlockCommentAction(antlr4::RuleContext *contex
 
 void PostgreSQLLexer::EndDollarStringConstantAction(antlr4::RuleContext *context, size_t actionIndex) {
   switch (actionIndex) {
-    case 4: this.PopTag(); break;
+    case 4: this->PopTag(); break;
 
   default:
     break;
@@ -2621,9 +2622,9 @@ void PostgreSQLLexer::EndDollarStringConstantAction(antlr4::RuleContext *context
 
 bool PostgreSQLLexer::OperatorSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 0: return this.CheckLaMinus();
-    case 1: return this.CheckLaStar();
-    case 2: return this.CheckLaStar();
+    case 0: return this->CheckLaMinus();
+    case 1: return this->CheckLaStar();
+    case 2: return this->CheckLaStar();
 
   default:
     break;
@@ -2633,9 +2634,9 @@ bool PostgreSQLLexer::OperatorSempred(antlr4::RuleContext *_localctx, size_t pre
 
 bool PostgreSQLLexer::OperatorEndingWithPlusMinusSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 3: return this.CheckLaMinus();
-    case 4: return this.CheckLaStar();
-    case 5: return this.CheckLaMinus();
+    case 3: return this->CheckLaMinus();
+    case 4: return this->CheckLaStar();
+    case 5: return this->CheckLaMinus();
 
   default:
     break;
@@ -2645,8 +2646,8 @@ bool PostgreSQLLexer::OperatorEndingWithPlusMinusSempred(antlr4::RuleContext *_l
 
 bool PostgreSQLLexer::IdentifierStartCharSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 6: return this.CharIsLetter();
-    case 7: return this.CheckIfUtf32Letter();
+    case 6: return this->CharIsLetter();
+    case 7: return this->CheckIfUtf32Letter();
 
   default:
     break;
@@ -2656,7 +2657,7 @@ bool PostgreSQLLexer::IdentifierStartCharSempred(antlr4::RuleContext *_localctx,
 
 bool PostgreSQLLexer::EndDollarStringConstantSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 8: return this.IsTag();
+    case 8: return this->IsTag();
 
   default:
     break;
@@ -2666,7 +2667,7 @@ bool PostgreSQLLexer::EndDollarStringConstantSempred(antlr4::RuleContext *_local
 
 bool PostgreSQLLexer::MetaSemiSempred(antlr4::RuleContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 9: return this.IsSemiColon();
+    case 9: return this->IsSemiColon();
 
   default:
     break;

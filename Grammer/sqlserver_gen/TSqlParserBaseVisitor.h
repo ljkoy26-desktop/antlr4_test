@@ -8,6 +8,8 @@
 #include "TSqlParserVisitor.h"
 
 
+namespace antlrcpp_sqlserver {
+
 /**
  * This class provides an empty implementation of TSqlParserVisitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
@@ -3274,3 +3276,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_sqlserver

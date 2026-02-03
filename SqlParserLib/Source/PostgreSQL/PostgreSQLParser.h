@@ -5,8 +5,9 @@
 
 
 #include "antlr4-runtime.h"
+#include "PostgreSQLParserBase.h"
 
-
+namespace antlrcpp_postgresql {
 
 
 class  PostgreSQLParser : public PostgreSQLParserBase {
@@ -14709,3 +14710,4 @@ public:
 private:
 };
 
+}  // namespace antlrcpp_postgresql

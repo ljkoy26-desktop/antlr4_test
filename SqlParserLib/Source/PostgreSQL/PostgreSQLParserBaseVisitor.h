@@ -8,6 +8,8 @@
 #include "PostgreSQLParserVisitor.h"
 
 
+namespace antlrcpp_postgresql {
+
 /**
  * This class provides an empty implementation of PostgreSQLParserVisitor, which can be
  * extended to create a visitor which only needs to handle a subset of the available methods.
@@ -2914,3 +2916,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_postgresql

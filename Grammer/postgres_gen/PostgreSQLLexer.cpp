@@ -7,6 +7,7 @@
 
 using namespace antlr4;
 
+using namespace antlrcpp_postgresql;
 
 
 using namespace antlr4;

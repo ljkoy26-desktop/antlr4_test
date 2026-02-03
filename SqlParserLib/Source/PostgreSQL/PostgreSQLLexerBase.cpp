@@ -5,6 +5,8 @@
 #include <codecvt>
 #include <cwctype>
 
+using namespace antlrcpp_postgresql;
+
 PostgreSQLLexerBase::PostgreSQLLexerBase(antlr4::CharStream * input) : antlr4::Lexer(input)
 {
     _input = input;

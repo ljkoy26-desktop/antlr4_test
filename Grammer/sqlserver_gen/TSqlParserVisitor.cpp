@@ -5,3 +5,5 @@
 #include "TSqlParserVisitor.h"
 
 
+using namespace antlrcpp_sqlserver;
+

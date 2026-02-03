@@ -8,6 +8,7 @@
 
 
 using namespace antlrcpp;
+using namespace antlrcpp_postgresql;
 
 using namespace antlr4;
 
@@ -45175,7 +45176,7 @@ PostgreSQLParser::Createfunc_opt_listContext* PostgreSQLParser::createfunc_opt_l
     || _la == PostgreSQLParser::LEAKPROOF || ((((_la - 344) & ~ 0x3fULL) == 0) &&
       ((1ULL << (_la - 344)) & 8624554121) != 0) || _la == PostgreSQLParser::VOLATILE || ((((_la - 481) & ~ 0x3fULL) == 0) &&
       ((1ULL << (_la - 481)) & 196609) != 0));
-    this.ParseRoutineBody();
+    this->ParseRoutineBody();
    
   }
   catch (RecognitionException &e) {
@@ -78042,7 +78043,7 @@ PostgreSQLParser::A_expr_qualContext* PostgreSQLParser::a_expr_qual() {
     case 1: {
       setState(9026);
 
-      if (!(this.OnlyAcceptableOps())) throw FailedPredicateException(this, "this.OnlyAcceptableOps()");
+      if (!(this->OnlyAcceptableOps())) throw FailedPredicateException(this, "this.OnlyAcceptableOps()");
       setState(9027);
       qual_op();
       break;
@@ -101004,7 +101005,7 @@ bool PostgreSQLParser::sempred(RuleContext *context, size_t ruleIndex, size_t pr
 
 bool PostgreSQLParser::a_expr_qualSempred(A_expr_qualContext *_localctx, size_t predicateIndex) {
   switch (predicateIndex) {
-    case 0: return this.OnlyAcceptableOps();
+    case 0: return this->OnlyAcceptableOps();
 
   default:
     break;

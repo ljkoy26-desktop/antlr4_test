@@ -8,6 +8,7 @@
 #include "TSqlParser.h"
 
 
+namespace antlrcpp_sqlserver {
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -1650,3 +1651,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_sqlserver

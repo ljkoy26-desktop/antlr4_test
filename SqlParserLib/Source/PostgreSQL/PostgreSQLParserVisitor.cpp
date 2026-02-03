@@ -5,3 +5,5 @@
 #include "PostgreSQLParserVisitor.h"
 
 
+using namespace antlrcpp_postgresql;
+

@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_postgresql {
 
 
 class  PostgreSQLLexer : public PostgreSQLLexerBase {
@@ -192,3 +193,4 @@ private:
 
 };
 
+}  // namespace antlrcpp_postgresql

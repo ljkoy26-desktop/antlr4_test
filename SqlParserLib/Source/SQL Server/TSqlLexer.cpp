@@ -9,7 +9,7 @@ using namespace antlr4;
 
 
 
-using namespace antlr4;
+using namespace antlrcpp_sqlserver;
 
 namespace {
 
