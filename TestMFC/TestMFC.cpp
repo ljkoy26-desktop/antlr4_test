@@ -1,27 +1,27 @@
 ﻿
-// ANTLR4TEST.cpp: 애플리케이션에 대한 클래스 동작을 정의합니다.
+// TestMFC.cpp: 애플리케이션에 대한 클래스 동작을 정의합니다.
 //
 
 #include "pch.h"
 #include "framework.h"
-#include "ANTLR4TEST.h"
-#include "ANTLR4TESTDlg.h"
+#include "TestMFC.h"
+#include "TestMFCDlg.h"
 
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
 
 
-// CANTLR4TESTApp
+// CTestMFCApp
 
-BEGIN_MESSAGE_MAP(CANTLR4TESTApp, CWinApp)
+BEGIN_MESSAGE_MAP(CTestMFCApp, CWinApp)
 	ON_COMMAND(ID_HELP, &CWinApp::OnHelp)
 END_MESSAGE_MAP()
 
 
-// CANTLR4TESTApp 생성
+// CTestMFCApp 생성
 
-CANTLR4TESTApp::CANTLR4TESTApp()
+CTestMFCApp::CTestMFCApp()
 {
 	// 다시 시작 관리자 지원
 	m_dwRestartManagerSupportFlags = AFX_RESTART_MANAGER_SUPPORT_RESTART;
@@ -29,14 +29,14 @@ CANTLR4TESTApp::CANTLR4TESTApp()
 }
 
 
-// 유일한 CANTLR4TESTApp 개체입니다.
+// 유일한 CTestMFCApp 개체입니다.
 
-CANTLR4TESTApp theApp;
+CTestMFCApp theApp;
 
 
-// CANTLR4TESTApp 초기화
+// CTestMFCApp 초기화
 
-BOOL CANTLR4TESTApp::InitInstance()
+BOOL CTestMFCApp::InitInstance()
 {
 	// 애플리케이션 매니페스트가 ComCtl32.dll 버전 6 이상을 사용하여 비주얼 스타일을
 	// 사용하도록 지정하는 경우, Windows XP 상에서 반드시 InitCommonControlsEx()가 필요합니다.
@@ -68,7 +68,7 @@ BOOL CANTLR4TESTApp::InitInstance()
 	// 적절한 내용으로 수정해야 합니다.
 	SetRegistryKey(_T("로컬 애플리케이션 마법사에서 생성된 애플리케이션"));
 
-	CANTLR4TESTDlg dlg;
+	CTestMFCDlg dlg;
 	m_pMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
 	if (nResponse == IDOK)

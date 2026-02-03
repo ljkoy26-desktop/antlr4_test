@@ -20,9 +20,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{0F623676-7554-4629-94B7-B27E690417B0}</ProjectGuid>
+    <ProjectGuid>{62D33BC9-EA36-4505-BA37-40E295D8F221}</ProjectGuid>
     <Keyword>MFCProj</Keyword>
-    <RootNamespace>ANTLR4TEST</RootNamespace>
+    <RootNamespace>TestMFC</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -208,16 +208,16 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Include\AntlrProxy.h" />
-    <ClInclude Include="ANTLR4TEST.h" />
-    <ClInclude Include="ANTLR4TESTDlg.h" />
+    <ClInclude Include="TestMFC.h" />
+    <ClInclude Include="TestMFCDlg.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ANTLR4TEST.cpp" />
-    <ClCompile Include="ANTLR4TESTDlg.cpp" />
+    <ClCompile Include="TestMFC.cpp" />
+    <ClCompile Include="TestMFCDlg.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -226,13 +226,13 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="ANTLR4TEST.rc" />
+    <ResourceCompile Include="TestMFC.rc" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="res\ANTLR4TEST.rc2" />
+    <None Include="res\TestMFC.rc2" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="res\ANTLR4TEST.ico" />
+    <Image Include="res\TestMFC.ico" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SqlParserLib\SqlParserLib.vcxproj">

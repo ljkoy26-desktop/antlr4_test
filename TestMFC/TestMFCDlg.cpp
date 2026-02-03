@@ -1,7 +1,7 @@
 ﻿#include "pch.h"
 #include "framework.h"
-#include "ANTLR4TEST.h"
-#include "ANTLR4TESTDlg.h"
+#include "TestMFC.h"
+#include "TestMFCDlg.h"
 #include "afxdialogex.h"
 
 // 모든 ANTLR 관련 설정은 이 하나로 끝냅니다.
@@ -16,29 +16,29 @@ using namespace antlr4;
 #endif
 
 
-CANTLR4TESTDlg::CANTLR4TESTDlg(CWnd* pParent /*=nullptr*/)
-	: CDialogEx(IDD_ANTLR4TEST_DIALOG, pParent)
+CTestMFCDlg::CTestMFCDlg(CWnd* pParent /*=nullptr*/)
+	: CDialogEx(IDD_TestMFC_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
 
-void CANTLR4TESTDlg::DoDataExchange(CDataExchange* pDX)
+void CTestMFCDlg::DoDataExchange(CDataExchange* pDX)
 {
 	CDialogEx::DoDataExchange(pDX);
 }
 
-BEGIN_MESSAGE_MAP(CANTLR4TESTDlg, CDialogEx)
+BEGIN_MESSAGE_MAP(CTestMFCDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
-	ON_BN_CLICKED(IDC_BUTTON_PARSE, &CANTLR4TESTDlg::OnBnClickedButtonParse)
-	ON_BN_CLICKED(IDC_BUTTON_TYPE, &CANTLR4TESTDlg::OnBnClickedButtonIdentify)
-	ON_BN_CLICKED(IDC_BUTTON_MULTI, &CANTLR4TESTDlg::OnBnClickedButtonMultiParse)
-	ON_BN_CLICKED(IDC_BUTTON_TOKEN, &CANTLR4TESTDlg::OnBnClickedButtonTokenize)
+	ON_BN_CLICKED(IDC_BUTTON_PARSE, &CTestMFCDlg::OnBnClickedButtonParse)
+	ON_BN_CLICKED(IDC_BUTTON_TYPE, &CTestMFCDlg::OnBnClickedButtonIdentify)
+	ON_BN_CLICKED(IDC_BUTTON_MULTI, &CTestMFCDlg::OnBnClickedButtonMultiParse)
+	ON_BN_CLICKED(IDC_BUTTON_TOKEN, &CTestMFCDlg::OnBnClickedButtonTokenize)
 END_MESSAGE_MAP()
 
 
-BOOL CANTLR4TESTDlg::OnInitDialog()
+BOOL CTestMFCDlg::OnInitDialog()
 {
 	CDialogEx::OnInitDialog();
 
@@ -69,11 +69,11 @@ BOOL CANTLR4TESTDlg::OnInitDialog()
 	return TRUE;
 }
 
-void CANTLR4TESTDlg::OnSysCommand(UINT nID, LPARAM lParam)
+void CTestMFCDlg::OnSysCommand(UINT nID, LPARAM lParam)
 {
 	CDialogEx::OnSysCommand(nID, lParam);
 }
-void CANTLR4TESTDlg::OnPaint()
+void CTestMFCDlg::OnPaint()
 {
 	if (IsIconic())
 	{
@@ -98,12 +98,12 @@ void CANTLR4TESTDlg::OnPaint()
 	}
 }
 
-HCURSOR CANTLR4TESTDlg::OnQueryDragIcon()
+HCURSOR CTestMFCDlg::OnQueryDragIcon()
 {
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
-void CANTLR4TESTDlg::OnBnClickedButtonParse()
+void CTestMFCDlg::OnBnClickedButtonParse()
 {
 	// 1. UI에서 SQL 가져오기
 
@@ -174,7 +174,7 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 	}
 }
 
-void CANTLR4TESTDlg::AddTraceLog(LPCTSTR lpszFormat, ...)
+void CTestMFCDlg::AddTraceLog(LPCTSTR lpszFormat, ...)
 {
 	// 1. 가변 인자 문자열 구성
 	CString strLog;
@@ -201,7 +201,7 @@ void CANTLR4TESTDlg::AddTraceLog(LPCTSTR lpszFormat, ...)
 }
 
 // SQL 유형 식별 함수 구현
-CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg::IdentifySqlType(const std::string& sqlQuery)
+CTestMFCDlg::SqlStatementType CTestMFCDlg::IdentifySqlType(const std::string& sqlQuery)
 {
 	try {
 		ANTLRInputStream input(sqlQuery);
@@ -318,7 +318,7 @@ CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg::IdentifySqlType(const std::stri
 	return SqlStatementType::UNKNOWN;
 }
 
-CString CANTLR4TESTDlg::SqlTypeToString(SqlStatementType type)
+CString CTestMFCDlg::SqlTypeToString(SqlStatementType type)
 {
 	switch (type) {
 	case SqlStatementType::SELECT_STATEMENT:   return _T("SELECT (DML)");
@@ -345,7 +345,7 @@ CString CANTLR4TESTDlg::SqlTypeToString(SqlStatementType type)
 	}
 }
 
-void CANTLR4TESTDlg::OnBnClickedButtonIdentify()
+void CTestMFCDlg::OnBnClickedButtonIdentify()
 {
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
@@ -366,9 +366,9 @@ void CANTLR4TESTDlg::OnBnClickedButtonIdentify()
 }
 
 // 복합 쿼리 파싱: SimpleStatement에서 유형 식별하는 헬퍼 함수
-CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg_IdentifyFromSimpleStatement(antlrcpp_mysql::MySQLParser::SimpleStatementContext* simpleStmt)
+CTestMFCDlg::SqlStatementType CTestMFCDlg_IdentifyFromSimpleStatement(antlrcpp_mysql::MySQLParser::SimpleStatementContext* simpleStmt)
 {
-	using SqlType = CANTLR4TESTDlg::SqlStatementType;
+	using SqlType = CTestMFCDlg::SqlStatementType;
 
 	if (!simpleStmt) {
 		return SqlType::UNKNOWN;
@@ -463,7 +463,7 @@ CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg_IdentifyFromSimpleStatement(antl
 }
 
 // 복합 쿼리 파싱 함수 구현
-std::vector<CANTLR4TESTDlg::SqlStatementInfo> CANTLR4TESTDlg::ParseMultipleQueries(const std::string& sqlQueries)
+std::vector<CTestMFCDlg::SqlStatementInfo> CTestMFCDlg::ParseMultipleQueries(const std::string& sqlQueries)
 {
 	std::vector<SqlStatementInfo> results;
 
@@ -492,7 +492,7 @@ std::vector<CANTLR4TESTDlg::SqlStatementInfo> CANTLR4TESTDlg::ParseMultipleQueri
 
 			// simpleStatement 가져오기
 			auto* simpleStmt = queryCtx->simpleStatement();
-			info.type = CANTLR4TESTDlg_IdentifyFromSimpleStatement(simpleStmt);
+			info.type = CTestMFCDlg_IdentifyFromSimpleStatement(simpleStmt);
 
 			// 토큰에서 원본 SQL 텍스트 추출
 			if (simpleStmt) {
@@ -523,7 +523,7 @@ std::vector<CANTLR4TESTDlg::SqlStatementInfo> CANTLR4TESTDlg::ParseMultipleQueri
 }
 
 // 특정 인덱스의 쿼리 가져오기 (0부터 시작)
-CANTLR4TESTDlg::SqlStatementInfo CANTLR4TESTDlg::GetQueryAt(const std::string& sqlQueries, size_t index)
+CTestMFCDlg::SqlStatementInfo CTestMFCDlg::GetQueryAt(const std::string& sqlQueries, size_t index)
 {
 	SqlStatementInfo emptyInfo = { -1, SqlStatementType::UNKNOWN, "", 0, 0 };
 
@@ -550,7 +550,7 @@ CANTLR4TESTDlg::SqlStatementInfo CANTLR4TESTDlg::GetQueryAt(const std::string& s
 		info.index = static_cast<int>(index + 1);  // 1부터 시작하는 인덱스
 
 		auto* simpleStmt = queryCtx->simpleStatement();
-		info.type = CANTLR4TESTDlg_IdentifyFromSimpleStatement(simpleStmt);
+		info.type = CTestMFCDlg_IdentifyFromSimpleStatement(simpleStmt);
 
 		if (simpleStmt) {
 			antlr4::Token* startToken = simpleStmt->getStart();
@@ -576,7 +576,7 @@ CANTLR4TESTDlg::SqlStatementInfo CANTLR4TESTDlg::GetQueryAt(const std::string& s
 }
 
 // 복합 쿼리 파싱 버튼 핸들러
-void CANTLR4TESTDlg::OnBnClickedButtonMultiParse()
+void CTestMFCDlg::OnBnClickedButtonMultiParse()
 {
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
@@ -636,7 +636,7 @@ void CANTLR4TESTDlg::OnBnClickedButtonMultiParse()
 // ============================================================
 
 // TokenRole을 문자열로 변환
-CString CANTLR4TESTDlg::TokenRoleToString(TokenRole role)
+CString CTestMFCDlg::TokenRoleToString(TokenRole role)
 {
 	switch (role) {
 	// 키워드/예약어
@@ -688,9 +688,9 @@ CString CANTLR4TESTDlg::TokenRoleToString(TokenRole role)
 }
 
 // Lexer 토큰 타입에서 기본 역할 결정
-CANTLR4TESTDlg::TokenRole GetRoleFromLexerToken(size_t tokenType, const std::string& tokenText)
+CTestMFCDlg::TokenRole GetRoleFromLexerToken(size_t tokenType, const std::string& tokenText)
 {
-	using TR = CANTLR4TESTDlg::TokenRole;
+	using TR = CTestMFCDlg::TokenRole;
 
 	// antlrcpp_mysql::MySQLLexer의 토큰 타입 상수 사용
 	switch (tokenType) {
@@ -834,7 +834,7 @@ CANTLR4TESTDlg::TokenRole GetRoleFromLexerToken(size_t tokenType, const std::str
 }
 
 // 토큰화 함수 구현
-std::vector<CANTLR4TESTDlg::TokenInfo> CANTLR4TESTDlg::TokenizeQuery(const std::string& sqlQuery)
+std::vector<CTestMFCDlg::TokenInfo> CTestMFCDlg::TokenizeQuery(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -908,7 +908,7 @@ std::vector<CANTLR4TESTDlg::TokenInfo> CANTLR4TESTDlg::TokenizeQuery(const std::
 }
 
 // 토큰화 버튼 핸들러
-void CANTLR4TESTDlg::OnBnClickedButtonTokenize()
+void CTestMFCDlg::OnBnClickedButtonTokenize()
 {
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);

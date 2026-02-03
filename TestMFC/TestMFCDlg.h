@@ -3,13 +3,13 @@
 #include <string>
 #include <vector>
 
-class CANTLR4TESTDlg : public CDialogEx
+class CTestMFCDlg : public CDialogEx
 {
 public:
-	CANTLR4TESTDlg(CWnd* pParent = nullptr);
+	CTestMFCDlg(CWnd* pParent = nullptr);
 
 #ifdef AFX_DESIGN_TIME
-	enum { IDD = IDD_ANTLR4TEST_DIALOG };
+	enum { IDD = IDD_TestMFC_DIALOG };
 #endif
 
 	// SQL 문 유형을 나타내는 열거형
