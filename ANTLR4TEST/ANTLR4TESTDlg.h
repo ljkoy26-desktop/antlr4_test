@@ -151,8 +151,8 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 public:
-	afx_msg void OnBnClickedButtonParse();
-	afx_msg void OnBnClickedButtonIdentify();
+	afx_msg void OnBnClickedButtonParse(); // 파싱시작 ( 지금사용안함 )
+	afx_msg void OnBnClickedButtonIdentify(); // 쿼리 타입 분석 
 	afx_msg void OnBnClickedButtonMultiParse();  // 복합 쿼리 파싱 버튼
 	afx_msg void OnBnClickedButtonTokenize();    // 토큰화 버튼
 };
