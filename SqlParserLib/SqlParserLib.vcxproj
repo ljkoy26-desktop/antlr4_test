@@ -72,15 +72,23 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
+    <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
+    <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
+    <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
+    <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
+    <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -88,6 +96,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -103,6 +112,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>
@@ -166,6 +176,16 @@
     <ClInclude Include="Source\Oracle\PlSqlParserBase.h" />
     <ClInclude Include="Source\Oracle\PlSqlParserBaseVisitor.h" />
     <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLLexer.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLLexerBase.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParser.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserBase.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserBaseVisitor.h" />
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserVisitor.h" />
+    <ClInclude Include="Source\SQL Server\TSqlLexer.h" />
+    <ClInclude Include="Source\SQL Server\TSqlParser.h" />
+    <ClInclude Include="Source\SQL Server\TSqlParserBaseVisitor.h" />
+    <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp" />
@@ -179,6 +199,16 @@
     <ClCompile Include="Source\Oracle\PlSqlParser.cpp" />
     <ClCompile Include="Source\Oracle\PlSqlParserBaseVisitor.cpp" />
     <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLLexer.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLLexerBase.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParser.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserBase.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserBaseVisitor.cpp" />
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserVisitor.cpp" />
+    <ClCompile Include="Source\SQL Server\TSqlLexer.cpp" />
+    <ClCompile Include="Source\SQL Server\TSqlParser.cpp" />
+    <ClCompile Include="Source\SQL Server\TSqlParserBaseVisitor.cpp" />
+    <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\MySQL\MySQLLexer.interp" />
@@ -191,6 +221,15 @@
     <None Include="Source\Oracle\PlSqlParser.interp" />
     <None Include="Source\Oracle\PlSqlParser.tokens" />
     <None Include="Source\Oracle\transformGrammar.py" />
+    <None Include="Source\PostgreSQL\PostgreSQLLexer.interp" />
+    <None Include="Source\PostgreSQL\PostgreSQLLexer.tokens" />
+    <None Include="Source\PostgreSQL\PostgreSQLParser.interp" />
+    <None Include="Source\PostgreSQL\PostgreSQLParser.tokens" />
+    <None Include="Source\PostgreSQL\transformGrammar.py" />
+    <None Include="Source\SQL Server\TSqlLexer.interp" />
+    <None Include="Source\SQL Server\TSqlLexer.tokens" />
+    <None Include="Source\SQL Server\TSqlParser.interp" />
+    <None Include="Source\SQL Server\TSqlParser.tokens" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="Source\Oracle\st.CMakeLists.txt" />

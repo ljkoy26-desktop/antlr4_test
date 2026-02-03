@@ -72,6 +72,36 @@
     <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h">
       <Filter>Oracle</Filter>
     </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLLexer.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLLexerBase.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParser.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserBase.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserBaseVisitor.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\PostgreSQL\PostgreSQLParserVisitor.h">
+      <Filter>PostgreSQL</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SQL Server\TSqlLexer.h">
+      <Filter>SQL Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SQL Server\TSqlParser.h">
+      <Filter>SQL Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SQL Server\TSqlParserBaseVisitor.h">
+      <Filter>SQL Server</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h">
+      <Filter>SQL Server</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp">
@@ -107,6 +137,36 @@
     <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp">
       <Filter>Oracle</Filter>
     </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLLexer.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLLexerBase.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParser.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserBase.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserBaseVisitor.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\PostgreSQL\PostgreSQLParserVisitor.cpp">
+      <Filter>PostgreSQL</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SQL Server\TSqlLexer.cpp">
+      <Filter>SQL Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SQL Server\TSqlParser.cpp">
+      <Filter>SQL Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SQL Server\TSqlParserBaseVisitor.cpp">
+      <Filter>SQL Server</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp">
+      <Filter>SQL Server</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\MySQL\MySQLLexer.interp">
@@ -138,6 +198,33 @@
     </None>
     <None Include="Source\Oracle\transformGrammar.py">
       <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\PostgreSQL\PostgreSQLLexer.interp">
+      <Filter>PostgreSQL</Filter>
+    </None>
+    <None Include="Source\PostgreSQL\PostgreSQLLexer.tokens">
+      <Filter>PostgreSQL</Filter>
+    </None>
+    <None Include="Source\PostgreSQL\PostgreSQLParser.interp">
+      <Filter>PostgreSQL</Filter>
+    </None>
+    <None Include="Source\PostgreSQL\PostgreSQLParser.tokens">
+      <Filter>PostgreSQL</Filter>
+    </None>
+    <None Include="Source\PostgreSQL\transformGrammar.py">
+      <Filter>PostgreSQL</Filter>
+    </None>
+    <None Include="Source\SQL Server\TSqlLexer.interp">
+      <Filter>SQL Server</Filter>
+    </None>
+    <None Include="Source\SQL Server\TSqlLexer.tokens">
+      <Filter>SQL Server</Filter>
+    </None>
+    <None Include="Source\SQL Server\TSqlParser.interp">
+      <Filter>SQL Server</Filter>
+    </None>
+    <None Include="Source\SQL Server\TSqlParser.tokens">
+      <Filter>SQL Server</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
