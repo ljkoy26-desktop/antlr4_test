@@ -123,11 +123,11 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 		ANTLRInputStream input(sqlQuery);
 
 		// Lexer (토큰 분리)
-		MySQLLexer lexer(&input);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
 		CommonTokenStream tokens(&lexer);
 
 		// Parser (구조 분석)
-		MySQLParser parser(&tokens);
+		antlrcpp_mysql::MySQLParser parser(&tokens);
 
 		// [중요] 에러 리스너 설정 (콘솔 에러 방지)
 		parser.removeErrorListeners();
@@ -135,12 +135,12 @@ void CANTLR4TESTDlg::OnBnClickedButtonParse()
 
 		// 3. 파싱 시작 (MySQL 문법의 최상위 규칙 호출)
 		// 보통 'query', 'root', 'sqlStatements' 등이 최상위입니다.
-		// MySQLParser.h를 열어보면 최상위 함수를 알 수 있습니다. 
+		// antlrcpp_mysql::MySQLParser.h를 열어보면 최상위 함수를 알 수 있습니다. 
 		// 여기서는 예시로 'query()' 또는 'root()'를 가정합니다.
 
 		// ★ .g4 파일 확인 결과 MySQL 최상위는 보통 'query' 또는 'sqlStatements' 입니다.
 		// 자동완성으로 parser. 치고 나오는 함수 중 가장 그럴싸한 것을 고르세요.
-		MySQLParser::QueryContext* tree = parser.query();
+		antlrcpp_mysql::MySQLParser::QueryContext* tree = parser.query();
 
 		// 4. 결과 확인
 		size_t errorCount = parser.getNumberOfSyntaxErrors();
@@ -205,14 +205,14 @@ CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg::IdentifySqlType(const std::stri
 {
 	try {
 		ANTLRInputStream input(sqlQuery);
-		MySQLLexer lexer(&input);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
 		CommonTokenStream tokens(&lexer);
-		MySQLParser parser(&tokens);
+		antlrcpp_mysql::MySQLParser parser(&tokens);
 
 		parser.removeErrorListeners();
 
 		// 최상위 규칙으로 파싱
-		MySQLParser::QueryContext* queryCtx = parser.query();
+		antlrcpp_mysql::MySQLParser::QueryContext* queryCtx = parser.query();
 
 		if (parser.getNumberOfSyntaxErrors() > 0) {
 			return SqlStatementType::UNKNOWN;
@@ -366,7 +366,7 @@ void CANTLR4TESTDlg::OnBnClickedButtonIdentify()
 }
 
 // 복합 쿼리 파싱: SimpleStatement에서 유형 식별하는 헬퍼 함수
-CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg_IdentifyFromSimpleStatement(MySQLParser::SimpleStatementContext* simpleStmt)
+CANTLR4TESTDlg::SqlStatementType CANTLR4TESTDlg_IdentifyFromSimpleStatement(antlrcpp_mysql::MySQLParser::SimpleStatementContext* simpleStmt)
 {
 	using SqlType = CANTLR4TESTDlg::SqlStatementType;
 
@@ -469,21 +469,21 @@ std::vector<CANTLR4TESTDlg::SqlStatementInfo> CANTLR4TESTDlg::ParseMultipleQueri
 
 	try {
 		ANTLRInputStream input(sqlQueries);
-		MySQLLexer lexer(&input);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
 		CommonTokenStream tokens(&lexer);
-		MySQLParser parser(&tokens);
+		antlrcpp_mysql::MySQLParser parser(&tokens);
 
 		parser.removeErrorListeners();
 
 		// queries() 규칙으로 여러 쿼리 파싱
-		MySQLParser::QueriesContext* queriesCtx = parser.queries();
+		antlrcpp_mysql::MySQLParser::QueriesContext* queriesCtx = parser.queries();
 
 		if (!queriesCtx) {
 			return results;
 		}
 
 		// 모든 쿼리 가져오기
-		std::vector<MySQLParser::QueryContext*> queryList = queriesCtx->query();
+		std::vector<antlrcpp_mysql::MySQLParser::QueryContext*> queryList = queriesCtx->query();
 
 		int index = 1;
 		for (auto* queryCtx : queryList) {
@@ -529,19 +529,19 @@ CANTLR4TESTDlg::SqlStatementInfo CANTLR4TESTDlg::GetQueryAt(const std::string& s
 
 	try {
 		ANTLRInputStream input(sqlQueries);
-		MySQLLexer lexer(&input);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
 		CommonTokenStream tokens(&lexer);
-		MySQLParser parser(&tokens);
+		antlrcpp_mysql::MySQLParser parser(&tokens);
 
 		parser.removeErrorListeners();
 
-		MySQLParser::QueriesContext* queriesCtx = parser.queries();
+		antlrcpp_mysql::MySQLParser::QueriesContext* queriesCtx = parser.queries();
 		if (!queriesCtx) {
 			return emptyInfo;
 		}
 
 		// 특정 인덱스의 쿼리 가져오기
-		MySQLParser::QueryContext* queryCtx = queriesCtx->query(index);
+		antlrcpp_mysql::MySQLParser::QueryContext* queryCtx = queriesCtx->query(index);
 		if (!queryCtx) {
 			return emptyInfo;
 		}
@@ -692,140 +692,140 @@ CANTLR4TESTDlg::TokenRole GetRoleFromLexerToken(size_t tokenType, const std::str
 {
 	using TR = CANTLR4TESTDlg::TokenRole;
 
-	// MySQLLexer의 토큰 타입 상수 사용
+	// antlrcpp_mysql::MySQLLexer의 토큰 타입 상수 사용
 	switch (tokenType) {
 	// 키워드들
-	case MySQLLexer::SELECT_SYMBOL:    return TR::KEYWORD_SELECT;
-	case MySQLLexer::FROM_SYMBOL:      return TR::KEYWORD_FROM;
-	case MySQLLexer::WHERE_SYMBOL:     return TR::KEYWORD_WHERE;
-	case MySQLLexer::INSERT_SYMBOL:    return TR::KEYWORD_INSERT;
-	case MySQLLexer::UPDATE_SYMBOL:    return TR::KEYWORD_UPDATE;
-	case MySQLLexer::DELETE_SYMBOL:    return TR::KEYWORD_DELETE;
-	case MySQLLexer::INTO_SYMBOL:      return TR::KEYWORD_INTO;
-	case MySQLLexer::VALUES_SYMBOL:    return TR::KEYWORD_VALUES;
-	case MySQLLexer::SET_SYMBOL:       return TR::KEYWORD_SET;
-	case MySQLLexer::AND_SYMBOL:       return TR::KEYWORD_AND;
-	case MySQLLexer::OR_SYMBOL:        return TR::KEYWORD_OR;
-	case MySQLLexer::ORDER_SYMBOL:     return TR::KEYWORD_ORDER_BY;
-	case MySQLLexer::GROUP_SYMBOL:     return TR::KEYWORD_GROUP_BY;
-	case MySQLLexer::HAVING_SYMBOL:    return TR::KEYWORD_HAVING;
-	case MySQLLexer::JOIN_SYMBOL:
-	case MySQLLexer::INNER_SYMBOL:
-	case MySQLLexer::LEFT_SYMBOL:
-	case MySQLLexer::RIGHT_SYMBOL:
-	case MySQLLexer::OUTER_SYMBOL:
-	case MySQLLexer::CROSS_SYMBOL:     return TR::KEYWORD_JOIN;
-	case MySQLLexer::ON_SYMBOL:        return TR::KEYWORD_ON;
-	case MySQLLexer::AS_SYMBOL:        return TR::KEYWORD_AS;
+	case antlrcpp_mysql::MySQLLexer::SELECT_SYMBOL:    return TR::KEYWORD_SELECT;
+	case antlrcpp_mysql::MySQLLexer::FROM_SYMBOL:      return TR::KEYWORD_FROM;
+	case antlrcpp_mysql::MySQLLexer::WHERE_SYMBOL:     return TR::KEYWORD_WHERE;
+	case antlrcpp_mysql::MySQLLexer::INSERT_SYMBOL:    return TR::KEYWORD_INSERT;
+	case antlrcpp_mysql::MySQLLexer::UPDATE_SYMBOL:    return TR::KEYWORD_UPDATE;
+	case antlrcpp_mysql::MySQLLexer::DELETE_SYMBOL:    return TR::KEYWORD_DELETE;
+	case antlrcpp_mysql::MySQLLexer::INTO_SYMBOL:      return TR::KEYWORD_INTO;
+	case antlrcpp_mysql::MySQLLexer::VALUES_SYMBOL:    return TR::KEYWORD_VALUES;
+	case antlrcpp_mysql::MySQLLexer::SET_SYMBOL:       return TR::KEYWORD_SET;
+	case antlrcpp_mysql::MySQLLexer::AND_SYMBOL:       return TR::KEYWORD_AND;
+	case antlrcpp_mysql::MySQLLexer::OR_SYMBOL:        return TR::KEYWORD_OR;
+	case antlrcpp_mysql::MySQLLexer::ORDER_SYMBOL:     return TR::KEYWORD_ORDER_BY;
+	case antlrcpp_mysql::MySQLLexer::GROUP_SYMBOL:     return TR::KEYWORD_GROUP_BY;
+	case antlrcpp_mysql::MySQLLexer::HAVING_SYMBOL:    return TR::KEYWORD_HAVING;
+	case antlrcpp_mysql::MySQLLexer::JOIN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::INNER_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::LEFT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::RIGHT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::OUTER_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::CROSS_SYMBOL:     return TR::KEYWORD_JOIN;
+	case antlrcpp_mysql::MySQLLexer::ON_SYMBOL:        return TR::KEYWORD_ON;
+	case antlrcpp_mysql::MySQLLexer::AS_SYMBOL:        return TR::KEYWORD_AS;
 
 	// 기타 예약어들
-	case MySQLLexer::CREATE_SYMBOL:
-	case MySQLLexer::ALTER_SYMBOL:
-	case MySQLLexer::DROP_SYMBOL:
-	case MySQLLexer::TABLE_SYMBOL:
-	case MySQLLexer::DATABASE_SYMBOL:
-	case MySQLLexer::INDEX_SYMBOL:
-	case MySQLLexer::VIEW_SYMBOL:
-	case MySQLLexer::PROCEDURE_SYMBOL:
-	case MySQLLexer::FUNCTION_SYMBOL:
-	case MySQLLexer::TRIGGER_SYMBOL:
-	case MySQLLexer::GRANT_SYMBOL:
-	case MySQLLexer::REVOKE_SYMBOL:
-	case MySQLLexer::BEGIN_SYMBOL:
-	case MySQLLexer::COMMIT_SYMBOL:
-	case MySQLLexer::ROLLBACK_SYMBOL:
-	case MySQLLexer::DISTINCT_SYMBOL:
-	case MySQLLexer::ALL_SYMBOL:
-	case MySQLLexer::LIMIT_SYMBOL:
-	case MySQLLexer::OFFSET_SYMBOL:
-	case MySQLLexer::BY_SYMBOL:
-	case MySQLLexer::ASC_SYMBOL:
-	case MySQLLexer::DESC_SYMBOL:
-	case MySQLLexer::LIKE_SYMBOL:
-	case MySQLLexer::IN_SYMBOL:
-	case MySQLLexer::BETWEEN_SYMBOL:
-	case MySQLLexer::IS_SYMBOL:
-	case MySQLLexer::NOT_SYMBOL:
-	case MySQLLexer::EXISTS_SYMBOL:
-	case MySQLLexer::CASE_SYMBOL:
-	case MySQLLexer::WHEN_SYMBOL:
-	case MySQLLexer::THEN_SYMBOL:
-	case MySQLLexer::ELSE_SYMBOL:
-	case MySQLLexer::END_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::CREATE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::ALTER_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::DROP_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::TABLE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::DATABASE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::INDEX_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::VIEW_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::PROCEDURE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::FUNCTION_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::TRIGGER_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::GRANT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::REVOKE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::BEGIN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::COMMIT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::ROLLBACK_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::DISTINCT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::ALL_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::LIMIT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::OFFSET_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::BY_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::ASC_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::DESC_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::LIKE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::IN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::BETWEEN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::IS_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::NOT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::EXISTS_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::CASE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::WHEN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::THEN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::ELSE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::END_SYMBOL:
 		return TR::KEYWORD_OTHER;
 
 	// 숫자 리터럴
-	case MySQLLexer::INT_NUMBER:
-	case MySQLLexer::LONG_NUMBER:
-	case MySQLLexer::ULONGLONG_NUMBER:
-	case MySQLLexer::DECIMAL_NUMBER:
-	case MySQLLexer::FLOAT_NUMBER:
+	case antlrcpp_mysql::MySQLLexer::INT_NUMBER:
+	case antlrcpp_mysql::MySQLLexer::LONG_NUMBER:
+	case antlrcpp_mysql::MySQLLexer::ULONGLONG_NUMBER:
+	case antlrcpp_mysql::MySQLLexer::DECIMAL_NUMBER:
+	case antlrcpp_mysql::MySQLLexer::FLOAT_NUMBER:
 		return TR::LITERAL_NUMBER;
 
 	// 문자열 리터럴
-	case MySQLLexer::SINGLE_QUOTED_TEXT:
-	case MySQLLexer::DOUBLE_QUOTED_TEXT:
+	case antlrcpp_mysql::MySQLLexer::SINGLE_QUOTED_TEXT:
+	case antlrcpp_mysql::MySQLLexer::DOUBLE_QUOTED_TEXT:
 		return TR::LITERAL_STRING;
 
 	// NULL
-	case MySQLLexer::NULL_SYMBOL:
-	case MySQLLexer::NULL2_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::NULL_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::NULL2_SYMBOL:
 		return TR::LITERAL_NULL;
 
 	// 불린
-	case MySQLLexer::TRUE_SYMBOL:
-	case MySQLLexer::FALSE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::TRUE_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::FALSE_SYMBOL:
 		return TR::LITERAL_BOOLEAN;
 
 	// 비교 연산자
-	case MySQLLexer::EQUAL_OPERATOR:
-	case MySQLLexer::NOT_EQUAL_OPERATOR:
-	case MySQLLexer::LESS_THAN_OPERATOR:
-	case MySQLLexer::GREATER_THAN_OPERATOR:
-	case MySQLLexer::LESS_OR_EQUAL_OPERATOR:
-	case MySQLLexer::GREATER_OR_EQUAL_OPERATOR:
-	case MySQLLexer::NULL_SAFE_EQUAL_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::EQUAL_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::NOT_EQUAL_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::LESS_THAN_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::GREATER_THAN_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::LESS_OR_EQUAL_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::GREATER_OR_EQUAL_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::NULL_SAFE_EQUAL_OPERATOR:
 		return TR::OPERATOR_COMPARISON;
 
 	// 산술 연산자
-	case MySQLLexer::PLUS_OPERATOR:
-	case MySQLLexer::MINUS_OPERATOR:
-	case MySQLLexer::MULT_OPERATOR:
-	case MySQLLexer::DIV_OPERATOR:
-	case MySQLLexer::MOD_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::PLUS_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::MINUS_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::MULT_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::DIV_OPERATOR:
+	case antlrcpp_mysql::MySQLLexer::MOD_OPERATOR:
 		return TR::OPERATOR_ARITHMETIC;
 
 	// 구분자
-	case MySQLLexer::COMMA_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::COMMA_SYMBOL:
 		return TR::SEPARATOR_COMMA;
-	case MySQLLexer::DOT_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::DOT_SYMBOL:
 		return TR::SEPARATOR_DOT;
-	case MySQLLexer::SEMICOLON_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::SEMICOLON_SYMBOL:
 		return TR::SEPARATOR_SEMICOLON;
-	case MySQLLexer::OPEN_PAR_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::OPEN_PAR_SYMBOL:
 		return TR::SEPARATOR_PAREN_OPEN;
-	case MySQLLexer::CLOSE_PAR_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::CLOSE_PAR_SYMBOL:
 		return TR::SEPARATOR_PAREN_CLOSE;
 
 	// 공백
-	case MySQLLexer::WHITESPACE:
+	case antlrcpp_mysql::MySQLLexer::WHITESPACE:
 		return TR::WHITESPACE;
 
 	// 주석
-	case MySQLLexer::BLOCK_COMMENT:
-	case MySQLLexer::POUND_COMMENT:
-	case MySQLLexer::DASHDASH_COMMENT:
+	case antlrcpp_mysql::MySQLLexer::BLOCK_COMMENT:
+	case antlrcpp_mysql::MySQLLexer::POUND_COMMENT:
+	case antlrcpp_mysql::MySQLLexer::DASHDASH_COMMENT:
 		return TR::COMMENT;
 
 	// 파라미터
-	case MySQLLexer::PARAM_MARKER:
-	case MySQLLexer::AT_SIGN_SYMBOL:
-	case MySQLLexer::AT_AT_SIGN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::PARAM_MARKER:
+	case antlrcpp_mysql::MySQLLexer::AT_SIGN_SYMBOL:
+	case antlrcpp_mysql::MySQLLexer::AT_AT_SIGN_SYMBOL:
 		return TR::PARAMETER;
 
 	// 식별자 (기본값 - 문맥에 따라 나중에 재분류됨)
-	case MySQLLexer::IDENTIFIER:
-	case MySQLLexer::BACK_TICK_QUOTED_ID:
+	case antlrcpp_mysql::MySQLLexer::IDENTIFIER:
+	case antlrcpp_mysql::MySQLLexer::BACK_TICK_QUOTED_ID:
 		return TR::COLUMN_NAME;  // 기본값, 나중에 Parser에서 정확히 분류
 
 	default:
@@ -840,7 +840,7 @@ std::vector<CANTLR4TESTDlg::TokenInfo> CANTLR4TESTDlg::TokenizeQuery(const std::
 
 	try {
 		ANTLRInputStream input(sqlQuery);
-		MySQLLexer lexer(&input);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
 		CommonTokenStream tokenStream(&lexer);
 
 		// 모든 토큰 가져오기
@@ -856,7 +856,7 @@ std::vector<CANTLR4TESTDlg::TokenInfo> CANTLR4TESTDlg::TokenizeQuery(const std::
 			}
 
 			// 공백은 기본적으로 건너뛰기 (필요시 포함 가능)
-			if (token->getType() == MySQLLexer::WHITESPACE) {
+			if (token->getType() == antlrcpp_mysql::MySQLLexer::WHITESPACE) {
 				continue;
 			}
 
@@ -881,12 +881,12 @@ std::vector<CANTLR4TESTDlg::TokenInfo> CANTLR4TESTDlg::TokenizeQuery(const std::
 		// Parser를 사용하여 문맥 기반 역할 재분류
 		// ============================================================
 		ANTLRInputStream input2(sqlQuery);
-		MySQLLexer lexer2(&input2);
+		antlrcpp_mysql::MySQLLexer lexer2(&input2);
 		CommonTokenStream tokenStream2(&lexer2);
-		MySQLParser parser(&tokenStream2);
+		antlrcpp_mysql::MySQLParser parser(&tokenStream2);
 		parser.removeErrorListeners();
 
-		MySQLParser::QueryContext* queryCtx = parser.query();
+		antlrcpp_mysql::MySQLParser::QueryContext* queryCtx = parser.query();
 
 		if (queryCtx && parser.getNumberOfSyntaxErrors() == 0) {
 			auto* simpleStmt = queryCtx->simpleStatement();

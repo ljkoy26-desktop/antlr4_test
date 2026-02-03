@@ -128,7 +128,7 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;$(SolutionDir)x64\Debug</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;../bin/$(Configuration) $(Platform)\</AdditionalLibraryDirectories>
       <AdditionalDependencies>antlr4-runtime.lib;SqlParserLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
