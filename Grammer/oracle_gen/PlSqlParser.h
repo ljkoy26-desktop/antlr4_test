@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_oracle {
 
 
 class  PlSqlParser : public PlSqlParserBase {
@@ -29974,3 +29975,4 @@ public:
 private:
 };
 
+}  // namespace antlrcpp_oracle

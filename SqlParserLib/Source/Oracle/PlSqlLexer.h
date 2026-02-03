@@ -7,6 +7,9 @@
 #include "antlr4-runtime.h"
 #include "PlSqlLexerBase.h"
 
+namespace antlrcpp_oracle {
+
+
 class  PlSqlLexer : public PlSqlLexerBase {
 public:
   enum {
@@ -649,3 +652,4 @@ private:
 
 };
 
+}  // namespace antlrcpp_oracle

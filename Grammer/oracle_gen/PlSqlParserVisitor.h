@@ -8,6 +8,7 @@
 #include "PlSqlParser.h"
 
 
+namespace antlrcpp_oracle {
 
 /**
  * This class defines an abstract visitor for a parse tree
@@ -2438,3 +2439,4 @@ public:
 
 };
 
+}  // namespace antlrcpp_oracle

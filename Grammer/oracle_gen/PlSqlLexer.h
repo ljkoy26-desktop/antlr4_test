@@ -7,6 +7,7 @@
 #include "antlr4-runtime.h"
 
 
+namespace antlrcpp_oracle {
 
 
 class  PlSqlLexer : public PlSqlLexerBase {
@@ -651,3 +652,4 @@ private:
 
 };
 
+}  // namespace antlrcpp_oracle
