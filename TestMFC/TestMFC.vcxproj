@@ -124,7 +124,7 @@
       <PreprocessorDefinitions>_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)SqlParserLib\Source;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -208,6 +208,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="..\Common\Include\AntlrProxy.h" />
+    <ClInclude Include="SQLEngine.h" />
     <ClInclude Include="TestMFC.h" />
     <ClInclude Include="TestMFCDlg.h" />
     <ClInclude Include="framework.h" />
@@ -216,6 +217,9 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="SQLEngine.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="TestMFC.cpp" />
     <ClCompile Include="TestMFCDlg.cpp" />
     <ClCompile Include="pch.cpp">

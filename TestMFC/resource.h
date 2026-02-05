@@ -4,14 +4,17 @@
 //
 #define IDM_ABOUTBOX                    0x0010
 #define IDS_ABOUTBOX                    101
-#define IDD_TestMFC_DIALOG           102
+#define IDD_TestMFC_DIALOG              102
 #define IDR_MAINFRAME                   128
 #define IDC_EDIT_SQL                    1000
 #define IDC_BUTTON_PARSE                1001
 #define IDC_EDIT_TRACE                  1002
 #define IDC_BUTTON_TYPE                 1003
-#define IDC_BUTTON_MULTI                1004
-#define IDC_BUTTON_TOKEN                1005
+#define IDC_BUTTON_MULTI_MYSQL          1004
+#define IDC_BUTTON_TOKEN_MYSQL          1005
+#define IDC_BUTTON_MULTI_ORACLE         1006
+#define IDC_BUTTON_TOKEN_ORACLE         1007
+#define IDC_BUTTON_TOKEN_MYSQL2         1009
 
 // Next default values for new objects
 // 

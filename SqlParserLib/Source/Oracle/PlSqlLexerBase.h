@@ -12,7 +12,7 @@ namespace antlrcpp_oracle {
 	public:
 		bool IsNewlineAtPos(int pos)
 		{
-			int la = _input->LA(pos);
+			size_t la = _input->LA(pos);
 			return la == -1 || la == '\n';
 		};
 	};
