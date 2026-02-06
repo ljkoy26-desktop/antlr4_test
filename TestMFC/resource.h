@@ -14,7 +14,6 @@
 #define IDC_BUTTON_TOKEN_MYSQL          1005
 #define IDC_BUTTON_MULTI_ORACLE         1006
 #define IDC_BUTTON_TOKEN_ORACLE         1007
-#define IDC_BUTTON_TOKEN_MYSQL2         1009
 
 // Next default values for new objects
 // 
