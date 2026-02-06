@@ -1,0 +1,110 @@
+========================================== 
+[1] SQLParserLib Source Structure 
+========================================== 
+ 
+Folder PATH listing for volume p31 nvme 1tb
+Volume serial number is 6A55-4636
+C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\SQLPARSERLIB\SOURCE
+¦§¦¡¦¡¦¡MySQL
+¦¢       MySQLLexer.cpp
+¦¢       MySQLLexer.h
+¦¢       MySQLLexer.interp
+¦¢       MySQLLexer.tokens
+¦¢       MySQLLexerBase.cpp
+¦¢       MySQLLexerBase.h
+¦¢       MySQLParser.cpp
+¦¢       MySQLParser.h
+¦¢       MySQLParser.interp
+¦¢       MySQLParser.tokens
+¦¢       MySQLParserBase.cpp
+¦¢       MySQLParserBase.h
+¦¢       MySQLParserBaseVisitor.cpp
+¦¢       MySQLParserBaseVisitor.h
+¦¢       MySQLParserVisitor.cpp
+¦¢       MySQLParserVisitor.h
+¦¢       SqlMode.h
+¦¢       SqlModes.cpp
+¦¢       SqlModes.h
+¦¢       transformGrammar.py
+¦¢       
+¦§¦¡¦¡¦¡Oracle
+¦¢       PlSqlLexer.cpp
+¦¢       PlSqlLexer.h
+¦¢       PlSqlLexer.interp
+¦¢       PlSqlLexer.tokens
+¦¢       PlSqlLexerBase.h
+¦¢       PlSqlParser.cpp
+¦¢       PlSqlParser.h
+¦¢       PlSqlParser.interp
+¦¢       PlSqlParser.tokens
+¦¢       PlSqlParserBase.h
+¦¢       PlSqlParserBaseVisitor.cpp
+¦¢       PlSqlParserBaseVisitor.h
+¦¢       PlSqlParserVisitor.cpp
+¦¢       PlSqlParserVisitor.h
+¦¢       st.CMakeLists.txt
+¦¢       transformGrammar.py
+¦¢       
+¦§¦¡¦¡¦¡PostgreSQL
+¦¢       PostgreSQLLexer.cpp
+¦¢       PostgreSQLLexer.h
+¦¢       PostgreSQLLexer.interp
+¦¢       PostgreSQLLexer.tokens
+¦¢       PostgreSQLLexerBase.cpp
+¦¢       PostgreSQLLexerBase.h
+¦¢       PostgreSQLParser.cpp
+¦¢       PostgreSQLParser.h
+¦¢       PostgreSQLParser.interp
+¦¢       PostgreSQLParser.tokens
+¦¢       PostgreSQLParserBase.cpp
+¦¢       PostgreSQLParserBase.h
+¦¢       PostgreSQLParserBaseVisitor.cpp
+¦¢       PostgreSQLParserBaseVisitor.h
+¦¢       PostgreSQLParserVisitor.cpp
+¦¢       PostgreSQLParserVisitor.h
+¦¢       transformGrammar.py
+¦¢       
+¦¦¦¡¦¡¦¡SQL Server
+        TSqlLexer.cpp
+        TSqlLexer.h
+        TSqlLexer.interp
+        TSqlLexer.tokens
+        TSqlParser.cpp
+        TSqlParser.h
+        TSqlParser.interp
+        TSqlParser.tokens
+        TSqlParserBaseVisitor.cpp
+        TSqlParserBaseVisitor.h
+        TSqlParserVisitor.cpp
+        TSqlParserVisitor.h
+        
+ 
+ 
+========================================== 
+[2] TestMFC Structure 
+========================================== 
+ 
+Folder PATH listing for volume p31 nvme 1tb
+Volume serial number is 6A55-4636
+C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
+¦¢   framework.h
+¦¢   pch.cpp
+¦¢   pch.h
+¦¢   resource.h
+¦¢   SQLEngine.cpp
+¦¢   SQLEngine.h
+¦¢   targetver.h
+¦¢   TestMFC.aps
+¦¢   TestMFC.cpp
+¦¢   TestMFC.h
+¦¢   TestMFC.rc
+¦¢   TestMFC.vcxproj
+¦¢   TestMFC.vcxproj.filters
+¦¢   TestMFC.vcxproj.user
+¦¢   TestMFCDlg.cpp
+¦¢   TestMFCDlg.h
+¦¢   
+¦¦¦¡¦¡¦¡res
+        TestMFC.ico
+        TestMFC.rc2
+        
