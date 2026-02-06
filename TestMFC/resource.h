@@ -7,7 +7,7 @@
 #define IDD_TestMFC_DIALOG              102
 #define IDR_MAINFRAME                   128
 #define IDC_EDIT_SQL                    1000
-#define IDC_BUTTON_PARSE                1001
+
 #define IDC_EDIT_TRACE                  1002
 #define IDC_BUTTON_TYPE                 1003
 #define IDC_BUTTON_MULTI_MYSQL          1004
