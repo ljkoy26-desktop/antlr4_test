@@ -14,3 +14,7 @@
 #include "MySQL/MySQLParserBase.h"
 #include "MySQL/MySQLLexer.h"
 #include "MySQL/MySQLParser.h"
+
+// 4. SQL Server 파서 (네임스페이스 확인: antlrcpp_sqlserver)
+#include "SQL Server/TSqlLexer.h"
+#include "SQL Server/TSqlParser.h"

@@ -7,13 +7,14 @@
 #define IDD_TestMFC_DIALOG              102
 #define IDR_MAINFRAME                   128
 #define IDC_EDIT_SQL                    1000
-
 #define IDC_EDIT_TRACE                  1002
 #define IDC_BUTTON_TYPE                 1003
 #define IDC_BUTTON_MULTI_MYSQL          1004
 #define IDC_BUTTON_TOKEN_MYSQL          1005
 #define IDC_BUTTON_MULTI_ORACLE         1006
 #define IDC_BUTTON_TOKEN_ORACLE         1007
+#define IDC_BUTTON_MULTI_SQLSERVER      1008
+#define IDC_BUTTON_TOKEN_SQLSERVER      1009
 
 // Next default values for new objects
 // 

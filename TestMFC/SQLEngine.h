@@ -108,12 +108,15 @@ class SQLEngine
 public:
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
 
 	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
 	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
 
 	static TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText);
 	static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
+	static TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText);
 
 
 

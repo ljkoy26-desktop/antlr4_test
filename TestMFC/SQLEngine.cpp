@@ -3,6 +3,7 @@
 
 using namespace antlrcpp_oracle;
 using namespace antlrcpp_mysql;
+// antlrcpp_sqlserver는 명시적으로 네임스페이스를 지정하여 사용
 using namespace antlr4;
 
 // 내부 헬퍼 함수 (노출 안 함)
@@ -892,5 +893,372 @@ TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::str
 	default:
 		return TR::UNKNOWN;
 	}
+}
+
+// ============================================================
+// SQL Server (TSql) 관련 함수들
+// ============================================================
+
+// SQL Server용 내부 도우미: sql_clauses에서 문장 유형 식별
+static SqlStatementType IdentifyFromSqlClausesSQLServer(antlrcpp_sqlserver::TSqlParser::Sql_clausesContext* sqlClauses)
+{
+	if (!sqlClauses) return SqlStatementType::UNKNOWN;
+
+	// DML 체크
+	if (auto* dmlClause = sqlClauses->dml_clause()) {
+		if (dmlClause->select_statement_standalone()) return SqlStatementType::SELECT_STATEMENT;
+		if (dmlClause->insert_statement())            return SqlStatementType::INSERT_STATEMENT;
+		if (dmlClause->update_statement())             return SqlStatementType::UPDATE_STATEMENT;
+		if (dmlClause->delete_statement())             return SqlStatementType::DELETE_STATEMENT;
+	}
+
+	// DDL 체크
+	if (auto* ddlClause = sqlClauses->ddl_clause()) {
+		// CREATE 문들
+		if (ddlClause->create_table())     return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_index())     return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_database())  return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_sequence())  return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_synonym())   return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_schema())    return SqlStatementType::CREATE_STATEMENT;
+		if (ddlClause->create_type())      return SqlStatementType::CREATE_STATEMENT;
+
+		// ALTER 문들
+		if (ddlClause->alter_table())      return SqlStatementType::ALTER_STATEMENT;
+		if (ddlClause->alter_database())   return SqlStatementType::ALTER_STATEMENT;
+		if (ddlClause->alter_sequence())   return SqlStatementType::ALTER_STATEMENT;
+
+		// DROP 문들
+		if (ddlClause->drop_table())       return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_index())       return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_database())    return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_function())    return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_procedure())   return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_trigger())     return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_view())        return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_sequence())    return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_synonym())     return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_schema())      return SqlStatementType::DROP_STATEMENT;
+		if (ddlClause->drop_user())        return SqlStatementType::DROP_STATEMENT;
+
+		// TRUNCATE
+		if (ddlClause->truncate_table())   return SqlStatementType::TRUNCATE_STATEMENT;
+
+		return SqlStatementType::CREATE_STATEMENT;  // 기타 DDL
+	}
+
+	// CFL (Control-of-Flow) 문
+	if (sqlClauses->cfl_statement()) {
+		return SqlStatementType::CALL_STATEMENT;  // BEGIN...END, IF, WHILE 등
+	}
+
+	// another_statement (EXECUTE, SET, USE, GRANT/REVOKE, TCL 등)
+	if (auto* anotherStmt = sqlClauses->another_statement()) {
+		if (anotherStmt->execute_statement())      return SqlStatementType::CALL_STATEMENT;
+		if (anotherStmt->set_statement())           return SqlStatementType::SET_STATEMENT;
+		if (anotherStmt->use_statement())           return SqlStatementType::USE_STATEMENT;
+		if (anotherStmt->transaction_statement())   return SqlStatementType::TRANSACTION_STATEMENT;
+		if (anotherStmt->security_statement())      return SqlStatementType::GRANT_STATEMENT;
+		if (anotherStmt->declare_statement())       return SqlStatementType::CALL_STATEMENT;
+	}
+
+	return SqlStatementType::UNKNOWN;
+}
+
+// SQL Server용 내부 도우미: batch_level_statement에서 문장 유형 식별
+static SqlStatementType IdentifyFromBatchLevelSQLServer(antlrcpp_sqlserver::TSqlParser::Batch_level_statementContext* batchLevel)
+{
+	if (!batchLevel) return SqlStatementType::UNKNOWN;
+
+	if (batchLevel->create_or_alter_procedure()) return SqlStatementType::CREATE_PROCEDURE;
+	if (batchLevel->create_or_alter_function())  return SqlStatementType::CREATE_FUNCTION;
+	if (batchLevel->create_or_alter_trigger())   return SqlStatementType::CREATE_TRIGGER;
+	if (batchLevel->create_view())               return SqlStatementType::CREATE_STATEMENT;
+
+	return SqlStatementType::UNKNOWN;
+}
+
+std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std::string& sqlQueries)
+{
+	std::vector<SqlStatementInfo> results;
+
+	try {
+		ANTLRInputStream input(sqlQueries);
+		antlrcpp_sqlserver::TSqlLexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_sqlserver::TSqlParser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		// tsql_file() -> batch() 목록
+		antlrcpp_sqlserver::TSqlParser::Tsql_fileContext* fileCtx = parser.tsql_file();
+		if (!fileCtx) return results;
+
+		auto batchList = fileCtx->batch();
+		int index = 1;
+
+		for (auto* batchCtx : batchList) {
+			if (!batchCtx) continue;
+
+			// batch_level_statement (CREATE PROCEDURE/FUNCTION/TRIGGER/VIEW)
+			if (auto* batchLevel = batchCtx->batch_level_statement()) {
+				SqlStatementInfo info;
+				info.index = index++;
+				info.type = IdentifyFromBatchLevelSQLServer(batchLevel);
+
+				antlr4::Token* startToken = batchLevel->getStart();
+				antlr4::Token* stopToken = batchLevel->getStop();
+				if (startToken && stopToken) {
+					info.startLine = startToken->getLine();
+					info.startColumn = startToken->getCharPositionInLine();
+					size_t startIdx = startToken->getStartIndex();
+					size_t stopIdx = stopToken->getStopIndex();
+					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
+						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+					}
+				}
+				results.push_back(info);
+				continue;
+			}
+
+			// sql_clauses 목록 (일반 SQL문)
+			auto sqlClausesList = batchCtx->sql_clauses();
+			for (auto* sqlClauses : sqlClausesList) {
+				if (!sqlClauses) continue;
+
+				SqlStatementInfo info;
+				info.index = index++;
+				info.type = IdentifyFromSqlClausesSQLServer(sqlClauses);
+
+				antlr4::Token* startToken = sqlClauses->getStart();
+				antlr4::Token* stopToken = sqlClauses->getStop();
+				if (startToken && stopToken) {
+					info.startLine = startToken->getLine();
+					info.startColumn = startToken->getCharPositionInLine();
+					size_t startIdx = startToken->getStartIndex();
+					size_t stopIdx = stopToken->getStopIndex();
+					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
+						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+					}
+				}
+				results.push_back(info);
+			}
+		}
+	}
+	catch (...) {}
+
+	return results;
+}
+
+TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText)
+{
+	using TR = TokenRole;
+
+	switch (tokenType) {
+		// 키워드들
+	case antlrcpp_sqlserver::TSqlLexer::SELECT:     return TR::KEYWORD_SELECT;
+	case antlrcpp_sqlserver::TSqlLexer::FROM:       return TR::KEYWORD_FROM;
+	case antlrcpp_sqlserver::TSqlLexer::WHERE:      return TR::KEYWORD_WHERE;
+	case antlrcpp_sqlserver::TSqlLexer::INSERT:     return TR::KEYWORD_INSERT;
+	case antlrcpp_sqlserver::TSqlLexer::UPDATE:     return TR::KEYWORD_UPDATE;
+	case antlrcpp_sqlserver::TSqlLexer::DELETE:     return TR::KEYWORD_DELETE;
+	case antlrcpp_sqlserver::TSqlLexer::INTO:       return TR::KEYWORD_INTO;
+	case antlrcpp_sqlserver::TSqlLexer::VALUES:     return TR::KEYWORD_VALUES;
+	case antlrcpp_sqlserver::TSqlLexer::SET:        return TR::KEYWORD_SET;
+	case antlrcpp_sqlserver::TSqlLexer::AND:        return TR::KEYWORD_AND;
+	case antlrcpp_sqlserver::TSqlLexer::OR:         return TR::KEYWORD_OR;
+	case antlrcpp_sqlserver::TSqlLexer::ORDER:      return TR::KEYWORD_ORDER_BY;
+	case antlrcpp_sqlserver::TSqlLexer::GROUP:      return TR::KEYWORD_GROUP_BY;
+	case antlrcpp_sqlserver::TSqlLexer::HAVING:     return TR::KEYWORD_HAVING;
+	case antlrcpp_sqlserver::TSqlLexer::JOIN:
+	case antlrcpp_sqlserver::TSqlLexer::INNER:
+	case antlrcpp_sqlserver::TSqlLexer::LEFT:
+	case antlrcpp_sqlserver::TSqlLexer::RIGHT:
+	case antlrcpp_sqlserver::TSqlLexer::OUTER:
+	case antlrcpp_sqlserver::TSqlLexer::CROSS:
+	case antlrcpp_sqlserver::TSqlLexer::FULL:       return TR::KEYWORD_JOIN;
+	case antlrcpp_sqlserver::TSqlLexer::ON:         return TR::KEYWORD_ON;
+	case antlrcpp_sqlserver::TSqlLexer::AS:         return TR::KEYWORD_AS;
+
+		// 기타 예약어들
+	case antlrcpp_sqlserver::TSqlLexer::CREATE:
+	case antlrcpp_sqlserver::TSqlLexer::ALTER:
+	case antlrcpp_sqlserver::TSqlLexer::DROP:
+	case antlrcpp_sqlserver::TSqlLexer::TABLE:
+	case antlrcpp_sqlserver::TSqlLexer::DATABASE:
+	case antlrcpp_sqlserver::TSqlLexer::INDEX:
+	case antlrcpp_sqlserver::TSqlLexer::VIEW:
+	case antlrcpp_sqlserver::TSqlLexer::PROCEDURE:
+	case antlrcpp_sqlserver::TSqlLexer::FUNCTION:
+	case antlrcpp_sqlserver::TSqlLexer::TRIGGER:
+	case antlrcpp_sqlserver::TSqlLexer::GRANT:
+	case antlrcpp_sqlserver::TSqlLexer::REVOKE:
+	case antlrcpp_sqlserver::TSqlLexer::BEGIN:
+	case antlrcpp_sqlserver::TSqlLexer::COMMIT:
+	case antlrcpp_sqlserver::TSqlLexer::ROLLBACK:
+	case antlrcpp_sqlserver::TSqlLexer::DISTINCT:
+	case antlrcpp_sqlserver::TSqlLexer::ALL:
+	case antlrcpp_sqlserver::TSqlLexer::BY:
+	case antlrcpp_sqlserver::TSqlLexer::ASC:
+	case antlrcpp_sqlserver::TSqlLexer::DESC:
+	case antlrcpp_sqlserver::TSqlLexer::LIKE:
+	case antlrcpp_sqlserver::TSqlLexer::IN:
+	case antlrcpp_sqlserver::TSqlLexer::BETWEEN:
+	case antlrcpp_sqlserver::TSqlLexer::IS:
+	case antlrcpp_sqlserver::TSqlLexer::NOT:
+	case antlrcpp_sqlserver::TSqlLexer::EXISTS:
+	case antlrcpp_sqlserver::TSqlLexer::CASE:
+	case antlrcpp_sqlserver::TSqlLexer::WHEN:
+	case antlrcpp_sqlserver::TSqlLexer::THEN:
+	case antlrcpp_sqlserver::TSqlLexer::ELSE:
+	case antlrcpp_sqlserver::TSqlLexer::END:
+	case antlrcpp_sqlserver::TSqlLexer::DECLARE:
+	case antlrcpp_sqlserver::TSqlLexer::CURSOR:
+	case antlrcpp_sqlserver::TSqlLexer::FOR:
+	case antlrcpp_sqlserver::TSqlLexer::WHILE:
+	case antlrcpp_sqlserver::TSqlLexer::IF:
+	case antlrcpp_sqlserver::TSqlLexer::RETURN:
+	case antlrcpp_sqlserver::TSqlLexer::EXECUTE:
+	case antlrcpp_sqlserver::TSqlLexer::SEQUENCE:
+	case antlrcpp_sqlserver::TSqlLexer::TRUNCATE:
+	case antlrcpp_sqlserver::TSqlLexer::MERGE:
+	case antlrcpp_sqlserver::TSqlLexer::USING:
+	case antlrcpp_sqlserver::TSqlLexer::WITH:
+	case antlrcpp_sqlserver::TSqlLexer::UNION:
+	case antlrcpp_sqlserver::TSqlLexer::INTERSECT:
+	case antlrcpp_sqlserver::TSqlLexer::EXCEPT:
+	case antlrcpp_sqlserver::TSqlLexer::FETCH:
+	case antlrcpp_sqlserver::TSqlLexer::OFFSET:
+	case antlrcpp_sqlserver::TSqlLexer::TOP:
+	case antlrcpp_sqlserver::TSqlLexer::CONSTRAINT:
+	case antlrcpp_sqlserver::TSqlLexer::DEFAULT:
+	case antlrcpp_sqlserver::TSqlLexer::CHECK:
+	case antlrcpp_sqlserver::TSqlLexer::PRIMARY:
+	case antlrcpp_sqlserver::TSqlLexer::FOREIGN:
+	case antlrcpp_sqlserver::TSqlLexer::REFERENCES:
+	case antlrcpp_sqlserver::TSqlLexer::CLUSTERED:
+	case antlrcpp_sqlserver::TSqlLexer::GO:
+	case antlrcpp_sqlserver::TSqlLexer::USE:
+	case antlrcpp_sqlserver::TSqlLexer::PRINT:
+	case antlrcpp_sqlserver::TSqlLexer::TRAN:
+	case antlrcpp_sqlserver::TSqlLexer::TRANSACTION:
+	case antlrcpp_sqlserver::TSqlLexer::DENY:
+		return TR::KEYWORD_OTHER;
+
+		// 숫자 리터럴
+	case antlrcpp_sqlserver::TSqlLexer::DECIMAL:
+	case antlrcpp_sqlserver::TSqlLexer::FLOAT:
+	case antlrcpp_sqlserver::TSqlLexer::REAL:
+		return TR::LITERAL_NUMBER;
+
+		// 문자열 리터럴
+	case antlrcpp_sqlserver::TSqlLexer::STRING:
+		return TR::LITERAL_STRING;
+
+		// NULL
+	case antlrcpp_sqlserver::TSqlLexer::NULL_:
+		return TR::LITERAL_NULL;
+
+		// 비교 연산자
+	case antlrcpp_sqlserver::TSqlLexer::EQUAL:
+	case antlrcpp_sqlserver::TSqlLexer::GREATER:
+	case antlrcpp_sqlserver::TSqlLexer::LESS:
+	case antlrcpp_sqlserver::TSqlLexer::EXCLAMATION:
+		return TR::OPERATOR_COMPARISON;
+
+		// 산술 연산자
+	case antlrcpp_sqlserver::TSqlLexer::PLUS:
+	case antlrcpp_sqlserver::TSqlLexer::MINUS:
+	case antlrcpp_sqlserver::TSqlLexer::STAR:
+	case antlrcpp_sqlserver::TSqlLexer::DIVIDE:
+	case antlrcpp_sqlserver::TSqlLexer::MODULE:
+		return TR::OPERATOR_ARITHMETIC;
+
+		// 구분자
+	case antlrcpp_sqlserver::TSqlLexer::COMMA:
+		return TR::SEPARATOR_COMMA;
+	case antlrcpp_sqlserver::TSqlLexer::DOT:
+		return TR::SEPARATOR_DOT;
+	case antlrcpp_sqlserver::TSqlLexer::SEMI:
+		return TR::SEPARATOR_SEMICOLON;
+	case antlrcpp_sqlserver::TSqlLexer::LR_BRACKET:
+		return TR::SEPARATOR_PAREN_OPEN;
+	case antlrcpp_sqlserver::TSqlLexer::RR_BRACKET:
+		return TR::SEPARATOR_PAREN_CLOSE;
+
+		// 공백
+	case antlrcpp_sqlserver::TSqlLexer::SPACE:
+		return TR::WHITESPACE;
+
+		// 주석
+	case antlrcpp_sqlserver::TSqlLexer::COMMENT:
+	case antlrcpp_sqlserver::TSqlLexer::LINE_COMMENT:
+		return TR::COMMENT;
+
+		// 파라미터/변수
+	case antlrcpp_sqlserver::TSqlLexer::LOCAL_ID:   // @변수
+		return TR::PARAMETER;
+
+		// 식별자
+	case antlrcpp_sqlserver::TSqlLexer::ID:
+	case antlrcpp_sqlserver::TSqlLexer::DOUBLE_QUOTE_ID:
+	case antlrcpp_sqlserver::TSqlLexer::SQUARE_BRACKET_ID:
+	case antlrcpp_sqlserver::TSqlLexer::TEMP_ID:    // #임시테이블
+		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+
+	default:
+		return TR::UNKNOWN;
+	}
+}
+
+std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQuery)
+{
+	std::vector<TokenInfo> tokens;
+
+	try {
+		ANTLRInputStream input(sqlQuery);
+		antlrcpp_sqlserver::TSqlLexer lexer(&input);
+		CommonTokenStream tokenStream(&lexer);
+
+		// 모든 토큰 가져오기
+		lexer.removeErrorListeners();
+		tokenStream.fill();
+
+		int index = 1;
+		std::vector<antlr4::Token*> allTokens = tokenStream.getTokens();
+
+		for (antlr4::Token* token : allTokens) {
+			if (token->getType() == antlr4::Token::EOF) {
+				break;
+			}
+
+			// 공백은 기본적으로 건너뛰기
+			if (token->getType() == antlrcpp_sqlserver::TSqlLexer::SPACE) {
+				continue;
+			}
+
+			TokenInfo info;
+			info.index = index++;
+			info.text = token->getText();
+			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
+			if (info.tokenType.empty()) {
+				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
+			}
+			info.role = GetRoleFromLexerTokenSQLServer(token->getType(), info.text);
+			info.roleDesc = SQLEngine::TokenRoleToString(info.role);
+			info.line = token->getLine();
+			info.column = token->getCharPositionInLine();
+			info.startIndex = token->getStartIndex();
+			info.stopIndex = token->getStopIndex();
+
+			tokens.push_back(info);
+		}
+	}
+	catch (...) {
+		// 예외 발생 시 현재까지의 토큰 반환
+	}
+
+	return tokens;
 }
 

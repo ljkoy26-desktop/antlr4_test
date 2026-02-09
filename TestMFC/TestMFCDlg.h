@@ -33,4 +33,7 @@ public:
 
 	afx_msg void OnBnClickedButtonMultiParseOracle();  // 복합 쿼리 파싱 버튼 (Oracle)
 	afx_msg void OnBnClickedButtonTokenizeOracle();    // 토큰화 버튼 (Oracle)
+
+	afx_msg void OnBnClickedButtonMultiParseSQLServer();  // 복합 쿼리 파싱 버튼 (SQL Server)
+	afx_msg void OnBnClickedButtonTokenizeSQLServer();    // 토큰화 버튼 (SQL Server)
 };
