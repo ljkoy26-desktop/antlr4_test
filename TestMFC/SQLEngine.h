@@ -83,48 +83,48 @@ enum class TokenRole {
 };
 
 struct SqlStatementInfo {
-    int index;
-    SqlStatementType type;
-    std::string sqlText;
-    size_t startLine;
-    size_t startColumn;
+	int index;
+	SqlStatementType type;
+	std::string sqlText;
+	size_t startLine;
+	size_t startColumn;
 };
 
 struct TokenInfo {
-    int index;
-    std::string text;
-    std::string tokenType;
-    TokenRole role;
-    std::string roleDesc;
-    size_t line;
-    size_t column;
-    size_t startIndex;
-    size_t stopIndex;
+	int index;
+	std::string text;
+	std::string tokenType;
+	TokenRole role;
+	std::string roleDesc;
+	size_t line;
+	size_t column;
+	size_t startIndex;
+	size_t stopIndex;
 };
 
 // 2. 엔진 클래스
-class SQLEngine 
+class SQLEngine
 {
 public:
-    static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
-    static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
 
-    static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
-    static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
 
 	static TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText);
-    static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
+	static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
 
 
 
-    static std::string SqlTypeToString(SqlStatementType type);
-    static std::string TokenRoleToString(TokenRole role);
+	static std::string SqlTypeToString(SqlStatementType type);
+	static std::string TokenRoleToString(TokenRole role);
 
 
-    static SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
-    static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
+	static SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
+	static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
-    
+
 
 
 };

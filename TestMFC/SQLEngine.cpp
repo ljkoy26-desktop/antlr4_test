@@ -7,14 +7,14 @@ using namespace antlr4;
 
 // 내부 헬퍼 함수 (노출 안 함)
 SqlStatementType IdentifyFromUnitStatement(PlSqlParser::Unit_statementContext* unitStmt) {
-    if (!unitStmt) return SqlStatementType::UNKNOWN;
-    if (unitStmt->data_manipulation_language_statements()) {
-        auto* dml = unitStmt->data_manipulation_language_statements();
-        if (dml->select_statement()) return SqlStatementType::SELECT_STATEMENT;
-        if (dml->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
-    }
-    // ... 나머지 Identify 로직 TestMFCDlg.cpp에서 복사해서 붙여넣기 ...
-    return SqlStatementType::UNKNOWN;
+	if (!unitStmt) return SqlStatementType::UNKNOWN;
+	if (unitStmt->data_manipulation_language_statements()) {
+		auto* dml = unitStmt->data_manipulation_language_statements();
+		if (dml->select_statement()) return SqlStatementType::SELECT_STATEMENT;
+		if (dml->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
+	}
+	// ... 나머지 Identify 로직 TestMFCDlg.cpp에서 복사해서 붙여넣기 ...
+	return SqlStatementType::UNKNOWN;
 }
 
 static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Unit_statementContext* unitStmt)
@@ -26,7 +26,7 @@ static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Un
 	}
 
 	// DML 체크 (data_manipulation_language_statements)
-	if (auto* dmlStmt = unitStmt->data_manipulation_language_statements()) 
+	if (auto* dmlStmt = unitStmt->data_manipulation_language_statements())
 	{
 		if (dmlStmt->select_statement()) 			return SqlType::SELECT_STATEMENT;
 		if (dmlStmt->insert_statement()) 			return SqlType::INSERT_STATEMENT;
@@ -525,7 +525,8 @@ static SqlStatementType IdentifyFromSimpleStatementMySQL(antlrcpp_mysql::MySQLPa
 	if (simpleStmt->replaceStatement()) return SqlStatementType::REPLACE_STATEMENT;
 
 	// DDL 체크 (CREATE, ALTER, DROP)
-	if (auto* createStmt = simpleStmt->createStatement()) {
+	if (auto* createStmt = simpleStmt->createStatement()) 
+	{
 		if (createStmt->createProcedure()) return SqlStatementType::CREATE_PROCEDURE;
 		if (createStmt->createFunction())  return SqlStatementType::CREATE_FUNCTION;
 		if (createStmt->createTrigger())   return SqlStatementType::CREATE_TRIGGER;
@@ -538,7 +539,8 @@ static SqlStatementType IdentifyFromSimpleStatementMySQL(antlrcpp_mysql::MySQLPa
 	if (simpleStmt->truncateTableStatement()) return SqlStatementType::TRUNCATE_STATEMENT;
 
 	// DCL 체크 (GRANT, REVOKE)
-	if (auto* accountStmt = simpleStmt->accountManagementStatement()) {
+	if (auto* accountStmt = simpleStmt->accountManagementStatement()) 
+	{
 		if (accountStmt->grantStatement())  return SqlStatementType::GRANT_STATEMENT;
 		if (accountStmt->revokeStatement()) return SqlStatementType::REVOKE_STATEMENT;
 	}
@@ -549,7 +551,8 @@ static SqlStatementType IdentifyFromSimpleStatementMySQL(antlrcpp_mysql::MySQLPa
 	if (simpleStmt->setStatement())                   return SqlStatementType::SET_STATEMENT;
 
 	if (simpleStmt->showDatabasesStatement() || simpleStmt->showTablesStatement() ||
-		simpleStmt->showColumnsStatement() || simpleStmt->showStatusStatement()) {
+		simpleStmt->showColumnsStatement() || simpleStmt->showStatusStatement()) 
+	{
 		return SqlStatementType::SHOW_STATEMENT;
 	}
 
@@ -645,7 +648,7 @@ SqlStatementType SQLEngine::IdentifySqlTypeMySQL(const std::string& sqlQuery)
 		if (simpleStmt->replaceStatement())			return SqlStatementType::REPLACE_STATEMENT;
 
 		// DDL 체크 (CREATE, ALTER, DROP)
-		if (auto* createStmt = simpleStmt->createStatement()) 
+		if (auto* createStmt = simpleStmt->createStatement())
 		{
 			// PL/SQL 관련 CREATE 문 세분화
 			if (createStmt->createProcedure())			return SqlStatementType::CREATE_PROCEDURE;
@@ -659,7 +662,7 @@ SqlStatementType SQLEngine::IdentifySqlTypeMySQL(const std::string& sqlQuery)
 		if (simpleStmt->truncateTableStatement()) 	return SqlStatementType::TRUNCATE_STATEMENT;
 
 		// DCL 체크 (GRANT, REVOKE)
-		if (auto* accountStmt = simpleStmt->accountManagementStatement()) 
+		if (auto* accountStmt = simpleStmt->accountManagementStatement())
 		{
 			if (accountStmt->grantStatement()) 			return SqlStatementType::GRANT_STATEMENT;
 			if (accountStmt->revokeStatement()) 		return SqlStatementType::REVOKE_STATEMENT;
@@ -682,7 +685,7 @@ SqlStatementType SQLEngine::IdentifySqlTypeMySQL(const std::string& sqlQuery)
 			simpleStmt->showVariablesStatement() ||
 			simpleStmt->showGrantsStatement() ||
 			simpleStmt->showCreateTableStatement() ||
-			simpleStmt->showCreateDatabaseStatement()) 		
+			simpleStmt->showCreateDatabaseStatement())
 			return SqlStatementType::SHOW_STATEMENT;
 
 		// USE 문 (utilityStatement 내부)

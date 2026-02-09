@@ -25,18 +25,12 @@ protected:
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
 
-
 public:
 	afx_msg void OnBnClickedButtonIdentifyMySQL(); // 쿼리 타입 분석
 
-
-
 	afx_msg void OnBnClickedButtonMultiParseMySQL();  // 복합 쿼리 파싱 버튼 (MySQL)
 	afx_msg void OnBnClickedButtonTokenizeMySQL();    // 토큰화 버튼 (MySQL)
+
 	afx_msg void OnBnClickedButtonMultiParseOracle();  // 복합 쿼리 파싱 버튼 (Oracle)
 	afx_msg void OnBnClickedButtonTokenizeOracle();    // 토큰화 버튼 (Oracle)
-
-protected:
-	// Oracle용 토큰화 함수
-	// std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
 };
