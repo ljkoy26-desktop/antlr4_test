@@ -33,6 +33,8 @@ BEGIN_MESSAGE_MAP(CTestMFCDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_TOKEN_ORACLE, &CTestMFCDlg::OnBnClickedButtonTokenizeOracle)
 	ON_BN_CLICKED(IDC_BUTTON_MULTI_SQLSERVER, &CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer)
 	ON_BN_CLICKED(IDC_BUTTON_TOKEN_SQLSERVER, &CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer)
+	ON_BN_CLICKED(IDC_BUTTON_MULTI_POSTGRESQL, &CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL)
+	ON_BN_CLICKED(IDC_BUTTON_TOKEN_POSTGRESQL, &CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL)
 END_MESSAGE_MAP()
 
 
@@ -494,6 +496,120 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== 상세 정보 ====="));
+	for (const auto& tok : tokens) {
+		CString strText(tok.text.c_str());
+		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		CString strRole(stdRole.c_str());
+
+		AddTraceLog(_T("%d) %s ( %s )"),
+			tok.index,
+			strText,
+			strRole);
+	}
+}
+
+// PostgreSQL 복합 쿼리 파싱 버튼 핸들러
+void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
+{
+	// 1. UI에서 데이터 가져오기 (MFC 영역)
+	CString strInput;
+	GetDlgItemText(IDC_EDIT_SQL, strInput);
+
+	// CString(유니코드) -> std::string(멀티바이트) 변환
+	std::string sqlQueries = CT2A(strInput);
+
+	if (sqlQueries.empty()) {
+		AfxMessageBox(_T("SQL을 입력해주세요."));
+		return;
+	}
+
+	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
+	auto results = SQLEngine::ParseMultipleQueriesPostgreSQL(sqlQueries);
+
+	// 3. 결과 출력 (MFC 영역)
+	if (results.empty()) {
+		AddTraceLog(_T("파싱된 PostgreSQL SQL 문이 없습니다."));
+		return;
+	}
+
+	AddTraceLog(_T("===== PostgreSQL 복합 쿼리 파싱 결과 ====="));
+	AddTraceLog(_T("총 %d개의 SQL문 발견"), static_cast<int>(results.size()));
+
+	for (const auto& info : results) {
+		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdSql = info.sqlText;
+
+		if (stdSql.length() > 50) {
+			stdSql = stdSql.substr(0, 50) + "...";
+		}
+
+		CString strType(stdType.c_str());
+		CString strSql(stdSql.c_str());
+
+		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
+		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
+		AddTraceLog(_T("    SQL: %s"), strSql);
+		AddTraceLog(_T(""));
+	}
+}
+
+// PostgreSQL 토큰화 버튼 핸들러
+void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
+{
+	// 1. UI에서 SQL 가져오기
+	CString strInput;
+	GetDlgItemText(IDC_EDIT_SQL, strInput);
+
+	// MFC CString -> 표준 std::string 변환
+	std::string sqlQuery = CT2A(strInput);
+
+	if (sqlQuery.empty()) {
+		AfxMessageBox(_T("SQL을 입력해주세요."));
+		return;
+	}
+
+	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQueryPostgreSQL(sqlQuery);
+
+	if (tokens.empty()) {
+		AddTraceLog(_T("PostgreSQL 토큰이 없습니다."));
+		return;
+	}
+
+	// 3. 결과 출력 시작
+	AddTraceLog(_T("===== PostgreSQL SQL 토큰화 결과 ====="));
+	AddTraceLog(_T("입력: %s"), strInput);
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
+	AddTraceLog(_T(""));
+
+	// 테이블 헤더 출력
+	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
+	AddTraceLog(_T("--------------------------------------------------------------"));
+
+	for (const auto& tok : tokens) {
+		CString strText(tok.text.c_str());
+		CString strType(tok.tokenType.c_str());
+
+		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		CString strRole(stdRole.c_str());
+
+		if (strText.GetLength() > 18) {
+			strText = strText.Left(15) + _T("...");
+		}
+		if (strType.GetLength() > 23) {
+			strType = strType.Left(20) + _T("...");
+		}
+
+		AddTraceLog(_T("%-4d %-20s %-25s %s"),
+			tok.index,
+			strText,
+			strType,
+			strRole);
+	}
+
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== PostgreSQL 상세 정보 ====="));
 	for (const auto& tok : tokens) {
 		CString strText(tok.text.c_str());
 		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);

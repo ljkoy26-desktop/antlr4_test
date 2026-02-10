@@ -1262,3 +1262,393 @@ std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQ
 	return tokens;
 }
 
+// ============================================================
+// PostgreSQL 관련 함수들
+// ============================================================
+
+// PostgreSQL용 내부 도우미: stmt에서 문장 유형 식별
+static SqlStatementType IdentifyFromStmtPostgreSQL(antlrcpp_postgresql::PostgreSQLParser::StmtContext* stmtCtx)
+{
+	if (!stmtCtx) return SqlStatementType::UNKNOWN;
+
+	// DML 체크
+	if (stmtCtx->selectstmt())      return SqlStatementType::SELECT_STATEMENT;
+	if (stmtCtx->insertstmt())      return SqlStatementType::INSERT_STATEMENT;
+	if (stmtCtx->updatestmt())      return SqlStatementType::UPDATE_STATEMENT;
+	if (stmtCtx->deletestmt())      return SqlStatementType::DELETE_STATEMENT;
+	if (stmtCtx->mergestmt())       return SqlStatementType::SELECT_STATEMENT;  // MERGE는 DML 계열
+
+	// DDL: CREATE 문들
+	if (stmtCtx->createstmt())             return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createdbstmt())           return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->indexstmt())              return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createseqstmt())          return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createschemastmt())       return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createextensionstmt())    return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createtablespacestmt())   return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createdomainstmt())       return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createrolestmt())         return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createuserstmt())         return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createasstmt())           return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->creatematviewstmt())      return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createstatsstmt())        return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createpublicationstmt())  return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createsubscriptionstmt()) return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createforeigntablestmt()) return SqlStatementType::CREATE_STATEMENT;
+
+	// DDL: CREATE PROCEDURE/FUNCTION/TRIGGER/VIEW
+	if (stmtCtx->createfunctionstmt())     return SqlStatementType::CREATE_FUNCTION;
+	if (stmtCtx->createtrigstmt())         return SqlStatementType::CREATE_TRIGGER;
+	if (stmtCtx->createeventtrigstmt())    return SqlStatementType::CREATE_TRIGGER;
+	if (stmtCtx->viewstmt())              return SqlStatementType::CREATE_STATEMENT;
+	if (stmtCtx->createplangstmt())        return SqlStatementType::CREATE_PROCEDURE;
+
+	// DDL: ALTER 문들
+	if (stmtCtx->altertablestmt())         return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterdatabasestmt())      return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterdatabasesetstmt())   return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterseqstmt())           return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterrolestmt())          return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterrolesetstmt())       return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterfunctionstmt())      return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterdomainstmt())        return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterextensionstmt())     return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->alterownerstmt())         return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->altercompositetypestmt()) return SqlStatementType::ALTER_STATEMENT;
+	if (stmtCtx->altereventtrigstmt())     return SqlStatementType::ALTER_STATEMENT;
+
+	// DDL: DROP 문들
+	if (stmtCtx->dropstmt())              return SqlStatementType::DROP_STATEMENT;
+	if (stmtCtx->dropdbstmt())            return SqlStatementType::DROP_STATEMENT;
+	if (stmtCtx->droprolestmt())          return SqlStatementType::DROP_STATEMENT;
+	if (stmtCtx->droptablespacestmt())    return SqlStatementType::DROP_STATEMENT;
+	if (stmtCtx->dropsubscriptionstmt())  return SqlStatementType::DROP_STATEMENT;
+	if (stmtCtx->dropownedstmt())         return SqlStatementType::DROP_STATEMENT;
+
+	// DDL: TRUNCATE
+	if (stmtCtx->truncatestmt())          return SqlStatementType::TRUNCATE_STATEMENT;
+
+	// DCL: GRANT/REVOKE
+	if (stmtCtx->grantstmt())             return SqlStatementType::GRANT_STATEMENT;
+	if (stmtCtx->grantrolestmt())         return SqlStatementType::GRANT_STATEMENT;
+	if (stmtCtx->revokestmt())            return SqlStatementType::REVOKE_STATEMENT;
+	if (stmtCtx->revokerolestmt())        return SqlStatementType::REVOKE_STATEMENT;
+
+	// TCL: TRANSACTION 문
+	if (stmtCtx->transactionstmt())       return SqlStatementType::TRANSACTION_STATEMENT;
+
+	// PL/pgSQL: CALL, DO, EXECUTE
+	if (stmtCtx->callstmt())              return SqlStatementType::CALL_STATEMENT;
+	if (stmtCtx->dostmt())                return SqlStatementType::CALL_STATEMENT;
+	if (stmtCtx->executestmt())           return SqlStatementType::CALL_STATEMENT;
+
+	// SET/SHOW
+	if (stmtCtx->variablesetstmt())       return SqlStatementType::SET_STATEMENT;
+	if (stmtCtx->variableshowstmt())      return SqlStatementType::SHOW_STATEMENT;
+	if (stmtCtx->variableresetstmt())     return SqlStatementType::SET_STATEMENT;
+
+	return SqlStatementType::UNKNOWN;
+}
+
+std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries)
+{
+	std::vector<SqlStatementInfo> results;
+
+	try {
+		ANTLRInputStream input(sqlQueries);
+		antlrcpp_postgresql::PostgreSQLLexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_postgresql::PostgreSQLParser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		// root() -> stmtblock() -> stmtmulti() -> stmt() 목록
+		auto* rootCtx = parser.root();
+		if (!rootCtx) return results;
+
+		auto* stmtBlock = rootCtx->stmtblock();
+		if (!stmtBlock) return results;
+
+		auto* stmtMulti = stmtBlock->stmtmulti();
+		if (!stmtMulti) return results;
+
+		auto stmtList = stmtMulti->stmt();
+		int index = 1;
+
+		for (auto* stmtCtx : stmtList) {
+			if (!stmtCtx) continue;
+
+			// 빈 문장 건너뛰기 (세미콜론만 있는 경우)
+			if (!stmtCtx->getStart() || stmtCtx->getStart()->getType() == antlr4::Token::EOF) {
+				continue;
+			}
+
+			SqlStatementInfo info;
+			info.index = index++;
+			info.type = IdentifyFromStmtPostgreSQL(stmtCtx);
+
+			antlr4::Token* startToken = stmtCtx->getStart();
+			antlr4::Token* stopToken = stmtCtx->getStop();
+			if (startToken && stopToken) {
+				info.startLine = startToken->getLine();
+				info.startColumn = startToken->getCharPositionInLine();
+				size_t startIdx = startToken->getStartIndex();
+				size_t stopIdx = stopToken->getStopIndex();
+				if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
+					info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+				}
+			}
+			results.push_back(info);
+		}
+	}
+	catch (...) {}
+
+	return results;
+}
+
+TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText)
+{
+	using TR = TokenRole;
+	using PgLexer = antlrcpp_postgresql::PostgreSQLLexer;
+
+	switch (tokenType) {
+		// 키워드들
+	case PgLexer::SELECT:       return TR::KEYWORD_SELECT;
+	case PgLexer::FROM:         return TR::KEYWORD_FROM;
+	case PgLexer::WHERE:        return TR::KEYWORD_WHERE;
+	case PgLexer::INSERT:       return TR::KEYWORD_INSERT;
+	case PgLexer::UPDATE:       return TR::KEYWORD_UPDATE;
+	case PgLexer::DELETE_P:     return TR::KEYWORD_DELETE;
+	case PgLexer::INTO:         return TR::KEYWORD_INTO;
+	case PgLexer::VALUES:       return TR::KEYWORD_VALUES;
+	case PgLexer::SET:          return TR::KEYWORD_SET;
+	case PgLexer::AND:          return TR::KEYWORD_AND;
+	case PgLexer::OR:           return TR::KEYWORD_OR;
+	case PgLexer::ORDER:        return TR::KEYWORD_ORDER_BY;
+	case PgLexer::GROUP_P:      return TR::KEYWORD_GROUP_BY;
+	case PgLexer::HAVING:       return TR::KEYWORD_HAVING;
+	case PgLexer::JOIN:
+	case PgLexer::INNER_P:
+	case PgLexer::LEFT:
+	case PgLexer::RIGHT:
+	case PgLexer::OUTER_P:
+	case PgLexer::CROSS:
+	case PgLexer::FULL:
+	case PgLexer::NATURAL:      return TR::KEYWORD_JOIN;
+	case PgLexer::ON:           return TR::KEYWORD_ON;
+	case PgLexer::AS:           return TR::KEYWORD_AS;
+
+		// 기타 예약어들
+	case PgLexer::CREATE:
+	case PgLexer::ALTER:
+	case PgLexer::DROP:
+	case PgLexer::TABLE:
+	case PgLexer::DATABASE:
+	case PgLexer::INDEX:
+	case PgLexer::VIEW:
+	case PgLexer::PROCEDURE:
+	case PgLexer::FUNCTION:
+	case PgLexer::TRIGGER:
+	case PgLexer::GRANT:
+	case PgLexer::REVOKE:
+	case PgLexer::BEGIN_P:
+	case PgLexer::COMMIT:
+	case PgLexer::ROLLBACK:
+	case PgLexer::DISTINCT:
+	case PgLexer::ALL:
+	case PgLexer::BY:
+	case PgLexer::ASC:
+	case PgLexer::DESC:
+	case PgLexer::LIKE:
+	case PgLexer::ILIKE:
+	case PgLexer::IN_P:
+	case PgLexer::BETWEEN:
+	case PgLexer::IS:
+	case PgLexer::NOT:
+	case PgLexer::EXISTS:
+	case PgLexer::CASE:
+	case PgLexer::WHEN:
+	case PgLexer::THEN:
+	case PgLexer::ELSE:
+	case PgLexer::END_P:
+	case PgLexer::DECLARE:
+	case PgLexer::CURSOR:
+	case PgLexer::FOR:
+	case PgLexer::WHILE:
+	case PgLexer::RETURN:
+	case PgLexer::EXECUTE:
+	case PgLexer::SEQUENCE:
+	case PgLexer::TRUNCATE:
+	case PgLexer::MERGE:
+	case PgLexer::USING:
+	case PgLexer::WITH:
+	case PgLexer::UNION:
+	case PgLexer::INTERSECT:
+	case PgLexer::EXCEPT:
+	case PgLexer::FETCH:
+	case PgLexer::OFFSET:
+	case PgLexer::LIMIT:
+	case PgLexer::CONSTRAINT:
+	case PgLexer::DEFAULT:
+	case PgLexer::CHECK:
+	case PgLexer::PRIMARY:
+	case PgLexer::FOREIGN:
+	case PgLexer::REFERENCES:
+	case PgLexer::DO:
+	case PgLexer::CALL:
+	case PgLexer::SCHEMA:
+	case PgLexer::TRANSACTION:
+	case PgLexer::SAVEPOINT:
+	case PgLexer::RETURNING:
+	case PgLexer::EXPLAIN:
+	case PgLexer::VACUUM:
+	case PgLexer::ANALYZE:
+	case PgLexer::SHOW:
+	case PgLexer::COPY:
+	case PgLexer::PREPARE:
+	case PgLexer::PARTITION:
+	case PgLexer::MATERIALIZED:
+	case PgLexer::RECURSIVE:
+	case PgLexer::ONLY:
+	case PgLexer::LATERAL_P:
+	case PgLexer::WINDOW:
+	case PgLexer::ARRAY:
+	case PgLexer::SOME:
+	case PgLexer::ANY:
+		return TR::KEYWORD_OTHER;
+
+		// 숫자 리터럴
+	case PgLexer::Integral:
+	case PgLexer::Numeric:
+	case PgLexer::BinaryIntegral:
+	case PgLexer::OctalIntegral:
+	case PgLexer::HexadecimalIntegral:
+		return TR::LITERAL_NUMBER;
+
+		// 문자열 리터럴
+	case PgLexer::StringConstant:
+	case PgLexer::UnicodeEscapeStringConstant:
+	case PgLexer::EscapeStringConstant:
+	case PgLexer::BeginDollarStringConstant:
+	case PgLexer::DollarText:
+	case PgLexer::EndDollarStringConstant:
+		return TR::LITERAL_STRING;
+
+		// NULL
+	case PgLexer::NULL_P:
+		return TR::LITERAL_NULL;
+
+		// 불린
+	case PgLexer::TRUE_P:
+	case PgLexer::FALSE_P:
+		return TR::LITERAL_BOOLEAN;
+
+		// 비교 연산자
+	case PgLexer::EQUAL:
+	case PgLexer::NOT_EQUALS:
+	case PgLexer::LT:
+	case PgLexer::GT:
+	case PgLexer::LESS_EQUALS:
+	case PgLexer::GREATER_EQUALS:
+		return TR::OPERATOR_COMPARISON;
+
+		// 산술 연산자
+	case PgLexer::PLUS:
+	case PgLexer::MINUS:
+	case PgLexer::STAR:
+	case PgLexer::SLASH:
+	case PgLexer::PERCENT:
+		return TR::OPERATOR_ARITHMETIC;
+
+		// 구분자
+	case PgLexer::COMMA:
+		return TR::SEPARATOR_COMMA;
+	case PgLexer::DOT:
+		return TR::SEPARATOR_DOT;
+	case PgLexer::SEMI:
+		return TR::SEPARATOR_SEMICOLON;
+	case PgLexer::OPEN_PAREN:
+		return TR::SEPARATOR_PAREN_OPEN;
+	case PgLexer::CLOSE_PAREN:
+		return TR::SEPARATOR_PAREN_CLOSE;
+
+		// 공백
+	case PgLexer::Whitespace:
+	case PgLexer::Newline:
+		return TR::WHITESPACE;
+
+		// 주석
+	case PgLexer::LineComment:
+	case PgLexer::BlockComment:
+		return TR::COMMENT;
+
+		// 파라미터
+	case PgLexer::PARAM:        // $1, $2 등
+	case PgLexer::COLON:
+		return TR::PARAMETER;
+
+		// 식별자
+	case PgLexer::Identifier:
+	case PgLexer::QuotedIdentifier:
+	case PgLexer::UnicodeQuotedIdentifier:
+	case PgLexer::PLSQLIDENTIFIER:
+	case PgLexer::PLSQLVARIABLENAME:
+		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+
+	default:
+		return TR::UNKNOWN;
+	}
+}
+
+std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sqlQuery)
+{
+	std::vector<TokenInfo> tokens;
+
+	try {
+		ANTLRInputStream input(sqlQuery);
+		antlrcpp_postgresql::PostgreSQLLexer lexer(&input);
+		CommonTokenStream tokenStream(&lexer);
+
+		// 모든 토큰 가져오기
+		lexer.removeErrorListeners();
+		tokenStream.fill();
+
+		int index = 1;
+		std::vector<antlr4::Token*> allTokens = tokenStream.getTokens();
+
+		for (antlr4::Token* token : allTokens) {
+			if (token->getType() == antlr4::Token::EOF) {
+				break;
+			}
+
+			// 공백/줄바꿈은 기본적으로 건너뛰기
+			if (token->getType() == antlrcpp_postgresql::PostgreSQLLexer::Whitespace ||
+				token->getType() == antlrcpp_postgresql::PostgreSQLLexer::Newline) {
+				continue;
+			}
+
+			TokenInfo info;
+			info.index = index++;
+			info.text = token->getText();
+			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
+			if (info.tokenType.empty()) {
+				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
+			}
+			info.role = GetRoleFromLexerTokenPostgreSQL(token->getType(), info.text);
+			info.roleDesc = SQLEngine::TokenRoleToString(info.role);
+			info.line = token->getLine();
+			info.column = token->getCharPositionInLine();
+			info.startIndex = token->getStartIndex();
+			info.stopIndex = token->getStopIndex();
+
+			tokens.push_back(info);
+		}
+	}
+	catch (...) {
+		// 예외 발생 시 현재까지의 토큰 반환
+	}
+
+	return tokens;
+}
+

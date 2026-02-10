@@ -36,4 +36,7 @@ public:
 
 	afx_msg void OnBnClickedButtonMultiParseSQLServer();  // 복합 쿼리 파싱 버튼 (SQL Server)
 	afx_msg void OnBnClickedButtonTokenizeSQLServer();    // 토큰화 버튼 (SQL Server)
+
+	afx_msg void OnBnClickedButtonMultiParsePostgreSQL();  // 복합 쿼리 파싱 버튼 (PostgreSQL)
+	afx_msg void OnBnClickedButtonTokenizePostgreSQL();    // 토큰화 버튼 (PostgreSQL)
 };

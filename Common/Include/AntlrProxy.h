@@ -18,3 +18,9 @@
 // 4. SQL Server 파서 (네임스페이스 확인: antlrcpp_sqlserver)
 #include "SQL Server/TSqlLexer.h"
 #include "SQL Server/TSqlParser.h"
+
+// 5. PostgreSQL 파서 (네임스페이스 확인: antlrcpp_postgresql)
+#include "PostgreSQL/PostgreSQLLexerBase.h"
+#include "PostgreSQL/PostgreSQLParserBase.h"
+#include "PostgreSQL/PostgreSQLLexer.h"
+#include "PostgreSQL/PostgreSQLParser.h"

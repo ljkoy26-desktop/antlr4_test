@@ -15,6 +15,8 @@
 #define IDC_BUTTON_TOKEN_ORACLE         1007
 #define IDC_BUTTON_MULTI_SQLSERVER      1008
 #define IDC_BUTTON_TOKEN_SQLSERVER      1009
+#define IDC_BUTTON_MULTI_POSTGRESQL     1010
+#define IDC_BUTTON_TOKEN_POSTGRESQL     1011
 
 // Next default values for new objects
 // 
