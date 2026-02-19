@@ -2,9 +2,23 @@
 [1] SQLParserLib Source Structure 
 ========================================== 
  
-Folder PATH listing for volume 2TB_Nvme2
-Volume serial number is 6657-F8FC
-H:\SOURCE\GITHUBDESKTOP\ANTLR4_TEST\SQLPARSERLIB\SOURCE
+Folder PATH listing for volume p31 nvme 1tb
+Volume serial number is 6A55-4636
+C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\SQLPARSERLIB\SOURCE
+├───DB2
+│       Db2Lexer.cpp
+│       Db2Lexer.h
+│       Db2Lexer.interp
+│       Db2Lexer.tokens
+│       Db2Parser.cpp
+│       Db2Parser.h
+│       Db2Parser.interp
+│       Db2Parser.tokens
+│       Db2ParserBaseVisitor.cpp
+│       Db2ParserBaseVisitor.h
+│       Db2ParserVisitor.cpp
+│       Db2ParserVisitor.h
+│       
 ├───MySQL
 │       MySQLLexer.cpp
 │       MySQLLexer.h
@@ -84,9 +98,9 @@ H:\SOURCE\GITHUBDESKTOP\ANTLR4_TEST\SQLPARSERLIB\SOURCE
 [2] TestMFC Structure 
 ========================================== 
  
-Folder PATH listing for volume 2TB_Nvme2
-Volume serial number is 6657-F8FC
-H:\SOURCE\GITHUBDESKTOP\ANTLR4_TEST\TESTMFC
+Folder PATH listing for volume p31 nvme 1tb
+Volume serial number is 6A55-4636
+C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
 │   framework.h
 │   pch.cpp
 │   pch.h
@@ -108,3 +122,1087 @@ H:\SOURCE\GITHUBDESKTOP\ANTLR4_TEST\TESTMFC
         TestMFC.ico
         TestMFC.rc2
         
+ 
+ 
+========================================== 
+[3] Testcase Structure 
+========================================== 
+ 
+Folder PATH listing for volume p31 nvme 1tb
+Volume serial number is 6A55-4636
+C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTCASE
+├───athena
+│   └───examples
+│           alter-database.sql
+│           create-external-table.sql
+│           create-table.sql
+│           cte.sql
+│           drop-table.sql
+│           insert-into-select.sql
+│           insert-into-values.sql
+│           msck.sql
+│           select.sql
+│           show-tables.sql
+│           update.sql
+│           
+├───clickhouse
+│   └───examples
+│           create_dictionary.sql
+│           create_table.sql
+│           delete.sql
+│           insert.sql
+│           multiple_statements.sql
+│           rename.sql
+│           select.sql
+│           update.sql
+│           
+├───cockroachdb
+│   └───examples
+│           select.sql
+│           
+├───databricks
+│   └───examples
+│           alter.sql
+│           create.sql
+│           create_function.sql
+│           create_procedure.sql
+│           create_stream.sql
+│           create_table.sql
+│           create_view.sql
+│           cte.sql
+│           describe.sql
+│           dml.sql
+│           drop.sql
+│           other.sql
+│           select.sql
+│           show.sql
+│           tables.sql
+│           use.sql
+│           
+├───db2
+│   └───examples
+│           query.sql
+│           tcl.sql
+│           
+├───derby
+│   └───examples
+│           create.sql
+│           dml.sql
+│           drop.sql
+│           other.sql
+│           select.sql
+│           
+├───drill
+│   └───examples
+│           create.sql
+│           drop.sql
+│           other.sql
+│           select.sql
+│           
+├───hive
+│   ├───v2
+│   │   │   desc.xml
+│   │   │   FromClauseParser.g4
+│   │   │   HintParser.g4
+│   │   │   HiveLexer.g4
+│   │   │   HiveParser.g4
+│   │   │   IdentifiersParser.g4
+│   │   │   pom.xml
+│   │   │   README.md
+│   │   │   SelectClauseParser.g4
+│   │   │   
+│   │   └───examples
+│   │           ddl.sql
+│   │           expression.sql
+│   │           indexes.sql
+│   │           select.sql
+│   │           transform_1.sql
+│   │           transform_2.sql
+│   │           transform_3.sql
+│   │           transform_4.sql
+│   │           transform_5.sql
+│   │           transform_6.sql
+│   │           
+│   ├───v3
+│   │   │   desc.xml
+│   │   │   FromClauseParser.g4
+│   │   │   HintParser.g4
+│   │   │   HiveLexer.g4
+│   │   │   HiveParser.g4
+│   │   │   IdentifiersParser.g4
+│   │   │   pom.xml
+│   │   │   ResourcePlanParser.g4.ignore
+│   │   │   SelectClauseParser.g4
+│   │   │   
+│   │   └───examples
+│   │           ddl.sql
+│   │           expression.sql
+│   │           select.sql
+│   │           transform_1.sql
+│   │           transform_2.sql
+│   │           transform_3.sql
+│   │           transform_4.sql
+│   │           transform_5.sql
+│   │           transform_6.sql
+│   │           
+│   └───v4
+│       │   desc.xml
+│       │   HiveLexer.g4
+│       │   HiveParser.g4
+│       │   pom.xml
+│       │   README.md
+│       │   
+│       └───examples
+│               create-table.hql
+│               create-view.hql
+│               drop-table.hql
+│               expression.sql
+│               select.sql
+│               show-tables.hql
+│               
+├───informix-sql
+│   └───examples
+│           close_stmt.sql
+│           commit.sql
+│           create_role.sql
+│           drop_access_method.sql
+│           drop_aggregate.sql
+│           drop_database.sql
+│           drop_index.sql
+│           drop_role.sql
+│           drop_synonym.sql
+│           drop_table.sql
+│           drop_trigger.sql
+│           drop_trusted_context.sql
+│           drop_type.sql
+│           drop_user.sql
+│           drop_view.sql
+│           drop_xadatasource.sql
+│           drop_xadatasource_type.sql
+│           release_savepoint.sql
+│           rename_column.sql
+│           rename_constraint.sql
+│           rename_database.sql
+│           rename_index.sql
+│           rename_security.sql
+│           rename_sequence.sql
+│           rename_table.sql
+│           rename_trusted_context.sql
+│           rename_user.sql
+│           rollback_work.sql
+│           savepoint.sql
+│           setautoFree.sql
+│           set_collation.sql
+│           set_dataskip.sql
+│           set_debug_file.sql
+│           set_deferred_prepare.sql
+│           
+├───mariadb
+│   └───examples
+│       ├───fast
+│       │       admin.sql
+│       │       analyze.sql
+│       │       case_sensitive_sql.sql
+│       │       ddl_alter.sql
+│       │       ddl_create.sql
+│       │       ddl_drop.sql
+│       │       ddl_flush.sql
+│       │       dml_delete.sql
+│       │       dml_insert.sql
+│       │       dml_replace.sql
+│       │       dml_select.sql
+│       │       dml_test_arithmetic_expression.sql
+│       │       dml_union.sql
+│       │       dml_update.sql
+│       │       ext_tests.sql
+│       │       grant.sql
+│       │       kill.sql
+│       │       mysql_spec_comment.sql
+│       │       optimize.sql
+│       │       show.sql
+│       │       smoke_tests.sql
+│       │       userstat.sql
+│       │       
+│       └───slow
+│               bitrix_queries_cut.sql
+│               
+├───mysql
+│   │   수동추가한 케이스.sql
+│   │   
+│   └───examples
+│           admin.sql
+│           analyze.sql
+│           bitrix_queries_cut.sql
+│           case_sensitive_sql.sql
+│           ddl_alter.sql
+│           ddl_create.sql
+│           ddl_drop.sql
+│           ddl_flush.sql
+│           dml_delete.sql
+│           dml_insert.sql
+│           dml_replace.sql
+│           dml_select.sql
+│           dml_table.sql
+│           dml_test_arithmetic_expression.sql
+│           dml_union.sql
+│           dml_update.sql
+│           dml_with.sql
+│           expressions.sql
+│           ext_tests.sql
+│           grant.sql
+│           kill.sql
+│           mysql_spec_comment.sql
+│           optimize.sql
+│           smoke_tests.sql
+│           
+├───oracle
+│   └───examples
+│       │   4357-not-ambig.sql
+│       │   alter_attribute_dimension.sql
+│       │   alter_function.sql
+│       │   alter_hierarchy.sql
+│       │   alter_index.sql
+│       │   alter_library.sql
+│       │   alter_operator.sql
+│       │   alter_outline.sql
+│       │   alter_rollback_segment.sql
+│       │   alter_table.sql
+│       │   alter_tablespace_set.sql
+│       │   alter_table_modify_partition_shrink.sql
+│       │   associate_statistics.sql
+│       │   cast_multiset04.sql
+│       │   cast_multiset08.sql
+│       │   condition14.sql
+│       │   condition16.sql
+│       │   context.sql
+│       │   create_diskgroup.sql
+│       │   create_edition.sql
+│       │   create_function03.sql
+│       │   create_lockdown_profile.sql
+│       │   create_sequence.sql
+│       │   create_synonym01.sql
+│       │   create_synonym02.sql
+│       │   create_synonym03.sql
+│       │   create_table.sql
+│       │   datetime01.sql
+│       │   datetime05.sql
+│       │   disassociate_statistics.sql
+│       │   drop_analytic_view.sql
+│       │   drop_attribute_dimension.sql
+│       │   drop_audit_policy.sql
+│       │   drop_cluster.sql
+│       │   drop_context.sql
+│       │   drop_database.sql
+│       │   drop_directory.sql
+│       │   drop_diskgroup.sql
+│       │   drop_edition.sql
+│       │   drop_flashback_archive.sql
+│       │   drop_hierarchy.sql
+│       │   drop_indextype.sql
+│       │   drop_inmemory_join_group.sql
+│       │   drop_java.sql
+│       │   drop_library.sql
+│       │   drop_lockdown_profile.sql
+│       │   drop_materialized_view_log.sql
+│       │   drop_materialized_zonemap.sql
+│       │   drop_operator.sql
+│       │   drop_outline.sql
+│       │   drop_pmem_filestore.sql
+│       │   drop_restore_point.sql
+│       │   drop_role.sql
+│       │   drop_rollback_segment.sql
+│       │   drop_table.sql
+│       │   drop_tablespace_set.sql
+│       │   drop_user.sql
+│       │   drop_view.sql
+│       │   flashback01.sql
+│       │   flashback_table.sql
+│       │   function01.sql
+│       │   function02.sql
+│       │   function04.sql
+│       │   function06.sql
+│       │   grant.sql
+│       │   interval01.sql
+│       │   interval02.sql
+│       │   interval04.sql
+│       │   join11.sql
+│       │   join12.sql
+│       │   join19.sql
+│       │   join20.sql
+│       │   join21.sql
+│       │   keywordasidentifier01.sql
+│       │   keywordasidentifier02.sql
+│       │   keywordasidentifier05.sql
+│       │   least_greatest.sql
+│       │   lexer01.sql
+│       │   lexer02.sql
+│       │   lexer02.sql.tree
+│       │   lexer03.sql
+│       │   lexer04.sql
+│       │   lexer05.sql
+│       │   lob-item.sql
+│       │   lob-item.sql.tree
+│       │   merge_using_collection.sql
+│       │   offset_clause.sql
+│       │   order_by01.sql
+│       │   order_by02.sql
+│       │   order_by03.sql
+│       │   order_by04.sql
+│       │   order_by05.sql
+│       │   order_by06.sql
+│       │   pivot14.sql
+│       │   pivot15.sql
+│       │   rename_objects.sql
+│       │   revoke.sql
+│       │   select_package_function.sql
+│       │   select_without_from.sql
+│       │   seq_token_error.sql
+│       │   set_and_anonymous_block.sql
+│       │   simple06.sql
+│       │   simple07.sql
+│       │   simple08.sql
+│       │   simple10.sql
+│       │   simple11.sql
+│       │   simple13.sql
+│       │   table-compress.sql
+│       │   table-compress.sql.tree
+│       │   to_char.sql
+│       │   to_char_001.sql
+│       │   to_char_002.sql
+│       │   truncate_cluster.sql
+│       │   truncate_table.sql
+│       │   xmltable02.sql
+│       │   
+│       └───examples-sql-script
+│               anonymous_block.sql
+│               case_when.sql
+│               cursor-attributes-with-spaces.sql
+│               declare_procedure_no_args.sql
+│               delete_as_regular_id.pkb
+│               deterministic_function.pks
+│               e_in_out_parameters.pks
+│               grants.sql
+│               green_run.sql
+│               green_table.sql
+│               green_tools.pkb
+│               green_tools.pks
+│               green_tools_review.sql
+│               in_out_parameters.pks
+│               key_word_as_param.pkb
+│               logical_expressions.sql
+│               package_body_null.pkb
+│               package_with_cursor.sql
+│               package_with_schema.pkb
+│               package_with_schema.pks
+│               package_with_simple_init_block.pkb
+│               pipe_row.pkb
+│               pltables.sql
+│               pragma_autonomous_transaction.sql
+│               pragma_exception_init.pkb
+│               pragma_exception_init.pks
+│               pragma_udf.sql
+│               procedure_with_cursor_and_limit.sql
+│               proc_over_dblink_as_nvl_param.pkb
+│               result_cache_function.pks
+│               select_into.sql
+│               show_errors.pks
+│               substr_as_regular_id.pkb
+│               synonym_with_database_link.sql
+│               trigger_examples.sql
+│               type_body_elements.sql
+│               user.sql
+│               with_clause_in_exists_block_in_procedure.sql
+│               
+├───phoenix
+│   └───examples
+│           ddl.sql
+│           dml.sql
+│           other.sql
+│           
+├───postgresql
+│   ├───examples
+│   │       advisory_lock.sql
+│   │       aggregates.sql
+│   │       alter_generic.sql
+│   │       alter_operator.sql
+│   │       alter_table.sql
+│   │       amutils.sql
+│   │       arrays.sql
+│   │       async.sql
+│   │       bit.sql
+│   │       bitmapops.sql
+│   │       boolean.sql
+│   │       box.sql
+│   │       brin.sql
+│   │       btree_index.sql
+│   │       builtin_functions_date.sql
+│   │       builtin_functions_format_date.sql
+│   │       builtin_functions_math.sql
+│   │       builtin_functions_string.sql
+│   │       case.sql
+│   │       char.sql
+│   │       circle.sql
+│   │       cluster.sql
+│   │       collate.sql
+│   │       combocid.sql
+│   │       comments.sql
+│   │       conversion.sql
+│   │       copydml.sql
+│   │       copyselect.sql
+│   │       create_aggregate.sql
+│   │       create_am.sql
+│   │       create_cast.sql
+│   │       create_function_3.sql
+│   │       create_index.sql
+│   │       create_index_spgist.sql
+│   │       create_misc.sql
+│   │       create_operator.sql
+│   │       create_procedure.sql
+│   │       create_table.sql
+│   │       create_table_like.sql
+│   │       create_type.sql
+│   │       create_view.sql
+│   │       date.sql
+│   │       dbsize.sql
+│   │       delete.sql
+│   │       dependency.sql
+│   │       domain.sql
+│   │       drop_if_exists.sql
+│   │       drop_operator.sql
+│   │       enum.sql
+│   │       equivclass.sql
+│   │       event_trigger.sql
+│   │       explain.sql
+│   │       expressions.sql
+│   │       fast_default.sql
+│   │       float4.sql
+│   │       float8.sql
+│   │       foreign_data.sql
+│   │       foreign_key.sql
+│   │       functional_deps.sql
+│   │       generated.sql
+│   │       geometry.sql
+│   │       gin.sql
+│   │       gist.sql
+│   │       groupingsets.sql
+│   │       guc.sql
+│   │       hash_func.sql
+│   │       hash_index.sql
+│   │       hash_part.sql
+│   │       horology.sql
+│   │       hs_primary_extremes.sql
+│   │       hs_primary_setup.sql
+│   │       hs_standby_allowed.sql
+│   │       hs_standby_check.sql
+│   │       hs_standby_disallowed.sql
+│   │       hs_standby_functions.sql
+│   │       identity.sql
+│   │       incremental_sort.sql
+│   │       indexing.sql
+│   │       index_including.sql
+│   │       index_including_gist.sql
+│   │       indirect_toast.sql
+│   │       inet.sql
+│   │       inherit.sql
+│   │       init_privs.sql
+│   │       insert.sql
+│   │       insert_conflict.sql
+│   │       int2.sql
+│   │       int4.sql
+│   │       int8.sql
+│   │       interval.sql
+│   │       join.sql
+│   │       join_hash.sql
+│   │       json.sql
+│   │       jsonb.sql
+│   │       jsonb_jsonpath.sql
+│   │       jsonpath.sql
+│   │       jsonpath_encoding.sql
+│   │       json_encoding.sql
+│   │       limit.sql
+│   │       line.sql
+│   │       lock.sql
+│   │       lseg.sql
+│   │       macaddr.sql
+│   │       macaddr8.sql
+│   │       matview.sql
+│   │       merge.sql
+│   │       misc_functions.sql
+│   │       misc_sanity.sql
+│   │       money.sql
+│   │       name.sql
+│   │       namespace.sql
+│   │       non_ansi_join.sql
+│   │       numbers.sql
+│   │       numbers.sql.tree
+│   │       numeric.sql
+│   │       numeric_big.sql
+│   │       numerology.sql
+│   │       object_address.sql
+│   │       oid.sql
+│   │       oidjoins.sql
+│   │       opr_sanity.sql
+│   │       partition_aggregate.sql
+│   │       partition_info.sql
+│   │       partition_join.sql
+│   │       partition_prune.sql
+│   │       password.sql
+│   │       path.sql
+│   │       pg_lsn.sql
+│   │       plancache.sql
+│   │       plpgsql-control-structures.sql
+│   │       plpgsql-cursors.sql
+│   │       plpgsql-declarations.sql
+│   │       plpgsql-errors-and-messages.sql
+│   │       plpgsql-implementation.sql
+│   │       plpgsql-structure.sql
+│   │       plpgsql-trigger.sql
+│   │       plpgsql.sql
+│   │       point.sql
+│   │       polygon.sql
+│   │       polymorphism.sql
+│   │       portals.sql
+│   │       portals_p2.sql
+│   │       prepare.sql
+│   │       prepared_xacts.sql
+│   │       privileges.sql
+│   │       psql_crosstab.sql
+│   │       publication.sql
+│   │       random.sql
+│   │       rangefuncs.sql
+│   │       rangetypes.sql
+│   │       regex.sql
+│   │       regex_linux_utf8.sql
+│   │       regproc.sql
+│   │       reindex.sql
+│   │       reindex_2.sql
+│   │       reindex_catalog.sql
+│   │       reloptions.sql
+│   │       replica_identity.sql
+│   │       returning.sql
+│   │       roleattributes.sql
+│   │       rowsecurity.sql
+│   │       rowtypes.sql
+│   │       rules.sql
+│   │       sanity_check.sql
+│   │       security_label.sql
+│   │       select.sql
+│   │       select_distinct.sql
+│   │       select_distinct_on.sql
+│   │       select_having.sql
+│   │       select_implicit.sql
+│   │       select_into.sql
+│   │       select_parallel.sql
+│   │       select_views.sql
+│   │       sequence.sql
+│   │       spgist.sql
+│   │       stats.sql
+│   │       stats_ext.sql
+│   │       subscription.sql
+│   │       subselect.sql
+│   │       sysviews.sql
+│   │       tablesample.sql
+│   │       temp.sql
+│   │       text.sql
+│   │       tid.sql
+│   │       tidscan.sql
+│   │       time.sql
+│   │       timestamp.sql
+│   │       timestamptz.sql
+│   │       timetz.sql
+│   │       transactions.sql
+│   │       triggers.sql
+│   │       truncate.sql
+│   │       tsdicts.sql
+│   │       tsearch.sql
+│   │       tsrf.sql
+│   │       tstypes.sql
+│   │       tuplesort.sql
+│   │       txid.sql
+│   │       typed_table.sql
+│   │       type_sanity.sql
+│   │       unicode.sql
+│   │       union.sql
+│   │       updatable_views.sql
+│   │       update.sql
+│   │       uuid.sql
+│   │       vacuum.sql
+│   │       vacuum_raw.sql
+│   │       varchar.sql
+│   │       window.sql
+│   │       with.sql
+│   │       write_parallel.sql
+│   │       xid.sql
+│   │       xmlmap.sql
+│   │       
+│   └───examples.errors
+│           collate_icu_utf8.sql
+│           collate_linux_utf8.sql
+│           copy2.sql
+│           create_am.sql
+│           errors.sql
+│           psql.sql
+│           strings.sql
+│           tablesample.sql
+│           triggers.sql
+│           tuplesort.sql
+│           txid.sql
+│           xid.sql
+│           xml.sql
+│           
+├───snowflake
+│   └───examples
+│           alerts.sql
+│           alter.sql
+│           alt_cast.sql
+│           at_before.sql
+│           call.sql
+│           comment.sql
+│           create.sql
+│           create_fileformat.sql
+│           create_function.sql
+│           create_pipe.sql
+│           create_procedure.sql
+│           create_stage.sql
+│           create_stream.sql
+│           create_table.sql
+│           create_table_like.sql
+│           create_task.sql
+│           create_view.sql
+│           datasets.sql
+│           describe.sql
+│           dml.sql
+│           drop.sql
+│           dynamic_table.sql
+│           event_table.sql
+│           execute.sql
+│           expr.sql
+│           fn.sql
+│           git.sql
+│           grant.sql
+│           having.sql
+│           identifier.sql
+│           ids.sql
+│           iff.sql
+│           joins.sql
+│           materialized_views.sql
+│           other.sql
+│           password_policy.sql
+│           pivot.sql
+│           secrets.sql
+│           select.sql
+│           semantic_views.sql
+│           session_policy.sql
+│           show.sql
+│           tables.sql
+│           tags.sql
+│           task.sql
+│           transaction.sql
+│           undrop.sql
+│           use.sql
+│           values.sql
+│           warehouse.sql
+│           
+├───sqlite
+│   └───examples
+│           alter-table-drop-column.sql
+│           cte.sql
+│           empty.sql
+│           frame_spec_2937.sql
+│           identifiers.sql
+│           insert.sql
+│           join-operators.sql
+│           null_test.sql
+│           operators.sql
+│           returning.sql
+│           sql1.sql
+│           sql2.sql
+│           sql3.sql
+│           triggers.sql
+│           values.sql
+│           WindowsFunctionsForSqLite.sql
+│           
+├───sqlserver
+│   ├───examples
+│   │       analytic_windowed_functions.sql
+│   │       applicaton_roles.sql
+│   │       assemblies.sql
+│   │       asymmetric_keys.sql
+│   │       authorizations.sql
+│   │       availability_group.sql
+│   │       azure_synapse_analytics.sql
+│   │       backup.sql
+│   │       backup_certificate.sql
+│   │       backup_master_key.sql
+│   │       backup_service_master_key.sql
+│   │       broker_priority.sql
+│   │       built_in_functions_cryptographic.sql
+│   │       built_in_functions_cursor.sql
+│   │       built_in_functions_data_type.sql
+│   │       built_in_functions_date.sql
+│   │       built_in_functions_json.sql
+│   │       built_in_functions_logical.sql
+│   │       built_in_functions_math.sql
+│   │       built_in_functions_metadata.sql
+│   │       built_in_functions_security.sql
+│   │       built_in_functions_string.sql
+│   │       built_in_functions_system.sql
+│   │       certificates.sql
+│   │       Column_Elem.sql
+│   │       column_encryption_key.sql
+│   │       column_master_key.sql
+│   │       concat_op.sql
+│   │       constants.sql
+│   │       constants.sql.errors
+│   │       control_flow.sql
+│   │       create_endpoint.sql
+│   │       create_function_optional_parens.sql
+│   │       create_xml_index.sql
+│   │       credentials.sql
+│   │       cryptographic_provider.sql
+│   │       cursors.sql
+│   │       database_engine_stored_procedures.sql
+│   │       database_hadr.sql
+│   │       dbcc.sql
+│   │       db_roles.sql
+│   │       ddl_alter_database.sql
+│   │       ddl_alter_database_audit_specification.sql
+│   │       ddl_alter_database_mirroring.sql
+│   │       ddl_alter_endpoint.sql
+│   │       ddl_alter_service.sql
+│   │       ddl_alter_table.sql
+│   │       ddl_alter_view.sql
+│   │       ddl_alter_xml_schema_collection.sql
+│   │       ddl_create_alter_database.sql
+│   │       ddl_create_database_audit_specification.sql
+│   │       ddl_create_drop_type.sql
+│   │       ddl_create_table.sql
+│   │       ddl_create_view.sql
+│   │       ddl_function.sql
+│   │       ddl_index.sql
+│   │       ddl_procedures.sql
+│   │       ddl_table.sql
+│   │       dml_delete.sql
+│   │       dml_insert.sql
+│   │       dml_merge.sql
+│   │       dml_openrowset.sql
+│   │       dml_select.sql
+│   │       dml_update.sql
+│   │       drop.sql
+│   │       event_notification.sql
+│   │       event_session.sql
+│   │       exec_first_in_batch.sql
+│   │       expressions.sql
+│   │       external_data_source.sql
+│   │       external_library.sql
+│   │       fulltext_catalog.sql
+│   │       full_width_chars.sql
+│   │       gogo.sql
+│   │       hierarchyid.sql
+│   │       hints.sql
+│   │       hints.sql.tree
+│   │       issue978.sql
+│   │       issue_2282.sql
+│   │       issue_3300.sql
+│   │       issue_924_925.sql
+│   │       issue_927.sql
+│   │       json_data_type.sql
+│   │       keywords_as_id.sql
+│   │       keywords_reserved.sql
+│   │       keywords_reserved.sql.errors
+│   │       kill_statements.sql
+│   │       locktable.sql
+│   │       logins.sql
+│   │       master_key.sql
+│   │       message_type.sql
+│   │       nestedcomment.sql
+│   │       non_ansi_join.sql
+│   │       parameters.sql
+│   │       parse.sql
+│   │       partition_function.sql
+│   │       partition_scheme.sql
+│   │       pr754.sql
+│   │       predicates.sql
+│   │       print_with_param.sql
+│   │       raiseerror.sql
+│   │       reconfigure_statement.sql
+│   │       remote_service_binding.sql
+│   │       replace.sql
+│   │       resource_governor.sql
+│   │       resource_pools.sql
+│   │       revert.sql
+│   │       route.sql
+│   │       rule.sql
+│   │       schema.sql
+│   │       search_property_list.sql
+│   │       security_policy.sql
+│   │       security_statement.sql
+│   │       select_partition_function.sql
+│   │       sequences.sql
+│   │       server_audit.sql
+│   │       server_audit_specification.sql
+│   │       server_configuration.sql
+│   │       server_roles.sql
+│   │       service.sql
+│   │       service_master_keys.sql
+│   │       Set.sql
+│   │       shutdown_statements.sql
+│   │       splitfunction.sql
+│   │       statements.sql
+│   │       stoplist.sql
+│   │       string_agg.sql
+│   │       symmetric_keys.sql
+│   │       synonym.sql
+│   │       temporary_tables.sql
+│   │       test_alias_add.sql
+│   │       transactions.sql
+│   │       triggers.sql
+│   │       truncate.sql
+│   │       try_parse.sql
+│   │       update_statistics.sql
+│   │       users.sql
+│   │       workload_group.sql
+│   │       xml_data_type.sql
+│   │       xml_data_type.sql.tree
+│   │       xml_schema_collection.sql
+│   │       
+│   └───examples-small
+│           applicaton_roles.sql
+│           applicaton_roles.sql.tree
+│           authorizations.sql
+│           authorizations.sql.tree
+│           drop.sql
+│           drop.sql.tree
+│           grant_principal_id.sql
+│           grant_principal_id.sql.tree
+│           update_statistics.sql
+│           update_statistics.sql.tree
+│           
+├───starrocks
+│   └───examples
+│           alter_load_test.sql
+│           select_test.sql
+│           truncate_test.sql
+│           
+├───teradata
+│   └───examples
+│       ├───dcl
+│       │       grant_connect_through.sql
+│       │       grant_logon.sql
+│       │       grant_sql_form.sql
+│       │       revoke_connect_through.sql
+│       │       revoke_monitor.sql
+│       │       revoke_role.sql
+│       │       revoke_sql_form.sql
+│       │       
+│       ├───ddl
+│       │   │   drop_cast.sql
+│       │   │   drop_schema.sql
+│       │   │   drop_transform.sql
+│       │   │   help.sql
+│       │   │   show_object.sql
+│       │   │   show_request.sql
+│       │   │   
+│       │   ├───authorization
+│       │   │       create_replace_authorization.sql
+│       │   │       drop_authorization.sql
+│       │   │       
+│       │   ├───database
+│       │   │       create_database.sql
+│       │   │       database.sql
+│       │   │       delete_database.sql
+│       │   │       drop_database.sql
+│       │   │       incremental_restore_allow_write.sql
+│       │   │       logging_incremental_archive_off.sql
+│       │   │       logging_incremental_archive_on.sql
+│       │   │       modify_database.sql
+│       │   │       
+│       │   ├───foreign_server
+│       │   │       alter_foreign_server.sql
+│       │   │       create_foreign_server.sql
+│       │   │       drop_foreign_server.sql
+│       │   │       
+│       │   ├───function
+│       │   │       alter_function.sql
+│       │   │       create_replace_external_function.sql
+│       │   │       create_replace_sql_function.sql
+│       │   │       create_replace_table_function.sql
+│       │   │       rename_function.sql
+│       │   │       
+│       │   ├───load_isolation
+│       │   │       begin_isolated_loading.sql
+│       │   │       end_isolated_loading.sql
+│       │   │       
+│       │   ├───logging
+│       │   │       begin_logging.sql
+│       │   │       begin_query_capture.sql
+│       │   │       begin_query_logging.sql
+│       │   │       end_logging.sql
+│       │   │       end_query_logging.sql
+│       │   │       flush_query_logging.sql
+│       │   │       
+│       │   ├───procedure
+│       │   │       fetch.sql
+│       │   │       
+│       │   ├───profile
+│       │   │       create_profile.sql
+│       │   │       modify_profile.sql
+│       │   │       
+│       │   ├───session
+│       │   │       set_query_band.sql
+│       │   │       set_session.sql
+│       │   │       
+│       │   ├───statistics
+│       │   │       drop_stats_qcd_form.sql
+│       │   │       show_statistics_optimizer_form.sql
+│       │   │       show_statistics_qcd_form.sql
+│       │   │       
+│       │   ├───table
+│       │   │       alter_table.sql
+│       │   │       create_error_table.sql
+│       │   │       create_foreign_table.sql
+│       │   │       create_global_temporary_trace_table.sql
+│       │   │       create_queue_table.sql
+│       │   │       create_table_as.sql
+│       │   │       drop_error_table.sql
+│       │   │       
+│       │   ├───type
+│       │   │       alter_type.sql
+│       │   │       create_type_array_form.sql
+│       │   │       create_type_distinct_form.sql
+│       │   │       create_type_structured_form.sql
+│       │   │       
+│       │   ├───user
+│       │   │       create_user.sql
+│       │   │       delete_user.sql
+│       │   │       drop_user.sql
+│       │   │       modify_user.sql
+│       │   │       
+│       │   └───view
+│       │           create_replace_view.sql
+│       │           
+│       └───dml
+│           │   call.sql
+│           │   insert.sql
+│           │   rollback.sql
+│           │   
+│           ├───query_and_workload_analysis
+│           │       collect_demographics.sql
+│           │       collect_stats_qcd_form.sql
+│           │       dump_explain.sql
+│           │       initiate_index_analysis.sql
+│           │       initiate_partition_analysis.sql
+│           │       insert_explain.sql
+│           │       restart_index_analysis.sql
+│           │       
+│           └───select
+│                   select.sql
+│                   select_array_functions.sql
+│                   select_array_operators_and_methods.sql
+│                   select_expand_on_clause.sql
+│                   select_from_foreign.sql
+│                   select_json_dot_notation_expressions.sql
+│                   select_json_functions.sql
+│                   select_json_keys.sql
+│                   select_json_shred.sql
+│                   select_json_table.sql
+│                   select_unnest.sql
+│                   select_with_returns_clause.sql
+│                   
+└───trino
+    └───examples
+            aggregation_filter.sql
+            aggregation_with_order_by.sql
+            all_columns.sql
+            alter_table_alter_column_set_data_type.sql
+            alter_table_set_authorization.sql
+            alter_view_set_authorization.sql
+            analyze.sql
+            at_time_zone.sql
+            call.sql
+            comment_column.sql
+            comment_table.sql
+            comment_view.sql
+            commit.sql
+            create_materialized_view.sql
+            create_role.sql
+            create_schema.sql
+            create_table.sql
+            create_table_as_select.sql
+            create_view.sql
+            deallocate_prepare.sql
+            delete.sql
+            deny.sql
+            describe_input.sql
+            describe_output.sql
+            double_in_query.sql
+            drop_column.sql
+            drop_materialized_view.sql
+            drop_role.sql
+            drop_schema.sql
+            drop_table.sql
+            drop_view.sql
+            execute.sql
+            execute_with_using.sql
+            exists.sql
+            explain.sql
+            explain_analyze.sql
+            grant.sql
+            grant_roles.sql
+            implicit_join.sql
+            inline_routine.sql
+            insert_into.sql
+            intersect.sql
+            join_precedence.sql
+            lateral.sql
+            merge.sql
+            non_reserved.sql
+            prepare.sql
+            prepare_with_parameters.sql
+            refresh_materialized_view.sql
+            rename_column.sql
+            rename_materialized_view.sql
+            rename_schema.sql
+            rename_table.sql
+            rename_view.sql
+            reserved_word_identifier.sql
+            reset_session.sql
+            revoke.sql
+            revoke_roles.sql
+            rollback.sql
+            select_with_fetch.sql
+            select_with_group_by.sql
+            select_with_limit.sql
+            select_with_offset.sql
+            select_with_order_by.sql
+            select_with_row_type.sql
+            session_identifiers.sql
+            set_materialized_view_properties.sql
+            set_path.sql
+            set_role.sql
+            set_session.sql
+            set_table_properties.sql
+            show_catalogs.sql
+            show_columns.sql
+            show_functions.sql
+            show_grants.sql
+            show_roles.sql
+            show_role_grants.sql
+            show_schemas.sql
+            show_session.sql
+            show_stats.sql
+            show_stats_for_query.sql
+            show_tables.sql
+            start_transaction.sql
+            substring_built_in_function.sql
+            substring_registered_function.sql
+            table_execute.sql
+            truncate_table.sql
+            union.sql
+            unnest.sql
+            update.sql
+            values.sql
+            whereless_update.sql
+            window_clause.sql
+            with.sql
+            

@@ -1,10 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="소스 파일">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
     <Filter Include="헤더 파일">
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
@@ -16,14 +12,17 @@
     <Filter Include="MySQL">
       <UniqueIdentifier>{b7adc7cf-a6c3-4b41-974a-649eff8be570}</UniqueIdentifier>
     </Filter>
+    <Filter Include="DB2">
+      <UniqueIdentifier>{9105b20b-4123-4875-b294-ab8cee59280f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="SQLServer">
+      <UniqueIdentifier>{2403f359-e17d-42b3-ad14-68b7ef411ab2}</UniqueIdentifier>
+    </Filter>
     <Filter Include="Oracle">
-      <UniqueIdentifier>{6ee51271-2995-4ac5-b13d-d4cc444a9666}</UniqueIdentifier>
+      <UniqueIdentifier>{b5c27dae-1769-4c72-a320-b9df8eb4ad5b}</UniqueIdentifier>
     </Filter>
     <Filter Include="PostgreSQL">
-      <UniqueIdentifier>{73ef6195-b035-48ba-bae7-8c762554390e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="SQL Server">
-      <UniqueIdentifier>{f04092f5-183f-4560-816b-ca849e8533d3}</UniqueIdentifier>
+      <UniqueIdentifier>{639b3954-b057-4897-ab1e-039d34f5b8e1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -54,23 +53,17 @@
     <ClInclude Include="Source\MySQL\SqlModes.h">
       <Filter>MySQL</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlLexer.h">
-      <Filter>Oracle</Filter>
+    <ClInclude Include="Source\DB2\Db2Parser.h">
+      <Filter>DB2</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlLexerBase.h">
-      <Filter>Oracle</Filter>
+    <ClInclude Include="Source\DB2\Db2ParserBaseVisitor.h">
+      <Filter>DB2</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlParser.h">
-      <Filter>Oracle</Filter>
+    <ClInclude Include="Source\DB2\Db2ParserVisitor.h">
+      <Filter>DB2</Filter>
     </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlParserBase.h">
-      <Filter>Oracle</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlParserBaseVisitor.h">
-      <Filter>Oracle</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h">
-      <Filter>Oracle</Filter>
+    <ClInclude Include="Source\DB2\Db2Lexer.h">
+      <Filter>DB2</Filter>
     </ClInclude>
     <ClInclude Include="Source\PostgreSQL\PostgreSQLLexer.h">
       <Filter>PostgreSQL</Filter>
@@ -90,17 +83,35 @@
     <ClInclude Include="Source\PostgreSQL\PostgreSQLParserVisitor.h">
       <Filter>PostgreSQL</Filter>
     </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlLexer.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlLexerBase.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParser.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserBase.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserBaseVisitor.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\Oracle\PlSqlParserVisitor.h">
+      <Filter>Oracle</Filter>
+    </ClInclude>
     <ClInclude Include="Source\SQL Server\TSqlLexer.h">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClInclude>
     <ClInclude Include="Source\SQL Server\TSqlParser.h">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClInclude>
     <ClInclude Include="Source\SQL Server\TSqlParserBaseVisitor.h">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClInclude>
     <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -125,17 +136,17 @@
     <ClCompile Include="Source\MySQL\SqlModes.cpp">
       <Filter>MySQL</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Oracle\PlSqlLexer.cpp">
-      <Filter>Oracle</Filter>
+    <ClCompile Include="Source\DB2\Db2Parser.cpp">
+      <Filter>DB2</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Oracle\PlSqlParser.cpp">
-      <Filter>Oracle</Filter>
+    <ClCompile Include="Source\DB2\Db2ParserBaseVisitor.cpp">
+      <Filter>DB2</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Oracle\PlSqlParserBaseVisitor.cpp">
-      <Filter>Oracle</Filter>
+    <ClCompile Include="Source\DB2\Db2ParserVisitor.cpp">
+      <Filter>DB2</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp">
-      <Filter>Oracle</Filter>
+    <ClCompile Include="Source\DB2\Db2Lexer.cpp">
+      <Filter>DB2</Filter>
     </ClCompile>
     <ClCompile Include="Source\PostgreSQL\PostgreSQLLexer.cpp">
       <Filter>PostgreSQL</Filter>
@@ -155,17 +166,29 @@
     <ClCompile Include="Source\PostgreSQL\PostgreSQLParserVisitor.cpp">
       <Filter>PostgreSQL</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlLexer.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParser.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParserBaseVisitor.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Oracle\PlSqlParserVisitor.cpp">
+      <Filter>Oracle</Filter>
+    </ClCompile>
     <ClCompile Include="Source\SQL Server\TSqlLexer.cpp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClCompile>
     <ClCompile Include="Source\SQL Server\TSqlParser.cpp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClCompile>
     <ClCompile Include="Source\SQL Server\TSqlParserBaseVisitor.cpp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClCompile>
     <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -184,20 +207,17 @@
     <None Include="Source\MySQL\transformGrammar.py">
       <Filter>MySQL</Filter>
     </None>
-    <None Include="Source\Oracle\PlSqlLexer.interp">
-      <Filter>Oracle</Filter>
+    <None Include="Source\DB2\Db2Lexer.interp">
+      <Filter>DB2</Filter>
     </None>
-    <None Include="Source\Oracle\PlSqlLexer.tokens">
-      <Filter>Oracle</Filter>
+    <None Include="Source\DB2\Db2Lexer.tokens">
+      <Filter>DB2</Filter>
     </None>
-    <None Include="Source\Oracle\PlSqlParser.interp">
-      <Filter>Oracle</Filter>
+    <None Include="Source\DB2\Db2Parser.interp">
+      <Filter>DB2</Filter>
     </None>
-    <None Include="Source\Oracle\PlSqlParser.tokens">
-      <Filter>Oracle</Filter>
-    </None>
-    <None Include="Source\Oracle\transformGrammar.py">
-      <Filter>Oracle</Filter>
+    <None Include="Source\DB2\Db2Parser.tokens">
+      <Filter>DB2</Filter>
     </None>
     <None Include="Source\PostgreSQL\PostgreSQLLexer.interp">
       <Filter>PostgreSQL</Filter>
@@ -214,17 +234,32 @@
     <None Include="Source\PostgreSQL\transformGrammar.py">
       <Filter>PostgreSQL</Filter>
     </None>
+    <None Include="Source\Oracle\PlSqlLexer.interp">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlLexer.tokens">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlParser.interp">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\PlSqlParser.tokens">
+      <Filter>Oracle</Filter>
+    </None>
+    <None Include="Source\Oracle\transformGrammar.py">
+      <Filter>Oracle</Filter>
+    </None>
     <None Include="Source\SQL Server\TSqlLexer.interp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </None>
     <None Include="Source\SQL Server\TSqlLexer.tokens">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </None>
     <None Include="Source\SQL Server\TSqlParser.interp">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </None>
     <None Include="Source\SQL Server\TSqlParser.tokens">
-      <Filter>SQL Server</Filter>
+      <Filter>SQLServer</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
