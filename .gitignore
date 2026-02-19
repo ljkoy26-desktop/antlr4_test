@@ -398,3 +398,4 @@ FodyWeavers.xsd
 *.sln.iml
 Grammer/mysql_gen/MySQLParserBaseVisitor.h
 MyProject_Structure.txt
+/vcpkg
