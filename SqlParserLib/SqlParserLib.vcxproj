@@ -162,6 +162,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="Source\DB2\Db2Lexer.h" />
+    <ClInclude Include="Source\DB2\Db2Parser.h" />
+    <ClInclude Include="Source\DB2\Db2ParserBaseVisitor.h" />
+    <ClInclude Include="Source\DB2\Db2ParserVisitor.h" />
     <ClInclude Include="Source\MySQL\MySQLLexer.h" />
     <ClInclude Include="Source\MySQL\MySQLLexerBase.h" />
     <ClInclude Include="Source\MySQL\MySQLParser.h" />
@@ -188,6 +192,10 @@
     <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\DB2\Db2Lexer.cpp" />
+    <ClCompile Include="Source\DB2\Db2Parser.cpp" />
+    <ClCompile Include="Source\DB2\Db2ParserBaseVisitor.cpp" />
+    <ClCompile Include="Source\DB2\Db2ParserVisitor.cpp" />
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp" />
     <ClCompile Include="Source\MySQL\MySQLLexerBase.cpp" />
     <ClCompile Include="Source\MySQL\MySQLParser.cpp" />
@@ -211,6 +219,10 @@
     <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Source\DB2\Db2Lexer.interp" />
+    <None Include="Source\DB2\Db2Lexer.tokens" />
+    <None Include="Source\DB2\Db2Parser.interp" />
+    <None Include="Source\DB2\Db2Parser.tokens" />
     <None Include="Source\MySQL\MySQLLexer.interp" />
     <None Include="Source\MySQL\MySQLLexer.tokens" />
     <None Include="Source\MySQL\MySQLParser.interp" />
