@@ -39,4 +39,7 @@ public:
 
 	afx_msg void OnBnClickedButtonMultiParsePostgreSQL();  // 복합 쿼리 파싱 버튼 (PostgreSQL)
 	afx_msg void OnBnClickedButtonTokenizePostgreSQL();    // 토큰화 버튼 (PostgreSQL)
+
+	afx_msg void OnBnClickedButtonMultiParseDB2();  // 복합 쿼리 파싱 버튼 (DB2)
+	afx_msg void OnBnClickedButtonTokenizeDB2();    // 토큰화 버튼 (DB2)
 };

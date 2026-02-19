@@ -1652,3 +1652,471 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sql
 	return tokens;
 }
 
+// ============================================================
+// DB2 관련 함수들
+// ============================================================
+
+// DB2용 내부 도우미: sql_statement에서 문장 유형 식별
+static SqlStatementType IdentifyFromSqlStatementDB2(antlrcpp_db2::Db2Parser::Sql_statementContext* sqlStmt)
+{
+	if (!sqlStmt)
+		return SqlStatementType::UNKNOWN;
+
+	// SELECT 문 (sql_statement에서 직접 참조)
+	if (sqlStmt->select_statement())
+		return SqlStatementType::SELECT_STATEMENT;
+
+	// DML (sql_data_change_statement)
+	if (auto* dataChange = sqlStmt->sql_data_change_statement())
+	{
+		if (dataChange->insert_statement() || dataChange->insert_datalake_statement())
+			return SqlStatementType::INSERT_STATEMENT;
+		if (dataChange->update_statement() || dataChange->update_datalake_statement())
+			return SqlStatementType::UPDATE_STATEMENT;
+		if (dataChange->delete_statement() || dataChange->delete_deltalake_statement())
+			return SqlStatementType::DELETE_STATEMENT;
+		if (dataChange->merge_statement())
+			return SqlStatementType::INSERT_STATEMENT;  // MERGE는 DML 계열
+		if (dataChange->truncate_statement())
+			return SqlStatementType::TRUNCATE_STATEMENT;
+	}
+
+	// DDL/DCL (sql_schema_statement)
+	if (auto* schemaStmt = sqlStmt->sql_schema_statement())
+	{
+		// CREATE 문들
+		if (schemaStmt->create_table_statement() ||
+			schemaStmt->create_index_statement() ||
+			schemaStmt->create_view_statement() ||
+			schemaStmt->create_alias_statement() ||
+			schemaStmt->create_sequence_statement() ||
+			schemaStmt->create_schema_statement() ||
+			schemaStmt->create_bufferpool_statement() ||
+			schemaStmt->create_tablespace_statement() ||
+			schemaStmt->create_role_statement() ||
+			schemaStmt->create_global_temporary_table_statement() ||
+			schemaStmt->create_nickname_statement() ||
+			schemaStmt->create_type_statement() ||
+			schemaStmt->create_type_array_statement() ||
+			schemaStmt->create_type_cursor_statement() ||
+			schemaStmt->create_type_distinct_statement() ||
+			schemaStmt->create_type_row_statement() ||
+			schemaStmt->create_type_structured_statement() ||
+			schemaStmt->create_variable_statement() ||
+			schemaStmt->create_mask_statement() ||
+			schemaStmt->create_permission_statement() ||
+			schemaStmt->create_module_statement() ||
+			schemaStmt->create_external_table_statement() ||
+			schemaStmt->create_synonym_statement() ||
+			schemaStmt->create_server_statement() ||
+			schemaStmt->create_wrapper_statement() ||
+			schemaStmt->create_workload_statement())
+			return SqlStatementType::CREATE_STATEMENT;
+
+		// CREATE PROCEDURE
+		if (schemaStmt->create_procedure_statement() ||
+			schemaStmt->create_procedure_external_statement() ||
+			schemaStmt->create_procedure_sourced_statement() ||
+			schemaStmt->create_procedure_sql_statement())
+			return SqlStatementType::CREATE_PROCEDURE;
+
+		// CREATE FUNCTION
+		if (schemaStmt->create_function_statement() ||
+			schemaStmt->create_function_external_scalar_statement() ||
+			schemaStmt->create_function_external_table_statement() ||
+			schemaStmt->create_function_sql_scalar_table_or_row_statement() ||
+			schemaStmt->create_function_sourced_or_template_statement() ||
+			schemaStmt->create_function_aggregate_interface_statement() ||
+			schemaStmt->create_function_old_db_external_function_statement())
+			return SqlStatementType::CREATE_FUNCTION;
+
+		// CREATE TRIGGER
+		if (schemaStmt->create_trigger_statement())
+			return SqlStatementType::CREATE_TRIGGER;
+
+		// ALTER 문들
+		if (schemaStmt->alter_table_statement() ||
+			schemaStmt->alter_index_statement() ||
+			schemaStmt->alter_view_statement() ||
+			schemaStmt->alter_sequence_statement() ||
+			schemaStmt->alter_bufferpool_statement() ||
+			schemaStmt->alter_tablespace_statement() ||
+			schemaStmt->alter_database_statement() ||
+			schemaStmt->alter_function_statement() ||
+			schemaStmt->alter_procedure_external_statement() ||
+			schemaStmt->alter_procedure_sourced_statement() ||
+			schemaStmt->alter_procedure_sql_statement() ||
+			schemaStmt->alter_trigger_statement() ||
+			schemaStmt->alter_module_statement() ||
+			schemaStmt->alter_nickname_statement() ||
+			schemaStmt->alter_schema_statement() ||
+			schemaStmt->alter_server_statement() ||
+			schemaStmt->alter_workload_statement() ||
+			schemaStmt->alter_type_statement() ||
+			schemaStmt->alter_mask_statement() ||
+			schemaStmt->alter_permission_statement())
+			return SqlStatementType::ALTER_STATEMENT;
+
+		// DROP 문
+		if (schemaStmt->drop_statement())
+			return SqlStatementType::DROP_STATEMENT;
+
+		// GRANT 문들
+		if (schemaStmt->grant_database_authorities_statement() ||
+			schemaStmt->grant_role_statement() ||
+			schemaStmt->grant_table_view_or_nickname_privileges_statement() ||
+			schemaStmt->grant_schema_privileges_statement() ||
+			schemaStmt->grant_sequence_privileges_statement() ||
+			schemaStmt->grant_routine_privileges_statement() ||
+			schemaStmt->grant_package_privileges_statement() ||
+			schemaStmt->grant_index_privileges_statement() ||
+			schemaStmt->grant_module_privileges_statement() ||
+			schemaStmt->grant_server_privileges_statement() ||
+			schemaStmt->grant_table_space_privileges_statement() ||
+			schemaStmt->grant_workload_privileges_statement() ||
+			schemaStmt->grant_global_variable_privileges_statement() ||
+			schemaStmt->grant_exemption_statement() ||
+			schemaStmt->grant_security_label_statement() ||
+			schemaStmt->grant_setsessionuser_privilege_statement() ||
+			schemaStmt->grant_xsr_object_privileges_statement())
+			return SqlStatementType::GRANT_STATEMENT;
+
+		// REVOKE 문들
+		if (schemaStmt->revoke_database_authorities_statement() ||
+			schemaStmt->revoke_role_statement() ||
+			schemaStmt->revoke_table_view_or_nickname_privileges_statement() ||
+			schemaStmt->revoke_schema_privileges_statement() ||
+			schemaStmt->revoke_sequence_privileges_statement() ||
+			schemaStmt->revoke_routine_privileges_statement() ||
+			schemaStmt->revoke_package_privileges_statement() ||
+			schemaStmt->revoke_index_privileges_statement() ||
+			schemaStmt->revoke_module_privileges_statement() ||
+			schemaStmt->revoke_server_privileges_statement() ||
+			schemaStmt->revoke_table_space_privileges_statement() ||
+			schemaStmt->revoke_workload_privileges_statement() ||
+			schemaStmt->revoke_global_variable_privileges_statement() ||
+			schemaStmt->revoke_exemption_statement() ||
+			schemaStmt->revoke_security_label_statement() ||
+			schemaStmt->revoke_setsessionuser_privilege_statement() ||
+			schemaStmt->revoke_xsr_object_privileges_statement())
+			return SqlStatementType::REVOKE_STATEMENT;
+	}
+
+	// TCL (sql_transaction_statement)
+	if (sqlStmt->sql_transaction_statement())
+		return SqlStatementType::TRANSACTION_STATEMENT;
+
+	// 제어문 (sql_constrol_statement - CALL, CASE, IF, WHILE 등)
+	if (auto* ctrlStmt = sqlStmt->sql_constrol_statement())
+	{
+		if (ctrlStmt->call_statement())
+			return SqlStatementType::CALL_STATEMENT;
+		return SqlStatementType::CALL_STATEMENT;  // 기타 제어문도 CALL 계열로
+	}
+
+	// 세션 문 (SET, EXPLAIN 등)
+	if (auto* sessionStmt = sqlStmt->sql_session_statement())
+	{
+		if (sessionStmt->set_statement())
+			return SqlStatementType::SET_STATEMENT;
+	}
+
+	// 동적 SQL (EXECUTE, PREPARE 등)
+	if (sqlStmt->sql_dynamic_statement())
+		return SqlStatementType::CALL_STATEMENT;
+
+	// 데이터 문 (OPEN, CLOSE, FETCH 등)
+	if (sqlStmt->sql_data_statement())
+		return SqlStatementType::CALL_STATEMENT;
+
+	return SqlStatementType::UNKNOWN;
+}
+
+std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::string& sqlQueries)
+{
+	std::vector<SqlStatementInfo> results;
+
+	try
+	{
+		ANTLRInputStream input(sqlQueries);
+		antlrcpp_db2::Db2Lexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_db2::Db2Parser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		// db2_file() -> batch() -> sql_statement() 목록
+		auto* fileCtx = parser.db2_file();
+		if (!fileCtx)
+			return results;
+
+		auto* batchCtx = fileCtx->batch();
+		if (!batchCtx)
+			return results;
+
+		auto stmtList = batchCtx->sql_statement();
+		int nIndex = 1;
+
+		for (auto* sqlStmt : stmtList)
+		{
+			if (!sqlStmt)
+				continue;
+
+			// 빈 문장 건너뛰기
+			if (!sqlStmt->getStart() || sqlStmt->getStart()->getType() == antlr4::Token::EOF)
+				continue;
+
+			SqlStatementInfo info;
+			info.index = nIndex++;
+			info.type = IdentifyFromSqlStatementDB2(sqlStmt);
+
+			antlr4::Token* pStartToken = sqlStmt->getStart();
+			antlr4::Token* pStopToken = sqlStmt->getStop();
+			if (pStartToken && pStopToken)
+			{
+				info.startLine = pStartToken->getLine();
+				info.startColumn = pStartToken->getCharPositionInLine();
+				size_t nStartIdx = pStartToken->getStartIndex();
+				size_t nStopIdx = pStopToken->getStopIndex();
+				if (nStartIdx != (size_t)-1 && nStopIdx != (size_t)-1 && nStopIdx >= nStartIdx)
+				{
+					info.sqlText = sqlQueries.substr(nStartIdx, nStopIdx - nStartIdx + 1);
+				}
+			}
+			results.push_back(info);
+		}
+	}
+	catch (...) {}
+
+	return results;
+}
+
+TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText)
+{
+	using TR = TokenRole;
+	using Db2Lex = antlrcpp_db2::Db2Lexer;
+
+	switch (tokenType)
+	{
+		// 키워드들
+	case Db2Lex::SELECT:     return TR::KEYWORD_SELECT;
+	case Db2Lex::FROM:       return TR::KEYWORD_FROM;
+	case Db2Lex::WHERE:      return TR::KEYWORD_WHERE;
+	case Db2Lex::INSERT:     return TR::KEYWORD_INSERT;
+	case Db2Lex::UPDATE:     return TR::KEYWORD_UPDATE;
+	case Db2Lex::DELETE:     return TR::KEYWORD_DELETE;
+	case Db2Lex::INTO:       return TR::KEYWORD_INTO;
+	case Db2Lex::VALUES:     return TR::KEYWORD_VALUES;
+	case Db2Lex::SET:        return TR::KEYWORD_SET;
+	case Db2Lex::AND:        return TR::KEYWORD_AND;
+	case Db2Lex::OR:         return TR::KEYWORD_OR;
+	case Db2Lex::ORDER:      return TR::KEYWORD_ORDER_BY;
+	case Db2Lex::GROUP:      return TR::KEYWORD_GROUP_BY;
+	case Db2Lex::JOIN:
+	case Db2Lex::INNER:
+	case Db2Lex::LEFT:
+	case Db2Lex::RIGHT:
+	case Db2Lex::OUTER:
+	case Db2Lex::CROSS:
+	case Db2Lex::FULL:       return TR::KEYWORD_JOIN;
+	case Db2Lex::ON:         return TR::KEYWORD_ON;
+	case Db2Lex::AS:         return TR::KEYWORD_AS;
+
+		// 기타 예약어들
+	case Db2Lex::CREATE:
+	case Db2Lex::ALTER:
+	case Db2Lex::DROP:
+	case Db2Lex::TABLE:
+	case Db2Lex::DATABASE:
+	case Db2Lex::INDEX:
+	case Db2Lex::VIEW:
+	case Db2Lex::PROCEDURE:
+	case Db2Lex::FUNCTION:
+	case Db2Lex::TRIGGER:
+	case Db2Lex::GRANT:
+	case Db2Lex::REVOKE:
+	case Db2Lex::BEGIN:
+	case Db2Lex::COMMIT:
+	case Db2Lex::ROLLBACK:
+	case Db2Lex::DISTINCT:
+	case Db2Lex::ALL:
+	case Db2Lex::BY:
+	case Db2Lex::ASC:
+	case Db2Lex::DESC:
+	case Db2Lex::LIKE:
+	case Db2Lex::IN:
+	case Db2Lex::BETWEEN:
+	case Db2Lex::IS:
+	case Db2Lex::NOT:
+	case Db2Lex::EXISTS:
+	case Db2Lex::CASE:
+	case Db2Lex::WHEN:
+	case Db2Lex::THEN:
+	case Db2Lex::ELSE:
+	case Db2Lex::END:
+	case Db2Lex::DECLARE:
+	case Db2Lex::CURSOR:
+	case Db2Lex::FOR:
+	case Db2Lex::WHILE:
+	case Db2Lex::IF:
+	case Db2Lex::RETURN:
+	case Db2Lex::EXECUTE:
+	case Db2Lex::SEQUENCE:
+	case Db2Lex::TRUNCATE:
+	case Db2Lex::MERGE:
+	case Db2Lex::USING:
+	case Db2Lex::WITH:
+	case Db2Lex::UNION:
+	case Db2Lex::INTERSECT:
+	case Db2Lex::EXCEPT:
+	case Db2Lex::FETCH:
+	case Db2Lex::OFFSET:
+	case Db2Lex::LIMIT:
+	case Db2Lex::CONSTRAINT:
+	case Db2Lex::DEFAULT:
+	case Db2Lex::CHECK:
+	case Db2Lex::PRIMARY:
+	case Db2Lex::FOREIGN:
+	case Db2Lex::REFERENCES:
+	case Db2Lex::CALL:
+	case Db2Lex::SCHEMA:
+	case Db2Lex::TRANSACTION:
+	case Db2Lex::SAVEPOINT:
+	case Db2Lex::PACKAGE:
+	case Db2Lex::BODY:
+	case Db2Lex::TABLESPACE:
+	case Db2Lex::BUFFERPOOL:
+	case Db2Lex::ROLE:
+	case Db2Lex::PARTITION:
+	case Db2Lex::ONLY:
+	case Db2Lex::LATERAL:
+	case Db2Lex::SOME:
+	case Db2Lex::ANY:
+		return TR::KEYWORD_OTHER;
+
+		// 숫자 리터럴
+	case Db2Lex::DECIMAL_LITERAL:
+	case Db2Lex::SINGLE_DIGIT:
+	case Db2Lex::FLOAT_LITERAL:
+	case Db2Lex::REAL_LITERAL:
+		return TR::LITERAL_NUMBER;
+
+		// 문자열 리터럴
+	case Db2Lex::SINGLE_QUOTE:
+	case Db2Lex::STRING_LITERAL:
+	case Db2Lex::CHAR_LITERAL:
+		return TR::LITERAL_STRING;
+
+		// NULL
+	case Db2Lex::NULL_:
+		return TR::LITERAL_NULL;
+
+		// 불린
+	case Db2Lex::TRUE:
+	case Db2Lex::FALSE:
+		return TR::LITERAL_BOOLEAN;
+
+		// 비교 연산자
+	case Db2Lex::EQ:
+	case Db2Lex::NE:
+	case Db2Lex::LTGT:
+	case Db2Lex::LT:
+	case Db2Lex::GT:
+	case Db2Lex::LE:
+	case Db2Lex::GE:
+		return TR::OPERATOR_COMPARISON;
+
+		// 산술 연산자
+	case Db2Lex::PLUS:
+	case Db2Lex::MINUS:
+	case Db2Lex::STAR:
+	case Db2Lex::DIVIDE:
+	case Db2Lex::MODULE:
+		return TR::OPERATOR_ARITHMETIC;
+
+		// 구분자
+	case Db2Lex::COMMA:
+		return TR::SEPARATOR_COMMA;
+	case Db2Lex::DOT:
+		return TR::SEPARATOR_DOT;
+	case Db2Lex::SEMI:
+		return TR::SEPARATOR_SEMICOLON;
+	case Db2Lex::LEFT_RND_BKT:
+		return TR::SEPARATOR_PAREN_OPEN;
+	case Db2Lex::RIGHT_RND_BKT:
+		return TR::SEPARATOR_PAREN_CLOSE;
+
+		// 공백
+	case Db2Lex::WHITE_SPACE:
+		return TR::WHITESPACE;
+
+		// 주석
+	case Db2Lex::SQL_COMMENT:
+	case Db2Lex::LINE_COMMENT:
+		return TR::COMMENT;
+
+		// 파라미터
+	case Db2Lex::COLON:
+		return TR::PARAMETER;
+
+		// 식별자
+	case Db2Lex::ID:
+	case Db2Lex::DOUBLE_QUOTE_ID:
+		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+
+	default:
+		return TR::UNKNOWN;
+	}
+}
+
+std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery)
+{
+	std::vector<TokenInfo> tokens;
+
+	try
+	{
+		ANTLRInputStream input(sqlQuery);
+		antlrcpp_db2::Db2Lexer lexer(&input);
+		CommonTokenStream tokenStream(&lexer);
+
+		// 모든 토큰 가져오기
+		lexer.removeErrorListeners();
+		tokenStream.fill();
+
+		int nIndex = 1;
+		std::vector<antlr4::Token*> allTokens = tokenStream.getTokens();
+
+		for (antlr4::Token* pToken : allTokens)
+		{
+			if (pToken->getType() == antlr4::Token::EOF)
+				break;
+
+			// 공백은 기본적으로 건너뛰기
+			if (pToken->getType() == antlrcpp_db2::Db2Lexer::WHITE_SPACE)
+				continue;
+
+			TokenInfo info;
+			info.index = nIndex++;
+			info.text = pToken->getText();
+			info.tokenType = lexer.getVocabulary().getSymbolicName(pToken->getType());
+			if (info.tokenType.empty())
+				info.tokenType = lexer.getVocabulary().getLiteralName(pToken->getType());
+			info.role = GetRoleFromLexerTokenDB2(pToken->getType(), info.text);
+			info.roleDesc = SQLEngine::TokenRoleToString(info.role);
+			info.line = pToken->getLine();
+			info.column = pToken->getCharPositionInLine();
+			info.startIndex = pToken->getStartIndex();
+			info.stopIndex = pToken->getStopIndex();
+
+			tokens.push_back(info);
+		}
+	}
+	catch (...)
+	{
+		// 예외 발생 시 현재까지의 토큰 반환
+	}
+
+	return tokens;
+}
+

@@ -24,3 +24,7 @@
 #include "PostgreSQL/PostgreSQLParserBase.h"
 #include "PostgreSQL/PostgreSQLLexer.h"
 #include "PostgreSQL/PostgreSQLParser.h"
+
+// 6. DB2 파서 (네임스페이스 확인: antlrcpp_db2)
+#include "DB2/Db2Lexer.h"
+#include "DB2/Db2Parser.h"
