@@ -2,6 +2,9 @@
 #include <string>
 #include <vector>
 
+// SqlParserLib DLL 매크로
+#include "../SqlParserLib/framework.h"
+
 // 1. 유형 정의 (Dlg 클래스 안에 있던 것을 이리로 이동)
 
 enum class SqlStatementType {
@@ -103,7 +106,7 @@ struct TokenInfo {
 };
 
 // 2. 엔진 클래스
-class SQLEngine
+class SQLPARSERLIB_API SQLEngine
 {
 public:
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);

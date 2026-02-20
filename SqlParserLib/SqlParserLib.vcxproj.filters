@@ -113,6 +113,9 @@
     <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h">
       <Filter>SQLServer</Filter>
     </ClInclude>
+    <ClInclude Include="..\TestMFC\SQLEngine.h">
+      <Filter>헤더 파일</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\MySQL\MySQLLexer.cpp">
@@ -190,6 +193,7 @@
     <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp">
       <Filter>SQLServer</Filter>
     </ClCompile>
+    <ClCompile Include="..\TestMFC\SQLEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\MySQL\MySQLLexer.interp">

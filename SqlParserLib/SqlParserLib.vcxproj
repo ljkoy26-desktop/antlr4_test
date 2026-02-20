@@ -27,26 +27,26 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -94,14 +94,14 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_USRDLL;SQLPARSERLIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir)Sourcer\Oracle;$(ProjectDir)Source\SQLServer;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
     </Link>
   </ItemDefinitionGroup>
@@ -111,13 +111,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_USRDLL;SQLPARSERLIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
+      <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -127,20 +128,22 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_USRDLL;SQLPARSERLIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Sourcer\Oracle;$(ProjectDir)Source\SQLServer;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
       <ForcedIncludeFiles>
       </ForcedIncludeFiles>
-      <UndefinePreprocessorDefinitions>UNICODE;OVERFLOW;FALSE;TRUE;IN;OUT;DELETE;DEFAULT;ERROR;CONST;RETURN;</UndefinePreprocessorDefinitions>
+      <UndefinePreprocessorDefinitions>
+      </UndefinePreprocessorDefinitions>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -149,23 +152,25 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_USRDLL;SQLPARSERLIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)..\Grammer\oracle_gen;$(ProjectDir)..\Grammer\sqlserver_gen;$(ProjectDir)Source\MySQL;$(ProjectDir)..\Grammer\postgres_gen;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
     </ClCompile>
     <Link>
-      <SubSystem>
-      </SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
+      <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="..\TestMFC\SQLEngine.h" />
     <ClInclude Include="Source\DB2\Db2Lexer.h" />
     <ClInclude Include="Source\DB2\Db2Parser.h" />
     <ClInclude Include="Source\DB2\Db2ParserBaseVisitor.h" />
@@ -196,6 +201,9 @@
     <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\TestMFC\SQLEngine.cpp">
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Source\DB2\Db2Lexer.cpp" />
     <ClCompile Include="Source\DB2\Db2Parser.cpp" />
     <ClCompile Include="Source\DB2\Db2ParserBaseVisitor.cpp" />
