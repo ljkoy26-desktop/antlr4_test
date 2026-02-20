@@ -399,3 +399,4 @@ FodyWeavers.xsd
 Grammer/mysql_gen/MySQLParserBaseVisitor.h
 MyProject_Structure.txt
 /vcpkg
+.claude/settings.local.json
