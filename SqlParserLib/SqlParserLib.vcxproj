@@ -74,6 +74,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
     <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
+    <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -84,6 +85,7 @@
     <LinkIncremental>true</LinkIncremental>
     <OutDir>../bin/$(Configuration) $(Platform)\</OutDir>
     <IntDir>../obj/$(ProjectName)/$(Configuration) $(Platform)\</IntDir>
+    <TargetName>$(ProjectName)D</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
@@ -99,6 +101,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
+      <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
