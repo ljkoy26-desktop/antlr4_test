@@ -130,7 +130,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib;../bin/$(Configuration) $(Platform)\</AdditionalLibraryDirectories>
-      <AdditionalDependencies>antlr4-runtime.lib;SqlParserLib.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>antlr4-runtime.lib;SqlParserLibD.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <Midl>
       <MkTypLibCompatible>false</MkTypLibCompatible>
