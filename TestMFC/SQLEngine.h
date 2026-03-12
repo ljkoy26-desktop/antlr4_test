@@ -123,11 +123,8 @@ public:
 	// 통합 파싱 함수 (nDatabaseType: DatabaseType enum 값 사용)
 	static std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
 
-	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery);
+	// 통합 토큰화 함수 (nDatabaseType: DatabaseType enum 값 사용)
+	static std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType);
 
 	static TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText);
 	static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
@@ -148,6 +145,13 @@ private:
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries);
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
+
+	// DB별 토큰화 구현 (내부 전용)
+	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery);
+	static std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery);
 
 	// DB별 문장 유형 판별 (내부 전용)
 	static SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);

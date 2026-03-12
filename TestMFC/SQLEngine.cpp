@@ -315,6 +315,25 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 		return TR::UNKNOWN;
 	}
 }
+std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int nDatabaseType)
+{
+	switch (static_cast<DatabaseType>(nDatabaseType))
+	{
+	case DatabaseType::DB_ORACLE:
+		return TokenizeQueryOracle(sqlQuery);
+	case DatabaseType::DB_MYSQL:
+		return TokenizeQueryMySQL(sqlQuery);
+	case DatabaseType::DB_SQLSERVER:
+		return TokenizeQuerySQLServer(sqlQuery);
+	case DatabaseType::DB_POSTGRESQL:
+		return TokenizeQueryPostgreSQL(sqlQuery);
+	case DatabaseType::DB_DB2:
+		return TokenizeQueryDB2(sqlQuery);
+	default:
+		return {};
+	}
+}
+
 std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;

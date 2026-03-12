@@ -228,7 +228,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 		return;
 	}
 
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQueryMySQL(sqlQuery);
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_MYSQL);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("토큰이 없습니다."));
@@ -339,7 +339,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQueryOracle(sqlQuery);
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_ORACLE);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("Oracle 토큰이 없습니다."));
@@ -457,7 +457,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuerySQLServer(sqlQuery);
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_SQLSERVER);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("SQL Server 토큰이 없습니다."));
@@ -571,7 +571,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQueryPostgreSQL(sqlQuery);
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_POSTGRESQL);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("PostgreSQL 토큰이 없습니다."));
@@ -688,7 +688,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQueryDB2(sqlQuery);
+	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_DB2);
 
 	if (tokens.empty())
 	{
