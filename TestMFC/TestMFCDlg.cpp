@@ -166,7 +166,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	std::vector<SqlStatementInfo> results = SQLEngine::ParseMultipleQueriesMySQL(sqlQueries);
+	std::vector<SqlStatementInfo> results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_MYSQL);
 
 	if (results.empty()) {
 		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
@@ -290,7 +290,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
 	// SQLEngine은 오직 표준 자료형(std::vector, std::string)만 반환합니다.
-	auto results = SQLEngine::ParseMultipleQueriesOracle(sqlQueries);
+	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_ORACLE);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -412,7 +412,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueriesSQLServer(sqlQueries);
+	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -526,7 +526,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueriesPostgreSQL(sqlQueries);
+	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -641,7 +641,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueriesDB2(sqlQueries);
+	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_DB2);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty())

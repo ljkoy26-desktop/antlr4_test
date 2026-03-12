@@ -106,15 +106,22 @@ struct TokenInfo {
 	size_t stopIndex;
 };
 
-// 2. 엔진 클래스
+// 2. DB 종류 식별자
+enum class DatabaseType
+{
+	DB_ORACLE     = 0,
+	DB_MYSQL      = 1,
+	DB_SQLSERVER  = 2,
+	DB_POSTGRESQL = 3,
+	DB_DB2        = 4
+};
+
+// 3. 엔진 클래스
 class SQLPARSERLIB_API SQLEngine
 {
 public:
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
+	// 통합 파싱 함수 (nDatabaseType: DatabaseType enum 값 사용)
+	static std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
 
 	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
 	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
@@ -128,17 +135,21 @@ public:
 	static TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText);
 	static TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText);
 
-
-
 	static std::string SqlTypeToString(SqlStatementType type);
 	static std::string TokenRoleToString(TokenRole role);
-
 
 	static SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
 	static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
 private:
-	// 각 DB 파서로 문장 유형 판별 (내부 전용)
+	// DB별 파싱 구현 (내부 전용)
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries);
+	static std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
+
+	// DB별 문장 유형 판별 (내부 전용)
 	static SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);
 	static SqlStatementType IdentifySqlTypeSQLServer(const std::string& szSql);
 	static SqlStatementType IdentifySqlTypePostgreSQL(const std::string& szSql);

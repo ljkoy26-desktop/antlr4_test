@@ -86,6 +86,25 @@ static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Un
 	return SqlType::UNKNOWN;
 }
 
+std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType)
+{
+	switch (static_cast<DatabaseType>(nDatabaseType))
+	{
+	case DatabaseType::DB_ORACLE:
+		return ParseMultipleQueriesOracle(sqlQueries);
+	case DatabaseType::DB_MYSQL:
+		return ParseMultipleQueriesMySQL(sqlQueries);
+	case DatabaseType::DB_SQLSERVER:
+		return ParseMultipleQueriesSQLServer(sqlQueries);
+	case DatabaseType::DB_POSTGRESQL:
+		return ParseMultipleQueriesPostgreSQL(sqlQueries);
+	case DatabaseType::DB_DB2:
+		return ParseMultipleQueriesDB2(sqlQueries);
+	default:
+		return {};
+	}
+}
+
 std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::string& sqlQueries)
 {
 	std::vector<SqlStatementInfo> results;
