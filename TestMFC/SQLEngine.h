@@ -14,6 +14,7 @@ enum class SqlStatementType {
 	INSERT_STATEMENT,
 	UPDATE_STATEMENT,
 	DELETE_STATEMENT,
+	MERGE_STATEMENT,
 	REPLACE_STATEMENT,
 	// DDL (Data Definition Language)
 	CREATE_STATEMENT,
@@ -136,7 +137,11 @@ public:
 	static SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
 	static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
-
-
-
+private:
+	// 각 DB 파서로 문장 유형 판별 (내부 전용)
+	static SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);
+	static SqlStatementType IdentifySqlTypeSQLServer(const std::string& szSql);
+	static SqlStatementType IdentifySqlTypePostgreSQL(const std::string& szSql);
+	static SqlStatementType IdentifySqlTypeDB2(const std::string& szSql);
+	static SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
 };

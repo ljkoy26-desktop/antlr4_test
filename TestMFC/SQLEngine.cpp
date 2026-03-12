@@ -436,6 +436,7 @@ std::string SQLEngine::SqlTypeToString(SqlStatementType type)
 	case SqlStatementType::INSERT_STATEMENT:      return "INSERT (DML)";
 	case SqlStatementType::UPDATE_STATEMENT:      return "UPDATE (DML)";
 	case SqlStatementType::DELETE_STATEMENT:      return "DELETE (DML)";
+	case SqlStatementType::MERGE_STATEMENT:       return "MERGE (DML)";
 	case SqlStatementType::REPLACE_STATEMENT:     return "REPLACE (DML)";
 	case SqlStatementType::CREATE_STATEMENT:      return "CREATE (DDL)";
 	case SqlStatementType::ALTER_STATEMENT:       return "ALTER (DDL)";
@@ -2120,3 +2121,216 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery)
 	return tokens;
 }
 
+// ============================================================
+// DB 독립적 SQL 문장 유형 판별 (ANTLR 파서 기반)
+// ============================================================
+
+SqlStatementType SQLEngine::IdentifySqlTypeOracle(const std::string& szSql)
+{
+	try
+	{
+		ANTLRInputStream input(szSql);
+		PlSqlLexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		PlSqlParser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		PlSqlParser::Sql_scriptContext* scriptCtx = parser.sql_script();
+		if (!scriptCtx || parser.getNumberOfSyntaxErrors() > 0)
+			return SqlStatementType::UNKNOWN;
+
+		auto stmtList = scriptCtx->unit_statement();
+		if (stmtList.empty())
+			return SqlStatementType::UNKNOWN;
+
+		auto* unitStmt = stmtList[0];
+		if (!unitStmt)
+			return SqlStatementType::UNKNOWN;
+
+		if (auto* dmlStmt = unitStmt->data_manipulation_language_statements())
+		{
+			if (dmlStmt->select_statement()) return SqlStatementType::SELECT_STATEMENT;
+			if (dmlStmt->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
+			if (dmlStmt->update_statement()) return SqlStatementType::UPDATE_STATEMENT;
+			if (dmlStmt->delete_statement()) return SqlStatementType::DELETE_STATEMENT;
+			if (dmlStmt->merge_statement())  return SqlStatementType::MERGE_STATEMENT;
+		}
+
+		return IdentifyStatementOracle(unitStmt);
+	}
+	catch (...)
+	{
+		return SqlStatementType::UNKNOWN;
+	}
+}
+
+SqlStatementType SQLEngine::IdentifySqlTypeSQLServer(const std::string& szSql)
+{
+	try
+	{
+		ANTLRInputStream input(szSql);
+		antlrcpp_sqlserver::TSqlLexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_sqlserver::TSqlParser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		auto* fileCtx = parser.tsql_file();
+		if (!fileCtx || parser.getNumberOfSyntaxErrors() > 0)
+			return SqlStatementType::UNKNOWN;
+
+		auto batchList = fileCtx->batch();
+		if (batchList.empty())
+			return SqlStatementType::UNKNOWN;
+
+		auto* batchCtx = batchList[0];
+		if (!batchCtx)
+			return SqlStatementType::UNKNOWN;
+
+		if (auto* batchLevel = batchCtx->batch_level_statement())
+			return IdentifyFromBatchLevelSQLServer(batchLevel);
+
+		auto sqlClausesList = batchCtx->sql_clauses();
+		if (sqlClausesList.empty())
+			return SqlStatementType::UNKNOWN;
+
+		auto* sqlClauses = sqlClausesList[0];
+		if (auto* dmlClause = sqlClauses->dml_clause())
+		{
+			if (dmlClause->select_statement_standalone()) return SqlStatementType::SELECT_STATEMENT;
+			if (dmlClause->insert_statement())            return SqlStatementType::INSERT_STATEMENT;
+			if (dmlClause->update_statement())            return SqlStatementType::UPDATE_STATEMENT;
+			if (dmlClause->delete_statement())            return SqlStatementType::DELETE_STATEMENT;
+			if (dmlClause->merge_statement())             return SqlStatementType::MERGE_STATEMENT;
+		}
+
+		return IdentifyFromSqlClausesSQLServer(sqlClauses);
+	}
+	catch (...)
+	{
+		return SqlStatementType::UNKNOWN;
+	}
+}
+
+SqlStatementType SQLEngine::IdentifySqlTypePostgreSQL(const std::string& szSql)
+{
+	try
+	{
+		ANTLRInputStream input(szSql);
+		antlrcpp_postgresql::PostgreSQLLexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_postgresql::PostgreSQLParser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		auto* rootCtx = parser.root();
+		if (!rootCtx || parser.getNumberOfSyntaxErrors() > 0)
+			return SqlStatementType::UNKNOWN;
+
+		auto* stmtBlock = rootCtx->stmtblock();
+		if (!stmtBlock)
+			return SqlStatementType::UNKNOWN;
+
+		auto* stmtMulti = stmtBlock->stmtmulti();
+		if (!stmtMulti)
+			return SqlStatementType::UNKNOWN;
+
+		auto stmtList = stmtMulti->stmt();
+		if (stmtList.empty())
+			return SqlStatementType::UNKNOWN;
+
+		auto* stmtCtx = stmtList[0];
+		if (!stmtCtx)
+			return SqlStatementType::UNKNOWN;
+
+		if (stmtCtx->selectstmt()) return SqlStatementType::SELECT_STATEMENT;
+		if (stmtCtx->insertstmt()) return SqlStatementType::INSERT_STATEMENT;
+		if (stmtCtx->updatestmt()) return SqlStatementType::UPDATE_STATEMENT;
+		if (stmtCtx->deletestmt()) return SqlStatementType::DELETE_STATEMENT;
+		if (stmtCtx->mergestmt()) return SqlStatementType::MERGE_STATEMENT;
+
+		return IdentifyFromStmtPostgreSQL(stmtCtx);
+	}
+	catch (...)
+	{
+		return SqlStatementType::UNKNOWN;
+	}
+}
+
+SqlStatementType SQLEngine::IdentifySqlTypeDB2(const std::string& szSql)
+{
+	try
+	{
+		ANTLRInputStream input(szSql);
+		antlrcpp_db2::Db2Lexer lexer(&input);
+		CommonTokenStream tokens(&lexer);
+		antlrcpp_db2::Db2Parser parser(&tokens);
+
+		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+
+		auto* fileCtx = parser.db2_file();
+		if (!fileCtx || parser.getNumberOfSyntaxErrors() > 0)
+			return SqlStatementType::UNKNOWN;
+
+		auto* batchCtx = fileCtx->batch();
+		if (!batchCtx)
+			return SqlStatementType::UNKNOWN;
+
+		auto stmtList = batchCtx->sql_statement();
+		if (stmtList.empty())
+			return SqlStatementType::UNKNOWN;
+
+		auto* sqlStmt = stmtList[0];
+		if (!sqlStmt)
+			return SqlStatementType::UNKNOWN;
+
+		if (sqlStmt->select_statement())
+			return SqlStatementType::SELECT_STATEMENT;
+
+		if (auto* dataChange = sqlStmt->sql_data_change_statement())
+		{
+			if (dataChange->insert_statement() || dataChange->insert_datalake_statement())
+				return SqlStatementType::INSERT_STATEMENT;
+			if (dataChange->update_statement() || dataChange->update_datalake_statement())
+				return SqlStatementType::UPDATE_STATEMENT;
+			if (dataChange->delete_statement() || dataChange->delete_deltalake_statement())
+				return SqlStatementType::DELETE_STATEMENT;
+			if (dataChange->merge_statement())
+				return SqlStatementType::MERGE_STATEMENT;
+		}
+
+		return IdentifyFromSqlStatementDB2(sqlStmt);
+	}
+	catch (...)
+	{
+		return SqlStatementType::UNKNOWN;
+	}
+}
+
+// 모든 DB 파서를 순차적으로 시도하여 문장 유형 반환
+// MySQL -> Oracle -> SQLServer -> PostgreSQL -> DB2 순으로 시도
+SqlStatementType SQLEngine::IdentifySqlTypeAny(const std::string& szSql)
+{
+	SqlStatementType eType = IdentifySqlTypeMySQL(szSql);
+	if (eType != SqlStatementType::UNKNOWN)
+		return eType;
+
+	eType = IdentifySqlTypeOracle(szSql);
+	if (eType != SqlStatementType::UNKNOWN)
+		return eType;
+
+	eType = IdentifySqlTypeSQLServer(szSql);
+	if (eType != SqlStatementType::UNKNOWN)
+		return eType;
+
+	eType = IdentifySqlTypePostgreSQL(szSql);
+	if (eType != SqlStatementType::UNKNOWN)
+		return eType;
+
+	return IdentifySqlTypeDB2(szSql);
+}
