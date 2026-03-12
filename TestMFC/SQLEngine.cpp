@@ -6,17 +6,6 @@ using namespace antlrcpp_mysql;
 // antlrcpp_sqlserver는 명시적으로 네임스페이스를 지정하여 사용
 using namespace antlr4;
 
-// 내부 헬퍼 함수 (노출 안 함)
-SqlStatementType IdentifyFromUnitStatement(PlSqlParser::Unit_statementContext* unitStmt) {
-	if (!unitStmt) return SqlStatementType::UNKNOWN;
-	if (unitStmt->data_manipulation_language_statements()) {
-		auto* dml = unitStmt->data_manipulation_language_statements();
-		if (dml->select_statement()) return SqlStatementType::SELECT_STATEMENT;
-		if (dml->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
-	}
-	// ... 나머지 Identify 로직 TestMFCDlg.cpp에서 복사해서 붙여넣기 ...
-	return SqlStatementType::UNKNOWN;
-}
 
 static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Unit_statementContext* unitStmt)
 {
