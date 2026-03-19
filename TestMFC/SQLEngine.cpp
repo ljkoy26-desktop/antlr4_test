@@ -410,6 +410,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuer
 			TokenInfo info;
 			info.index = index++;
 			info.text = token->getText();
+			info.tokenTypeId = static_cast<size_t>(token->getType());
 			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
 			if (info.tokenType.empty()) {
 				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
@@ -459,6 +460,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryMySQL(const std::string& sqlQuery
 			TokenInfo info;
 			info.index = index++;
 			info.text = token->getText();
+			info.tokenTypeId = static_cast<size_t>(token->getType());
 			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
 			if (info.tokenType.empty()) {
 				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
@@ -640,57 +642,84 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 {
 	std::vector<SqlStatementInfo> results;
 
-	try {
-		ANTLRInputStream input(sqlQueries);
+	try
+	{
+		// 렉서로 전체 토큰화 후 SEMICOLON_SYMBOL 기준으로 문장 분리
+		// parser.queries() 방식 대신 토큰 스트림을 직접 순회하여 안정성 확보
+		antlr4::ANTLRInputStream input(sqlQueries);
 		antlrcpp_mysql::MySQLLexer lexer(&input);
-		CommonTokenStream tokens(&lexer);
-		antlrcpp_mysql::MySQLParser parser(&tokens);
+		antlr4::CommonTokenStream tokenStream(&lexer);
 
-		parser.removeErrorListeners();
+		lexer.removeErrorListeners();
+		tokenStream.fill();
 
-		// queries() 규칙으로 여러 쿼리 파싱
-		antlrcpp_mysql::MySQLParser::QueriesContext* queriesCtx = parser.queries();
+		const std::vector<antlr4::Token*>& vecAllTokens = tokenStream.getTokens();
 
-		if (!queriesCtx) {
-			return results;
-		}
+		int nIndex = 1;
+		bool bInStmt = false;
+		size_t nStmtStartChar = 0;
+		size_t nStmtStartLine = 1;
+		size_t nStmtStartCol  = 0;
+		size_t nLastStopChar  = 0;
 
-		// 모든 쿼리 가져오기
-		std::vector<antlrcpp_mysql::MySQLParser::QueryContext*> queryList = queriesCtx->query();
+		for (size_t i = 0; i < vecAllTokens.size(); i++)
+		{
+			antlr4::Token* pTok = vecAllTokens[i];
+			if (!pTok)
+				continue;
 
-		int index = 1;
-		for (auto* queryCtx : queryList) {
-			SqlStatementInfo info;
-			info.index = index++;
+			int nTokType = static_cast<int>(pTok->getType());
 
-			// simpleStatement 가져오기
-			auto* simpleStmt = queryCtx->simpleStatement();
-			info.type = IdentifyFromSimpleStatementMySQL(simpleStmt);
-
-			// 토큰에서 원본 SQL 텍스트 추출
-			if (simpleStmt) {
-				antlr4::Token* startToken = simpleStmt->getStart();
-				antlr4::Token* stopToken = simpleStmt->getStop();
-
-				if (startToken && stopToken) {
-					info.startLine = startToken->getLine();
-					info.startColumn = startToken->getCharPositionInLine();
-
-					// 원본 텍스트 추출
-					size_t startIdx = startToken->getStartIndex();
-					size_t stopIdx = stopToken->getStopIndex();
-					if (startIdx != INVALID_INDEX && stopIdx != INVALID_INDEX && stopIdx >= startIdx) {
-						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
-					}
+			// EOF: 세미콜론 없이 끝나는 마지막 문장 처리
+			if (nTokType == static_cast<int>(antlr4::Token::EOF))
+			{
+				if (bInStmt)
+				{
+					SqlStatementInfo stInfo;
+					stInfo.index       = nIndex++;
+					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.startLine   = nStmtStartLine;
+					stInfo.startColumn = nStmtStartCol;
+					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
+					results.push_back(stInfo);
+					bInStmt = false;
 				}
+				break;
 			}
 
-			results.push_back(info);
+			// 공백 건너뜀
+			if (nTokType == static_cast<int>(antlrcpp_mysql::MySQLLexer::WHITESPACE))
+				continue;
+
+			// SEMICOLON: 현재 문장 종료
+			if (nTokType == static_cast<int>(antlrcpp_mysql::MySQLLexer::SEMICOLON_SYMBOL))
+			{
+				if (bInStmt)
+				{
+					SqlStatementInfo stInfo;
+					stInfo.index       = nIndex++;
+					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.startLine   = nStmtStartLine;
+					stInfo.startColumn = nStmtStartCol;
+					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
+					results.push_back(stInfo);
+					bInStmt = false;
+				}
+				continue;
+			}
+
+			// 일반 토큰: 문장 범위 갱신
+			if (!bInStmt)
+			{
+				nStmtStartChar = pTok->getStartIndex();
+				nStmtStartLine = pTok->getLine();
+				nStmtStartCol  = pTok->getCharPositionInLine();
+				bInStmt = true;
+			}
+			nLastStopChar = pTok->getStopIndex();
 		}
 	}
-	catch (...) {
-		// 예외 발생 시 빈 결과 반환
-	}
+	catch (...) {}
 
 	for (auto& stInfo : results)
 	{
@@ -711,16 +740,18 @@ SqlStatementType SQLEngine::IdentifySqlTypeMySQL(const std::string& sqlQuery)
 		CommonTokenStream tokens(&lexer);
 		antlrcpp_mysql::MySQLParser parser(&tokens);
 
+		lexer.removeErrorListeners();
 		parser.removeErrorListeners();
 
-		// 최상위 규칙으로 파싱
 		antlrcpp_mysql::MySQLParser::QueryContext* queryCtx = parser.query();
+		if (!queryCtx)
+			return SqlStatementType::UNKNOWN;
 
-		if (parser.getNumberOfSyntaxErrors() > 0) return SqlStatementType::UNKNOWN;
-
-		// simpleStatement를 가져옴
 		auto* simpleStmt = queryCtx->simpleStatement();
-		if (!simpleStmt) return SqlStatementType::UNKNOWN;
+		if (!simpleStmt)
+			return SqlStatementType::UNKNOWN;
+
+		// 파서 오류 여부와 무관하게 파싱 컨텍스트로 타입 식별 먼저 시도
 
 		// DML 체크
 		if (simpleStmt->selectStatement()) 			return SqlStatementType::SELECT_STATEMENT;
@@ -772,6 +803,28 @@ SqlStatementType SQLEngine::IdentifySqlTypeMySQL(const std::string& sqlQuery)
 
 		// USE 문 (utilityStatement 내부)
 		if (simpleStmt->utilityStatement()) 			return SqlStatementType::USE_STATEMENT;
+
+		// 컨텍스트로 식별 못하고 파서 오류도 있으면 텍스트 기반 폴백
+		if (parser.getNumberOfSyntaxErrors() > 0)
+		{
+			std::string szUpper = sqlQuery;
+			std::transform(szUpper.begin(), szUpper.end(), szUpper.begin(), ::toupper);
+			size_t nPos = szUpper.find_first_not_of(" \t\r\n");
+			if (nPos != std::string::npos)
+			{
+				if (szUpper.compare(nPos, 7,  "SELECT ") == 0)  return SqlStatementType::SELECT_STATEMENT;
+				if (szUpper.compare(nPos, 7,  "INSERT ") == 0)  return SqlStatementType::INSERT_STATEMENT;
+				if (szUpper.compare(nPos, 7,  "UPDATE ") == 0)  return SqlStatementType::UPDATE_STATEMENT;
+				if (szUpper.compare(nPos, 7,  "DELETE ") == 0)  return SqlStatementType::DELETE_STATEMENT;
+				if (szUpper.compare(nPos, 8,  "REPLACE ") == 0) return SqlStatementType::REPLACE_STATEMENT;
+				if (szUpper.compare(nPos, 7,  "CREATE ") == 0)  return SqlStatementType::CREATE_STATEMENT;
+				if (szUpper.compare(nPos, 6,  "ALTER ") == 0)   return SqlStatementType::ALTER_STATEMENT;
+				if (szUpper.compare(nPos, 5,  "DROP ") == 0)    return SqlStatementType::DROP_STATEMENT;
+				if (szUpper.compare(nPos, 6,  "GRANT ") == 0)   return SqlStatementType::GRANT_STATEMENT;
+				if (szUpper.compare(nPos, 7,  "REVOKE ") == 0)  return SqlStatementType::REVOKE_STATEMENT;
+				if (szUpper.compare(nPos, 9,  "TRUNCATE ") == 0) return SqlStatementType::TRUNCATE_STATEMENT;
+			}
+		}
 	}
 	catch (...) {
 		return SqlStatementType::UNKNOWN;
@@ -1328,6 +1381,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQ
 			TokenInfo info;
 			info.index = index++;
 			info.text = token->getText();
+			info.tokenTypeId = static_cast<size_t>(token->getType());
 			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
 			if (info.tokenType.empty()) {
 				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
@@ -1724,6 +1778,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sql
 			TokenInfo info;
 			info.index = index++;
 			info.text = token->getText();
+			info.tokenTypeId = static_cast<size_t>(token->getType());
 			info.tokenType = lexer.getVocabulary().getSymbolicName(token->getType());
 			if (info.tokenType.empty()) {
 				info.tokenType = lexer.getVocabulary().getLiteralName(token->getType());
@@ -2198,6 +2253,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery)
 			TokenInfo info;
 			info.index = nIndex++;
 			info.text = pToken->getText();
+			info.tokenTypeId = static_cast<size_t>(pToken->getType());
 			info.tokenType = lexer.getVocabulary().getSymbolicName(pToken->getType());
 			if (info.tokenType.empty())
 				info.tokenType = lexer.getVocabulary().getLiteralName(pToken->getType());
@@ -2511,7 +2567,13 @@ bool SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
 {
 	try
 	{
-		antlr4::ANTLRInputStream input(szSql);
+		// MySQL parser는 세미콜론 없는 SQL에서 오류를 발생시킬 수 있으므로 자동 추가
+		std::string szInput = szSql;
+		size_t nLastNonSpace = szInput.find_last_not_of(" \t\r\n");
+		if (nLastNonSpace != std::string::npos && szInput[nLastNonSpace] != ';')
+			szInput += ";";
+
+		antlr4::ANTLRInputStream input(szInput);
 		antlrcpp_mysql::MySQLLexer lexer(&input);
 		antlr4::CommonTokenStream tokens(&lexer);
 		antlrcpp_mysql::MySQLParser parser(&tokens);
@@ -2611,6 +2673,7 @@ bool SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
 // 파싱 실행 - 결과를 m_vecStatements에 저장
 bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
 {
+	m_nDatabaseType = nDatabaseType;
 	m_vecStatements = ParseMultipleQueries(szSqlQueries, nDatabaseType);
 
 	// nDatabaseType을 각 문장 정보에도 기록
@@ -2648,6 +2711,36 @@ bool SQLEngine::HasSyntaxError(int nIndex) const
 const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
 {
 	return m_vecStatements;
+}
+
+// -------------------------------------------------------
+// [통합] GetRoleFromLexerToken - DB 타입 코드로 분기
+// -------------------------------------------------------
+
+// [정적] nDatabaseType에 맞는 DB별 함수로 분기
+TokenRole SQLEngine::GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType)
+{
+	switch (nDatabaseType)
+	{
+	case (int)DatabaseType::DB_ORACLE:
+		return GetRoleFromLexerTokenOracle(tokenTypeId, tokenText);
+	case (int)DatabaseType::DB_MYSQL:
+		return GetRoleFromLexerTokenMySQL(tokenTypeId, tokenText);
+	case (int)DatabaseType::DB_SQLSERVER:
+		return GetRoleFromLexerTokenSQLServer(tokenTypeId, tokenText);
+	case (int)DatabaseType::DB_POSTGRESQL:
+		return GetRoleFromLexerTokenPostgreSQL(tokenTypeId, tokenText);
+	case (int)DatabaseType::DB_DB2:
+		return GetRoleFromLexerTokenDB2(tokenTypeId, tokenText);
+	default:
+		return TokenRole::UNKNOWN;
+	}
+}
+
+// [인스턴스] 마지막 Parse()에서 저장된 m_nDatabaseType으로 분기
+TokenRole SQLEngine::GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const
+{
+	return GetRoleFromLexerToken(tokenTypeId, tokenText, m_nDatabaseType);
 }
 
 

@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <string>
 #include <vector>
 
@@ -99,6 +99,7 @@ struct SqlStatementInfo {
 struct TokenInfo {
 	int index;
 	std::string text;
+	size_t tokenTypeId;    // ANTLR 원시 토큰 타입 ID (GetRoleFromLexerToken 재조회용)
 	std::string tokenType;
 	TokenRole role;
 	std::string roleDesc;
@@ -141,6 +142,9 @@ public:
 	// 저장된 stmt 목록 전체 반환
 	const std::vector<SqlStatementInfo>& GetStatements() const;
 
+	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
+	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
+
 	// -------------------------------------------------------
 	// [정적 편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
 	// -------------------------------------------------------
@@ -164,6 +168,9 @@ public:
 	// 통합 토큰화 함수 (nDatabaseType: DatabaseType enum 값 사용)
 	static std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType);
 
+	// 통합 토큰 역할 반환 함수 (nDatabaseType: DatabaseType enum 값 사용)
+	static TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType);
+
 	static TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText);
 	static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
 	static TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText);
@@ -179,6 +186,9 @@ public:
 private:
 	// 마지막 Parse() 호출 결과를 저장하는 멤버변수
 	std::vector<SqlStatementInfo> m_vecStatements;
+
+	// 마지막 Parse() 호출에서 사용된 DB 타입 (GetRoleFromLexerToken 인스턴스 메서드에서 사용)
+	int m_nDatabaseType = -1;
 
 	// DB별 파싱 구현 (내부 전용)
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
