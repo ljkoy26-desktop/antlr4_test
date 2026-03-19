@@ -2,9 +2,9 @@
 [1] SQLParserLib Source Structure 
 ========================================== 
  
-Folder PATH listing for volume p31 nvme 1tb
-Volume serial number is 6A55-4636
-C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\SQLPARSERLIB\SOURCE
+Folder PATH listing
+Volume serial number is ECE3-C6D1
+C:\USERS\USER\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\SQLPARSERLIB\SOURCE
 ¦§¦¡¦¡¦¡DB2
 ¦¢       Db2Lexer.cpp
 ¦¢       Db2Lexer.h
@@ -98,9 +98,9 @@ C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\SQLPARSERLIB\SOURCE
 [2] TestMFC Structure 
 ========================================== 
  
-Folder PATH listing for volume p31 nvme 1tb
-Volume serial number is 6A55-4636
-C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
+Folder PATH listing
+Volume serial number is ECE3-C6D1
+C:\USERS\USER\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
 ¦¢   framework.h
 ¦¢   pch.cpp
 ¦¢   pch.h
@@ -108,7 +108,6 @@ C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
 ¦¢   SQLEngine.cpp
 ¦¢   SQLEngine.h
 ¦¢   targetver.h
-¦¢   TestMFC.aps
 ¦¢   TestMFC.cpp
 ¦¢   TestMFC.h
 ¦¢   TestMFC.rc
@@ -128,9 +127,9 @@ C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
 [3] Testcase Structure 
 ========================================== 
  
-Folder PATH listing for volume p31 nvme 1tb
-Volume serial number is 6A55-4636
-C:\USERS\LJKOY\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTCASE
+Folder PATH listing
+Volume serial number is ECE3-C6D1
+C:\USERS\USER\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTCASE
 ¦§¦¡¦¡¦¡athena
 ¦¢   ¦¦¦¡¦¡¦¡examples
 ¦¢           alter-database.sql

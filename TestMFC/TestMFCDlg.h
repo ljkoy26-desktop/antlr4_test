@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include "SQLEngine.h"
 
 class CTestMFCDlg : public CDialogEx
 {
@@ -26,6 +27,9 @@ protected:
 	DECLARE_MESSAGE_MAP()
 
 public:
+	// SQLEngine 인스턴스 멤버변수 - Parse() 후 메타정보 조회에 사용
+	SQLEngine m_oSQLEngine;
+
 	afx_msg void OnBnClickedButtonIdentifyMySQL(); // 쿼리 타입 분석
 
 	afx_msg void OnBnClickedButtonMultiParseMySQL();  // 복합 쿼리 파싱 버튼 (MySQL)
@@ -42,4 +46,5 @@ public:
 
 	afx_msg void OnBnClickedButtonMultiParseDB2();  // 복합 쿼리 파싱 버튼 (DB2)
 	afx_msg void OnBnClickedButtonTokenizeDB2();    // 토큰화 버튼 (DB2)
+	afx_msg void OnBnClickedButtonOutputClear();
 };

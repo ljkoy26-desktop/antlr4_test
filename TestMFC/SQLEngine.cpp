@@ -1,5 +1,6 @@
 ﻿#include "SQLEngine.h"
 #include "../Common/Include/AntlrProxy.h"
+#include <algorithm>
 
 using namespace antlrcpp_oracle;
 using namespace antlrcpp_mysql;
@@ -43,16 +44,43 @@ static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Un
 	if (unitStmt->create_package_body()) 		return SqlType::CREATE_PROCEDURE;
 
 	// DDL: ALTER 문들
-	if (unitStmt->alter_table()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_index()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_view()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_sequence())			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_user()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_session()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_procedure()) 		return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_function()) 		return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_trigger()) 			return SqlType::ALTER_STATEMENT;
-	if (unitStmt->alter_package())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_table()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_index()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_view()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_sequence())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_user()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_session()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_procedure()) 				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_function()) 				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_trigger()) 					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_package())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_analytic_view())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_attribute_dimension())		return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_audit_policy())				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_cluster())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_database())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_database_link())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_dimension())				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_diskgroup())				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_flashback_archive())		return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_hierarchy())				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_inmemory_join_group())		return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_java())						return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_library())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_lockdown_profile())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_materialized_view())		return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_materialized_view_log())	return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_materialized_zonemap())		return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_operator())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_outline())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_pmem_filestore())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_resource_cost())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_role())						return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_rollback_segment())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_synonym())					return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_tablespace())				return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_tablespace_set())			return SqlType::ALTER_STATEMENT;
+	if (unitStmt->alter_type())						return SqlType::ALTER_STATEMENT;
 
 	// DDL: DROP 문들
 	if (unitStmt->drop_table()) 		return SqlType::DROP_STATEMENT;
@@ -88,21 +116,34 @@ static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Un
 
 std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType)
 {
+	std::vector<SqlStatementInfo> vecResult;
+
 	switch (static_cast<DatabaseType>(nDatabaseType))
 	{
 	case DatabaseType::DB_ORACLE:
-		return ParseMultipleQueriesOracle(sqlQueries);
+		vecResult = ParseMultipleQueriesOracle(sqlQueries);
+		break;
 	case DatabaseType::DB_MYSQL:
-		return ParseMultipleQueriesMySQL(sqlQueries);
+		vecResult = ParseMultipleQueriesMySQL(sqlQueries);
+		break;
 	case DatabaseType::DB_SQLSERVER:
-		return ParseMultipleQueriesSQLServer(sqlQueries);
+		vecResult = ParseMultipleQueriesSQLServer(sqlQueries);
+		break;
 	case DatabaseType::DB_POSTGRESQL:
-		return ParseMultipleQueriesPostgreSQL(sqlQueries);
+		vecResult = ParseMultipleQueriesPostgreSQL(sqlQueries);
+		break;
 	case DatabaseType::DB_DB2:
-		return ParseMultipleQueriesDB2(sqlQueries);
+		vecResult = ParseMultipleQueriesDB2(sqlQueries);
+		break;
 	default:
 		return {};
 	}
+
+	// nDatabaseType 설정 (bHasError는 각 ParseMultipleQueriesXXX에서 개별 설정됨)
+	for (auto& stInfo : vecResult)
+		stInfo.nDatabaseType = nDatabaseType;
+
+	return vecResult;
 }
 
 std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::string& sqlQueries)
@@ -127,10 +168,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 			SqlStatementInfo info;
 			info.index = index++;
 
-			// 이전에 옮긴 Identify 함수 호출
-			// info.type = (int)IdentifyFromUnitStatementOracle(unitStmt); 
+			if (unitStmt)
+			info.type = IdentifyStatementOracle(unitStmt);
 
-			if (unitStmt) {
+		if (unitStmt) {
 				Token* startToken = unitStmt->getStart();
 				Token* stopToken = unitStmt->getStop();
 
@@ -150,6 +191,12 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 		}
 	}
 	catch (...) {}
+
+	for (auto& stInfo : results)
+	{
+		if (!stInfo.sqlText.empty())
+			stInfo.bHasError = CheckSyntaxErrorOracle(stInfo.sqlText);
+	}
 
 	return results;
 }
@@ -645,6 +692,12 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 		// 예외 발생 시 빈 결과 반환
 	}
 
+	for (auto& stInfo : results)
+	{
+		if (!stInfo.sqlText.empty())
+			stInfo.bHasError = CheckSyntaxErrorMySQL(stInfo.sqlText);
+	}
+
 	return results;
 }
 
@@ -1076,6 +1129,12 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 	}
 	catch (...) {}
 
+	for (auto& stInfo : results)
+	{
+		if (!stInfo.sqlText.empty())
+			stInfo.bHasError = CheckSyntaxErrorSQLServer(stInfo.sqlText);
+	}
+
 	return results;
 }
 
@@ -1431,6 +1490,12 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 		}
 	}
 	catch (...) {}
+
+	for (auto& stInfo : results)
+	{
+		if (!stInfo.sqlText.empty())
+			stInfo.bHasError = CheckSyntaxErrorPostgreSQL(stInfo.sqlText);
+	}
 
 	return results;
 }
@@ -1917,6 +1982,12 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 	}
 	catch (...) {}
 
+	for (auto& stInfo : results)
+	{
+		if (!stInfo.sqlText.empty())
+			stInfo.bHasError = CheckSyntaxErrorDB2(stInfo.sqlText);
+	}
+
 	return results;
 }
 
@@ -2165,7 +2236,7 @@ SqlStatementType SQLEngine::IdentifySqlTypeOracle(const std::string& szSql)
 		lexer.removeErrorListeners();
 
 		PlSqlParser::Sql_scriptContext* scriptCtx = parser.sql_script();
-		if (!scriptCtx || parser.getNumberOfSyntaxErrors() > 0)
+		if (!scriptCtx)
 			return SqlStatementType::UNKNOWN;
 
 		auto stmtList = scriptCtx->unit_statement();
@@ -2185,7 +2256,27 @@ SqlStatementType SQLEngine::IdentifySqlTypeOracle(const std::string& szSql)
 			if (dmlStmt->merge_statement())  return SqlStatementType::MERGE_STATEMENT;
 		}
 
-		return IdentifyStatementOracle(unitStmt);
+		// 파서 오류가 있어도 부분 파싱 컨텍스트로 타입 식별 시도
+		SqlStatementType eType = IdentifyStatementOracle(unitStmt);
+		if (eType != SqlStatementType::UNKNOWN)
+			return eType;
+
+		// 파서가 문법을 완전히 지원하지 않는 경우 텍스트 기반 폴백
+		if (parser.getNumberOfSyntaxErrors() > 0)
+		{
+			// 첫 토큰으로 대략적인 타입 판별
+			std::string szUpper = szSql;
+			std::transform(szUpper.begin(), szUpper.end(), szUpper.begin(), ::toupper);
+			size_t nPos = szUpper.find_first_not_of(" \t\r\n");
+			if (nPos != std::string::npos)
+			{
+				if (szUpper.compare(nPos, 6, "ALTER ") == 0)  return SqlStatementType::ALTER_STATEMENT;
+				if (szUpper.compare(nPos, 7, "CREATE ") == 0) return SqlStatementType::CREATE_STATEMENT;
+				if (szUpper.compare(nPos, 5, "DROP ") == 0)   return SqlStatementType::DROP_STATEMENT;
+			}
+		}
+
+		return SqlStatementType::UNKNOWN;
 	}
 	catch (...)
 	{
@@ -2360,4 +2451,256 @@ SqlStatementType SQLEngine::IdentifySqlTypeAny(const std::string& szSql)
 		return eType;
 
 	return IdentifySqlTypeDB2(szSql);
+}
+
+
+// ============================================================
+// 내부 오류 감지용 리스너 (파일 내부 전용)
+// ============================================================
+
+namespace
+{
+	class SqlSyntaxErrorListener : public antlr4::BaseErrorListener
+	{
+	public:
+		bool m_bHasError = false;
+
+		void syntaxError(
+			antlr4::Recognizer* /*recognizer*/,
+			antlr4::Token* /*offendingSymbol*/,
+			size_t /*line*/,
+			size_t /*charPositionInLine*/,
+			const std::string& /*msg*/,
+			std::exception_ptr /*e*/) override
+		{
+			m_bHasError = true;
+		}
+	};
+}
+
+
+// ============================================================
+// 문법 오류 감지 (내부 전용) - 개별 SQL 문장을 재파싱하여 확인
+// ============================================================
+
+bool SQLEngine::CheckSyntaxErrorOracle(const std::string& szSql)
+{
+	try
+	{
+		antlr4::ANTLRInputStream input(szSql);
+		antlrcpp_oracle::PlSqlLexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		antlrcpp_oracle::PlSqlParser parser(&tokens);
+
+		SqlSyntaxErrorListener oErrListener;
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+		lexer.addErrorListener(&oErrListener);
+		parser.addErrorListener(&oErrListener);
+
+		parser.sql_script();
+		return oErrListener.m_bHasError;
+	}
+	catch (...)
+	{
+		return true;
+	}
+}
+
+bool SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
+{
+	try
+	{
+		antlr4::ANTLRInputStream input(szSql);
+		antlrcpp_mysql::MySQLLexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		antlrcpp_mysql::MySQLParser parser(&tokens);
+
+		SqlSyntaxErrorListener oErrListener;
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+		lexer.addErrorListener(&oErrListener);
+		parser.addErrorListener(&oErrListener);
+
+		parser.query();
+		return oErrListener.m_bHasError;
+	}
+	catch (...)
+	{
+		return true;
+	}
+}
+
+bool SQLEngine::CheckSyntaxErrorSQLServer(const std::string& szSql)
+{
+	try
+	{
+		antlr4::ANTLRInputStream input(szSql);
+		antlrcpp_sqlserver::TSqlLexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		antlrcpp_sqlserver::TSqlParser parser(&tokens);
+
+		SqlSyntaxErrorListener oErrListener;
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+		lexer.addErrorListener(&oErrListener);
+		parser.addErrorListener(&oErrListener);
+
+		parser.tsql_file();
+		return oErrListener.m_bHasError;
+	}
+	catch (...)
+	{
+		return true;
+	}
+}
+
+bool SQLEngine::CheckSyntaxErrorPostgreSQL(const std::string& szSql)
+{
+	try
+	{
+		antlr4::ANTLRInputStream input(szSql);
+		antlrcpp_postgresql::PostgreSQLLexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		antlrcpp_postgresql::PostgreSQLParser parser(&tokens);
+
+		SqlSyntaxErrorListener oErrListener;
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+		lexer.addErrorListener(&oErrListener);
+		parser.addErrorListener(&oErrListener);
+
+		parser.root();
+		return oErrListener.m_bHasError;
+	}
+	catch (...)
+	{
+		return true;
+	}
+}
+
+bool SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
+{
+	try
+	{
+		antlr4::ANTLRInputStream input(szSql);
+		antlrcpp_db2::Db2Lexer lexer(&input);
+		antlr4::CommonTokenStream tokens(&lexer);
+		antlrcpp_db2::Db2Parser parser(&tokens);
+
+		SqlSyntaxErrorListener oErrListener;
+		lexer.removeErrorListeners();
+		parser.removeErrorListeners();
+		lexer.addErrorListener(&oErrListener);
+		parser.addErrorListener(&oErrListener);
+
+		parser.db2_file();
+		return oErrListener.m_bHasError;
+	}
+	catch (...)
+	{
+		return true;
+	}
+}
+
+
+// ============================================================
+// [인스턴스 기반] 파싱 후 멤버변수에 저장
+// ============================================================
+
+// 파싱 실행 - 결과를 m_vecStatements에 저장
+bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
+{
+	m_vecStatements = ParseMultipleQueries(szSqlQueries, nDatabaseType);
+
+	// nDatabaseType을 각 문장 정보에도 기록
+	for (auto& stInfo : m_vecStatements)
+		stInfo.nDatabaseType = nDatabaseType;
+
+	return !m_vecStatements.empty();
+}
+
+// 저장된 stmt 목록의 SQL 문장 수 반환
+int SQLEngine::GetStatementCount() const
+{
+	return static_cast<int>(m_vecStatements.size());
+}
+
+// 저장된 stmt 목록에서 n번째 SQL 문장의 타입 반환 (0-based index)
+SqlStatementType SQLEngine::GetStatementTypeAt(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return SqlStatementType::UNKNOWN;
+
+	return m_vecStatements[nIndex].type;
+}
+
+// 저장된 stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
+bool SQLEngine::HasSyntaxError(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return true;
+
+	return m_vecStatements[nIndex].bHasError;
+}
+
+// 저장된 stmt 목록 전체 반환
+const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
+{
+	return m_vecStatements;
+}
+
+
+// ============================================================
+// [정적 편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
+// ============================================================
+
+// stmt 목록의 SQL 문장 수 반환
+int SQLEngine::GetStatementCount(const std::vector<SqlStatementInfo>& vecStmts)
+{
+	return static_cast<int>(vecStmts.size());
+}
+
+// stmt 목록에서 n번째 SQL 문장의 타입 반환 (0-based index)
+SqlStatementType SQLEngine::GetStatementTypeAt(const std::vector<SqlStatementInfo>& vecStmts, int nIndex)
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(vecStmts.size()))
+		return SqlStatementType::UNKNOWN;
+
+	return vecStmts[nIndex].type;
+}
+
+// stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
+// - vecStmts의 각 항목에 nDatabaseType이 설정되어 있어야 정확히 동작
+// - ParseMultipleQueries + Parse() 경유 시 자동 설정됨
+bool SQLEngine::HasSyntaxError(const std::vector<SqlStatementInfo>& vecStmts, int nIndex)
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(vecStmts.size()))
+		return true;
+
+	// bHasError가 이미 설정된 경우 그대로 반환
+	if (vecStmts[nIndex].bHasError)
+		return true;
+
+	// bHasError가 false라도 nDatabaseType이 없으면 재파싱 불가
+	const SqlStatementInfo& stInfo = vecStmts[nIndex];
+	if (stInfo.sqlText.empty())
+		return false;
+
+	// nDatabaseType 기반으로 개별 문장을 재파싱하여 오류 감지
+	switch (static_cast<DatabaseType>(stInfo.nDatabaseType))
+	{
+	case DatabaseType::DB_ORACLE:
+		return CheckSyntaxErrorOracle(stInfo.sqlText);
+	case DatabaseType::DB_MYSQL:
+		return CheckSyntaxErrorMySQL(stInfo.sqlText);
+	case DatabaseType::DB_SQLSERVER:
+		return CheckSyntaxErrorSQLServer(stInfo.sqlText);
+	case DatabaseType::DB_POSTGRESQL:
+		return CheckSyntaxErrorPostgreSQL(stInfo.sqlText);
+	case DatabaseType::DB_DB2:
+		return CheckSyntaxErrorDB2(stInfo.sqlText);
+	default:
+		return false;
+	}
 }

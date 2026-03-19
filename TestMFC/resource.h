@@ -19,6 +19,7 @@
 #define IDC_BUTTON_TOKEN_POSTGRESQL     1011
 #define IDC_BUTTON_MULTI_DB2            1012
 #define IDC_BUTTON_TOKEN_DB2            1013
+#define IDC_BUTTON_OUTPUT_CLEAR         1014
 
 // Next default values for new objects
 // 

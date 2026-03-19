@@ -37,6 +37,7 @@ BEGIN_MESSAGE_MAP(CTestMFCDlg, CDialogEx)
 	ON_BN_CLICKED(IDC_BUTTON_TOKEN_POSTGRESQL, &CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL)
 	ON_BN_CLICKED(IDC_BUTTON_MULTI_DB2, &CTestMFCDlg::OnBnClickedButtonMultiParseDB2)
 	ON_BN_CLICKED(IDC_BUTTON_TOKEN_DB2, &CTestMFCDlg::OnBnClickedButtonTokenizeDB2)
+	ON_BN_CLICKED(IDC_BUTTON_OUTPUT_CLEAR, &CTestMFCDlg::OnBnClickedButtonOutputClear)
 END_MESSAGE_MAP()
 
 
@@ -213,6 +214,55 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 			std::string secondTypeName = SQLEngine::SqlTypeToString(second.type);
 			AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 		}
+	}
+
+	// -------------------------------------------------------
+	// [메타정보 조회 예시 1] 정적 편의 함수 - results vector 직접 활용
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
+
+	// (1) SQL 문장 수 조회
+	int nCount = SQLEngine::GetStatementCount(results);
+	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
+
+	// (2) 각 문장의 SQL 타입 조회
+	for (int i = 0; i < nCount; i++)
+	{
+		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
+		std::string strType = SQLEngine::SqlTypeToString(eType);
+		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
+	}
+
+	// (3) 각 문장의 문법 오류 여부 조회
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("--- 문법 오류 검사 ---"));
+	for (int i = 0; i < nCount; i++)
+	{
+		bool bError = SQLEngine::HasSyntaxError(results, i);
+		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [메타정보 조회 예시 2] 인스턴스 기반 - m_oSQLEngine 멤버변수 활용
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [인스턴스 기반] 메타정보 조회 ====="));
+
+	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_MYSQL);
+
+	int nInstCount = m_oSQLEngine.GetStatementCount();
+	AddTraceLog(_T("SQL 문장 수: %d"), nInstCount);
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
+		bool bError = m_oSQLEngine.HasSyntaxError(i);
+		std::string strType = SQLEngine::SqlTypeToString(eType);
+		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
+			i,
+			CString(strType.c_str()),
+			bError ? _T("있음") : _T("없음"));
 	}
 }
 
@@ -740,4 +790,17 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 			strText,
 			strRole);
 	}
+}
+
+void CTestMFCDlg::OnBnClickedButtonOutputClear()
+{
+	CEdit* pEditTrace = (CEdit*)GetDlgItem(IDC_EDIT_TRACE);
+	if (pEditTrace == nullptr)
+		return; 
+
+	pEditTrace->SetWindowText(_T(""));
+
+	// 컨트롤을 찾을 수 없으면 중단
+
+
 }

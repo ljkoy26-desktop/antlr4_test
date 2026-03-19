@@ -92,6 +92,8 @@ struct SqlStatementInfo {
 	std::string sqlText;
 	size_t startLine;
 	size_t startColumn;
+	bool bHasError;       // 문법 오류 여부
+	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
 };
 
 struct TokenInfo {
@@ -120,6 +122,42 @@ enum class DatabaseType
 class SQLPARSERLIB_API SQLEngine
 {
 public:
+	// -------------------------------------------------------
+	// [인스턴스 기반] 파싱 후 멤버변수에 저장하여 메타정보 조회
+	// -------------------------------------------------------
+
+	// 파싱 실행 후 결과를 m_vecStatements에 저장 (true: 성공, false: 결과 없음)
+	bool Parse(const std::string& szSqlQueries, int nDatabaseType);
+
+	// 저장된 stmt 목록의 SQL 문장 수 반환
+	int GetStatementCount() const;
+
+	// 저장된 stmt 목록에서 n번째 SQL 문장의 타입 반환 (0-based index)
+	SqlStatementType GetStatementTypeAt(int nIndex) const;
+
+	// 저장된 stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
+	bool HasSyntaxError(int nIndex) const;
+
+	// 저장된 stmt 목록 전체 반환
+	const std::vector<SqlStatementInfo>& GetStatements() const;
+
+	// -------------------------------------------------------
+	// [정적 편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
+	// -------------------------------------------------------
+
+	// stmt 목록의 SQL 문장 수 반환
+	static int GetStatementCount(const std::vector<SqlStatementInfo>& vecStmts);
+
+	// stmt 목록에서 n번째 SQL 문장의 타입 반환 (0-based index)
+	static SqlStatementType GetStatementTypeAt(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
+
+	// stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
+	static bool HasSyntaxError(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
+
+	// -------------------------------------------------------
+	// [기존 정적 함수]
+	// -------------------------------------------------------
+
 	// 통합 파싱 함수 (nDatabaseType: DatabaseType enum 값 사용)
 	static std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
 
@@ -139,6 +177,9 @@ public:
 	static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
 private:
+	// 마지막 Parse() 호출 결과를 저장하는 멤버변수
+	std::vector<SqlStatementInfo> m_vecStatements;
+
 	// DB별 파싱 구현 (내부 전용)
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
 	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
@@ -159,4 +200,11 @@ private:
 	static SqlStatementType IdentifySqlTypePostgreSQL(const std::string& szSql);
 	static SqlStatementType IdentifySqlTypeDB2(const std::string& szSql);
 	static SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
+
+	// 문법 오류 감지 (내부 전용 - 개별 SQL 문장을 재파싱하여 오류 확인)
+	static bool CheckSyntaxErrorOracle(const std::string& szSql);
+	static bool CheckSyntaxErrorMySQL(const std::string& szSql);
+	static bool CheckSyntaxErrorSQLServer(const std::string& szSql);
+	static bool CheckSyntaxErrorPostgreSQL(const std::string& szSql);
+	static bool CheckSyntaxErrorDB2(const std::string& szSql);
 };
