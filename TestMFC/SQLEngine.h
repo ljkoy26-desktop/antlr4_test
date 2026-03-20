@@ -146,42 +146,42 @@ public:
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
 
 	// -------------------------------------------------------
-	// [정적 편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
+	// [편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
 	// -------------------------------------------------------
 
 	// stmt 목록의 SQL 문장 수 반환
-	static int GetStatementCount(const std::vector<SqlStatementInfo>& vecStmts);
+	int GetStatementCount(const std::vector<SqlStatementInfo>& vecStmts);
 
 	// stmt 목록에서 n번째 SQL 문장의 타입 반환 (0-based index)
-	static SqlStatementType GetStatementTypeAt(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
+	SqlStatementType GetStatementTypeAt(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
 
 	// stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
-	static bool HasSyntaxError(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
+	bool HasSyntaxError(const std::vector<SqlStatementInfo>& vecStmts, int nIndex);
 
 	// -------------------------------------------------------
-	// [기존 정적 함수]
+	// [기존 함수]
 	// -------------------------------------------------------
 
 	// 통합 파싱 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	static std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
+	std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
 
 	// 통합 토큰화 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	static std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType);
+	std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType);
 
 	// 통합 토큰 역할 반환 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	static TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType);
+	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType) const;
 
-	static TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText);
-	static TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText);
-	static TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText);
-	static TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText);
-	static TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText);
+	TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const;
 
-	static std::string SqlTypeToString(SqlStatementType type);
-	static std::string TokenRoleToString(TokenRole role);
+	std::string SqlTypeToString(SqlStatementType type);
+	std::string TokenRoleToString(TokenRole role);
 
-	static SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
-	static SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
+	SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
+	SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
 private:
 	// 마지막 Parse() 호출 결과를 저장하는 멤버변수
@@ -191,30 +191,30 @@ private:
 	int m_nDatabaseType = -1;
 
 	// DB별 파싱 구현 (내부 전용)
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries);
-	static std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
+	std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);
+	std::vector<SqlStatementInfo> ParseMultipleQueriesMySQL(const std::string& sqlQueries);
+	std::vector<SqlStatementInfo> ParseMultipleQueriesSQLServer(const std::string& sqlQueries);
+	std::vector<SqlStatementInfo> ParseMultipleQueriesPostgreSQL(const std::string& sqlQueries);
+	std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
 
 	// DB별 토큰화 구현 (내부 전용)
-	static std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery);
-	static std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery);
 
 	// DB별 문장 유형 판별 (내부 전용)
-	static SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);
-	static SqlStatementType IdentifySqlTypeSQLServer(const std::string& szSql);
-	static SqlStatementType IdentifySqlTypePostgreSQL(const std::string& szSql);
-	static SqlStatementType IdentifySqlTypeDB2(const std::string& szSql);
-	static SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
+	SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);
+	SqlStatementType IdentifySqlTypeSQLServer(const std::string& szSql);
+	SqlStatementType IdentifySqlTypePostgreSQL(const std::string& szSql);
+	SqlStatementType IdentifySqlTypeDB2(const std::string& szSql);
+	SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
 
 	// 문법 오류 감지 (내부 전용 - 개별 SQL 문장을 재파싱하여 오류 확인)
-	static bool CheckSyntaxErrorOracle(const std::string& szSql);
-	static bool CheckSyntaxErrorMySQL(const std::string& szSql);
-	static bool CheckSyntaxErrorSQLServer(const std::string& szSql);
-	static bool CheckSyntaxErrorPostgreSQL(const std::string& szSql);
-	static bool CheckSyntaxErrorDB2(const std::string& szSql);
+	bool CheckSyntaxErrorOracle(const std::string& szSql);
+	bool CheckSyntaxErrorMySQL(const std::string& szSql);
+	bool CheckSyntaxErrorSQLServer(const std::string& szSql);
+	bool CheckSyntaxErrorPostgreSQL(const std::string& szSql);
+	bool CheckSyntaxErrorDB2(const std::string& szSql);
 };

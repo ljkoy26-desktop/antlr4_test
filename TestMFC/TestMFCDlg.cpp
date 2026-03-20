@@ -146,7 +146,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	std::vector<SqlStatementInfo> results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_MYSQL);
+	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_MYSQL);
 
 	if (results.empty()) {
 		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
@@ -159,7 +159,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 
 	for (const auto& info : results) {
 		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
 
 		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
@@ -180,17 +180,17 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
 
 	// 첫번째 쿼리 접근 예시
-	SqlStatementInfo first = SQLEngine::GetQueryAtMySQL(sqlQueries, 0);
+	SqlStatementInfo first = m_oSQLEngine.GetQueryAtMySQL(sqlQueries, 0);
 	if (first.index > 0) {
-		std::string firstTypeName = SQLEngine::SqlTypeToString(first.type);
+		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(first.type);
 		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
 	}
 
 	// 두번째 쿼리가 있다면
 	if (results.size() >= 2) {
-		SqlStatementInfo second = SQLEngine::GetQueryAtMySQL(sqlQueries, 1);
+		SqlStatementInfo second = m_oSQLEngine.GetQueryAtMySQL(sqlQueries, 1);
 		if (second.index > 0) {
-			std::string secondTypeName = SQLEngine::SqlTypeToString(second.type);
+			std::string secondTypeName = m_oSQLEngine.SqlTypeToString(second.type);
 			AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 		}
 	}
@@ -202,14 +202,14 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
 	// (1) SQL 문장 수 조회
-	int nCount = SQLEngine::GetStatementCount(results);
+	int nCount = m_oSQLEngine.GetStatementCount(results);
 	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	// (2) 각 문장의 SQL 타입 조회
 	for (int i = 0; i < nCount; i++)
 	{
-		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
 	}
 
@@ -218,7 +218,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	AddTraceLog(_T("--- 문법 오류 검사 ---"));
 	for (int i = 0; i < nCount; i++)
 	{
-		bool bError = SQLEngine::HasSyntaxError(results, i);
+		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
 		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
 	}
 
@@ -237,7 +237,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
 			i,
 			CString(strType.c_str()),
@@ -257,7 +257,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 		return;
 	}
 
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_MYSQL);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_MYSQL);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("토큰이 없습니다."));
@@ -275,8 +275,8 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 	for (const auto& tok : tokens) {
 		CString strText = CString(tok.text.c_str());
 		CString strType = CString(tok.tokenType.c_str());
-		CString strRole = CString(SQLEngine::TokenRoleToString(tok.role).c_str());
-		// std::string strRole = SQLEngine::TokenRoleToString(tok.role);
+		CString strRole = CString(m_oSQLEngine.TokenRoleToString(tok.role).c_str());
+		// std::string strRole = m_oSQLEngine.TokenRoleToString(tok.role);
 
 		// 긴 텍스트 자르기
 		if (strText.GetLength() > 18) {
@@ -299,7 +299,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 		AddTraceLog(_T("%d) %s ( %s )"),
 			tok.index,
 			CString(tok.text.c_str()).GetString(),
-			CString(SQLEngine::TokenRoleToString(tok.role).c_str()));
+			CString(m_oSQLEngine.TokenRoleToString(tok.role).c_str()));
 	}
 
 	// -------------------------------------------------------
@@ -314,13 +314,13 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 	for (int i = 0; i < nDemo; i++)
 	{
 		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = SQLEngine::GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_MYSQL);
+		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_MYSQL);
 		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
 		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
 
 		CString strText(tokens[i].text.c_str());
-		CString strStatic(SQLEngine::TokenRoleToString(eStaticRole).c_str());
-		CString strInst(SQLEngine::TokenRoleToString(eInstRole).c_str());
+		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
 		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
 	}
 }
@@ -341,7 +341,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
 	// SQLEngine은 오직 표준 자료형(std::vector, std::string)만 반환합니다.
-	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_ORACLE);
+	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_ORACLE);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -354,7 +354,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 	AddTraceLog(_T(""));
 
 	for (const auto& info : results) {
-		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
 
 		if (stdSql.length() > 50) {
@@ -373,25 +373,25 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
 
 	if (!results.empty()) {
-		std::string firstTypeName = SQLEngine::SqlTypeToString(results[0].type);
+		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
 		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
 	}
 
 	if (results.size() >= 2) {
-		std::string secondTypeName = SQLEngine::SqlTypeToString(results[1].type);
+		std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
 		AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 	}
 
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
-	int nCount = SQLEngine::GetStatementCount(results);
+	int nCount = m_oSQLEngine.GetStatementCount(results);
 	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	for (int i = 0; i < nCount; i++)
 	{
-		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
 	}
 
@@ -399,7 +399,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 	AddTraceLog(_T("--- 문법 오류 검사 ---"));
 	for (int i = 0; i < nCount; i++)
 	{
-		bool bError = SQLEngine::HasSyntaxError(results, i);
+		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
 		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
 	}
 
@@ -415,7 +415,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
 			i,
 			CString(strType.c_str()),
@@ -439,7 +439,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_ORACLE);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_ORACLE);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("Oracle 토큰이 없습니다."));
@@ -462,8 +462,8 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 		CString strText(tok.text.c_str());
 		CString strType(tok.tokenType.c_str());
 
-		// SQLEngine::TokenRoleToString은 이제 std::string을 반환합니다.
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		// UI 출력을 위한 길이 제한 처리
@@ -486,7 +486,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 	AddTraceLog(_T("===== 상세 정보 ====="));
 	for (const auto& tok : tokens) {
 		CString strText(tok.text.c_str());
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		AddTraceLog(_T("%d) %s ( %s )"),
@@ -507,13 +507,13 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 	for (int i = 0; i < nDemo; i++)
 	{
 		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = SQLEngine::GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_ORACLE);
+		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_ORACLE);
 		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
 		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
 
 		CString strText(tokens[i].text.c_str());
-		CString strStatic(SQLEngine::TokenRoleToString(eStaticRole).c_str());
-		CString strInst(SQLEngine::TokenRoleToString(eInstRole).c_str());
+		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
 		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
 	}
 }
@@ -534,7 +534,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
+	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -547,7 +547,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	AddTraceLog(_T(""));
 
 	for (const auto& info : results) {
-		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
 
 		if (stdSql.length() > 50) {
@@ -566,25 +566,25 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
 
 	if (!results.empty()) {
-		std::string firstTypeName = SQLEngine::SqlTypeToString(results[0].type);
+		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
 		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
 	}
 
 	if (results.size() >= 2) {
-		std::string secondTypeName = SQLEngine::SqlTypeToString(results[1].type);
+		std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
 		AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 	}
 
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
-	int nCount = SQLEngine::GetStatementCount(results);
+	int nCount = m_oSQLEngine.GetStatementCount(results);
 	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	for (int i = 0; i < nCount; i++)
 	{
-		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
 	}
 
@@ -592,7 +592,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	AddTraceLog(_T("--- 문법 오류 검사 ---"));
 	for (int i = 0; i < nCount; i++)
 	{
-		bool bError = SQLEngine::HasSyntaxError(results, i);
+		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
 		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
 	}
 
@@ -608,7 +608,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
 			i,
 			CString(strType.c_str()),
@@ -632,7 +632,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_SQLSERVER);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_SQLSERVER);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("SQL Server 토큰이 없습니다."));
@@ -654,7 +654,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 		CString strText(tok.text.c_str());
 		CString strType(tok.tokenType.c_str());
 
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		if (strText.GetLength() > 18) {
@@ -675,7 +675,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 	AddTraceLog(_T("===== 상세 정보 ====="));
 	for (const auto& tok : tokens) {
 		CString strText(tok.text.c_str());
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		AddTraceLog(_T("%d) %s ( %s )"),
@@ -696,13 +696,13 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 	for (int i = 0; i < nDemo; i++)
 	{
 		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = SQLEngine::GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_SQLSERVER);
+		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_SQLSERVER);
 		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
 		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
 
 		CString strText(tokens[i].text.c_str());
-		CString strStatic(SQLEngine::TokenRoleToString(eStaticRole).c_str());
-		CString strInst(SQLEngine::TokenRoleToString(eInstRole).c_str());
+		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
 		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
 	}
 }
@@ -723,7 +723,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
+	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -736,7 +736,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	AddTraceLog(_T(""));
 
 	for (const auto& info : results) {
-		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
 
 		if (stdSql.length() > 50) {
@@ -755,25 +755,25 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
 
 	if (!results.empty()) {
-		std::string firstTypeName = SQLEngine::SqlTypeToString(results[0].type);
+		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
 		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
 	}
 
 	if (results.size() >= 2) {
-		std::string secondTypeName = SQLEngine::SqlTypeToString(results[1].type);
+		std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
 		AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 	}
 
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
-	int nCount = SQLEngine::GetStatementCount(results);
+	int nCount = m_oSQLEngine.GetStatementCount(results);
 	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	for (int i = 0; i < nCount; i++)
 	{
-		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
 	}
 
@@ -781,7 +781,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	AddTraceLog(_T("--- 문법 오류 검사 ---"));
 	for (int i = 0; i < nCount; i++)
 	{
-		bool bError = SQLEngine::HasSyntaxError(results, i);
+		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
 		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
 	}
 
@@ -797,7 +797,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
 			i,
 			CString(strType.c_str()),
@@ -821,7 +821,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_POSTGRESQL);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_POSTGRESQL);
 
 	if (tokens.empty()) {
 		AddTraceLog(_T("PostgreSQL 토큰이 없습니다."));
@@ -843,7 +843,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 		CString strText(tok.text.c_str());
 		CString strType(tok.tokenType.c_str());
 
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		if (strText.GetLength() > 18) {
@@ -864,7 +864,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 	AddTraceLog(_T("===== PostgreSQL 상세 정보 ====="));
 	for (const auto& tok : tokens) {
 		CString strText(tok.text.c_str());
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		AddTraceLog(_T("%d) %s ( %s )"),
@@ -885,13 +885,13 @@ void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 	for (int i = 0; i < nDemo; i++)
 	{
 		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = SQLEngine::GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_POSTGRESQL);
+		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_POSTGRESQL);
 		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
 		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
 
 		CString strText(tokens[i].text.c_str());
-		CString strStatic(SQLEngine::TokenRoleToString(eStaticRole).c_str());
-		CString strInst(SQLEngine::TokenRoleToString(eInstRole).c_str());
+		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
 		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
 	}
 }
@@ -913,7 +913,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = SQLEngine::ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_DB2);
+	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_DB2);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty())
@@ -928,7 +928,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 
 	for (const auto& info : results)
 	{
-		std::string stdType = SQLEngine::SqlTypeToString(info.type);
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
 
 		if (stdSql.length() > 50)
@@ -947,26 +947,26 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 
 	if (!results.empty())
 	{
-		std::string firstTypeName = SQLEngine::SqlTypeToString(results[0].type);
+		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
 		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
 	}
 
 	if (results.size() >= 2)
 	{
-		std::string secondTypeName = SQLEngine::SqlTypeToString(results[1].type);
+		std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
 		AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
 	}
 
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
-	int nCount = SQLEngine::GetStatementCount(results);
+	int nCount = m_oSQLEngine.GetStatementCount(results);
 	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	for (int i = 0; i < nCount; i++)
 	{
-		SqlStatementType eType = SQLEngine::GetStatementTypeAt(results, i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
 	}
 
@@ -974,7 +974,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 	AddTraceLog(_T("--- 문법 오류 검사 ---"));
 	for (int i = 0; i < nCount; i++)
 	{
-		bool bError = SQLEngine::HasSyntaxError(results, i);
+		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
 		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
 	}
 
@@ -990,7 +990,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = SQLEngine::SqlTypeToString(eType);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
 		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
 			i,
 			CString(strType.c_str()),
@@ -1015,7 +1015,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = SQLEngine::TokenizeQuery(sqlQuery, (int)DatabaseType::DB_DB2);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_DB2);
 
 	if (tokens.empty())
 	{
@@ -1039,7 +1039,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 		CString strText(tok.text.c_str());
 		CString strType(tok.tokenType.c_str());
 
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		if (strText.GetLength() > 18)
@@ -1059,7 +1059,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	for (const auto& tok : tokens)
 	{
 		CString strText(tok.text.c_str());
-		std::string stdRole = SQLEngine::TokenRoleToString(tok.role);
+		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
 		CString strRole(stdRole.c_str());
 
 		AddTraceLog(_T("%d) %s ( %s )"),
@@ -1080,13 +1080,13 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	for (int i = 0; i < nDemo; i++)
 	{
 		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = SQLEngine::GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_DB2);
+		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_DB2);
 		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
 		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
 
 		CString strText(tokens[i].text.c_str());
-		CString strStatic(SQLEngine::TokenRoleToString(eStaticRole).c_str());
-		CString strInst(SQLEngine::TokenRoleToString(eInstRole).c_str());
+		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
 		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
 	}
 }

@@ -201,7 +201,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -884,7 +884,7 @@ SqlStatementInfo SQLEngine::GetQueryAtMySQL(const std::string& sqlQueries, size_
 		return emptyInfo;
 	}
 }
-TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -1191,7 +1191,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -1554,7 +1554,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 	using PgLexer = antlrcpp_postgresql::PostgreSQLLexer;
@@ -2046,7 +2046,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 	using Db2Lex = antlrcpp_db2::Db2Lexer;
@@ -2718,7 +2718,7 @@ const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
 // -------------------------------------------------------
 
 // [정적] nDatabaseType에 맞는 DB별 함수로 분기
-TokenRole SQLEngine::GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType)
+TokenRole SQLEngine::GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText, int nDatabaseType) const
 {
 	switch (nDatabaseType)
 	{
