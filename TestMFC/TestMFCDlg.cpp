@@ -204,29 +204,30 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	// -------------------------------------------------------
 	// [메타정보 조회 예시 1] 정적 편의 함수 - results vector 직접 활용
 	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
+	//AddTraceLog(_T(""));
+	//AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
 	// (1) SQL 문장 수 조회
-	int nCount = m_oSQLEngine.GetStatementCount(results);
-	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
+	int nCount(0);
+	//int nCount = m_oSQLEngine.GetStatementCount(results);
+	//AddTraceLog(_T("SQL 문장 수: %d"), nCount);
 
 	// (2) 각 문장의 SQL 타입 조회
-	for (int i = 0; i < nCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
-	}
+	//for (int i = 0; i < nCount; i++)
+	//{
+	//	SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
+	//	std::string strType = m_oSQLEngine.SqlTypeToString(eType);
+	//	AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
+	//}
 
-	// (3) 각 문장의 문법 오류 여부 조회
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("--- 문법 오류 검사 ---"));
-	for (int i = 0; i < nCount; i++)
-	{
-		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
-		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
-	}
+	//// (3) 각 문장의 문법 오류 여부 조회
+	//AddTraceLog(_T(""));
+	//AddTraceLog(_T("--- 문법 오류 검사 ---"));
+	//for (int i = 0; i < nCount; i++)
+	//{
+	//	bool bError = m_oSQLEngine.HasSyntaxError(results, i);
+	//	AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
+	//}
 
 	// -------------------------------------------------------
 	// [메타정보 조회 예시 2] 인스턴스 기반 - m_oSQLEngine 멤버변수 활용
