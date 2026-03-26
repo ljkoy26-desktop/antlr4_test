@@ -59,13 +59,19 @@ BOOL CTestMFCDlg::OnInitDialog()
 			pSysMenu->AppendMenu(MF_STRING, IDM_ABOUTBOX, strAboutMenu);
 		}
 	}
-
-
 	SetIcon(m_hIcon, TRUE);
 	SetIcon(m_hIcon, FALSE);
 
-	// 복합 쿼리 테스트용 기본 SQL
-	SetDlgItemText(IDC_EDIT_SQL, _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nGRANT SELECT ON db.* TO 'user'@'localhost';"));
+	// mysql 
+
+	CString sSQL;
+	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nGRANT SELECT ON db.* TO 'user'@'localhost';");
+	SetDlgItemText(IDC_EDIT_SQL, sSQL);
+
+	// oracle
+
+	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nSELECT* FROM emp WHERE id IN(SELECT id FROM dept)';");
+	SetDlgItemText(IDC_EDIT_SQL, sSQL);
 
 	return TRUE;
 }
@@ -153,7 +159,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 		return;
 	}
 
-	AddTraceLog(_T("===== 복합 쿼리 파싱 결과 ====="));
+	AddTraceLog(_T("===== MySQL 복합 쿼리 파싱 결과 ====="));
 	AddTraceLog(_T("총 %d개의 SQL문 발견"), (int)results.size());
 	AddTraceLog(_T(""));
 
@@ -242,6 +248,35 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 			i,
 			CString(strType.c_str()),
 			bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
 	}
 }
 
@@ -420,6 +455,35 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 			i,
 			CString(strType.c_str()),
 			bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
 	}
 }
 
@@ -614,6 +678,35 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 			CString(strType.c_str()),
 			bError ? _T("있음") : _T("없음"));
 	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
+	}
 }
 
 // SQL Server 토큰화 버튼 핸들러
@@ -802,6 +895,35 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 			i,
 			CString(strType.c_str()),
 			bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
 	}
 }
 
@@ -995,6 +1117,35 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 			i,
 			CString(strType.c_str()),
 			bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nInstCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
 	}
 }
 

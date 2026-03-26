@@ -94,6 +94,8 @@ struct SqlStatementInfo {
 	size_t startColumn;
 	bool bHasError;       // 문법 오류 여부
 	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
+	bool bHasSubQuery;    // 서브쿼리 존재 여부
+	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
 };
 
 struct TokenInfo {
@@ -144,6 +146,15 @@ public:
 
 	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
+
+	// 저장된 stmt 목록에서 n번째 문장에 서브쿼리가 존재하는지 반환
+	bool HasSubQuery(int nIndex) const;
+
+	// 저장된 stmt 목록에서 n번째 문장의 서브쿼리 개수 반환
+	int GetSubQueryCount(int nIndex) const;
+
+	// 저장된 stmt 목록에서 n번째 문장의 m번째 서브쿼리 정보 반환 (0-based index)
+	SqlStatementInfo GetSubQueryAt(int nIndex, int nSubIndex) const;
 
 	// -------------------------------------------------------
 	// [편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회

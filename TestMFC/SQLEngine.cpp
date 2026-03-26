@@ -8,6 +8,52 @@ using namespace antlrcpp_mysql;
 using namespace antlr4;
 
 
+// ============================================================
+// 서브쿼리 탐색 공통 헬퍼 (파일 내부 전용, anonymous namespace)
+// ============================================================
+namespace {
+
+// 파스 트리에서 특정 타입의 컨텍스트를 재귀적으로 모두 수집
+template<typename TCtx>
+void CollectSubQueryContextsDeep(antlr4::tree::ParseTree* pNode, std::vector<TCtx*>& outVec)
+{
+	if (!pNode) return;
+	if (auto* pTyped = dynamic_cast<TCtx*>(pNode))
+		outVec.push_back(pTyped);
+	for (auto* pChild : pNode->children)
+		CollectSubQueryContextsDeep<TCtx>(pChild, outVec);
+}
+
+// 파스 트리 컨텍스트에서 SqlStatementInfo 서브쿼리 정보 생성
+SqlStatementInfo BuildSubQueryInfoFromCtx(
+	antlr4::ParserRuleContext* pCtx, const std::string& sqlSource, int nSubIndex)
+{
+	SqlStatementInfo sub;
+	sub.index        = nSubIndex;
+	sub.type         = SqlStatementType::SELECT_STATEMENT;
+	sub.bHasError    = false;
+	sub.nDatabaseType = -1;
+	sub.bHasSubQuery = false;
+
+	if (pCtx)
+	{
+		auto* pStart = pCtx->getStart();
+		auto* pStop  = pCtx->getStop();
+		if (pStart && pStop)
+		{
+			sub.startLine   = pStart->getLine();
+			sub.startColumn = pStart->getCharPositionInLine();
+			size_t nStart   = pStart->getStartIndex();
+			size_t nStop    = pStop->getStopIndex();
+			if (nStart != (size_t)-1 && nStop != (size_t)-1 && nStop >= nStart)
+				sub.sqlText = sqlSource.substr(nStart, nStop - nStart + 1);
+		}
+	}
+	return sub;
+}
+
+} // namespace
+
 static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Unit_statementContext* unitStmt)
 {
 	using SqlType = SqlStatementType;
@@ -149,45 +195,84 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueries(const std::string&
 std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::string& sqlQueries)
 {
 	std::vector<SqlStatementInfo> results;
-	try {
-		ANTLRInputStream input(sqlQueries);
-		PlSqlLexer lexer(&input);
-		CommonTokenStream tokens(&lexer);
-		PlSqlParser parser(&tokens);
 
-		parser.removeErrorListeners();
+	try
+	{
+		// 렉서로 전체 토큰화 후 SEMICOLON 기준으로 문장 분리 (MySQL과 동일한 방식)
+		// parser.sql_script() 방식 대신 토큰 스트림을 직접 순회하여 개별 오류에 강건하게 처리
+		antlr4::ANTLRInputStream input(sqlQueries);
+		antlrcpp_oracle::PlSqlLexer lexer(&input);
+		antlr4::CommonTokenStream tokenStream(&lexer);
+
 		lexer.removeErrorListeners();
+		tokenStream.fill();
 
-		PlSqlParser::Sql_scriptContext* scriptCtx = parser.sql_script();
-		if (!scriptCtx) return results;
+		const std::vector<antlr4::Token*>& vecAllTokens = tokenStream.getTokens();
 
-		auto stmtList = scriptCtx->unit_statement();
-		int index = 1;
+		int nIndex = 1;
+		bool bInStmt = false;
+		size_t nStmtStartChar = 0;
+		size_t nStmtStartLine = 1;
+		size_t nStmtStartCol  = 0;
+		size_t nLastStopChar  = 0;
 
-		for (auto* unitStmt : stmtList) {
-			SqlStatementInfo info;
-			info.index = index++;
+		for (size_t i = 0; i < vecAllTokens.size(); i++)
+		{
+			antlr4::Token* pTok = vecAllTokens[i];
+			if (!pTok)
+				continue;
 
-			if (unitStmt)
-			info.type = IdentifyStatementOracle(unitStmt);
+			int nTokType = static_cast<int>(pTok->getType());
 
-		if (unitStmt) {
-				Token* startToken = unitStmt->getStart();
-				Token* stopToken = unitStmt->getStop();
-
-				if (startToken && stopToken) {
-					info.startLine = startToken->getLine();
-					info.startColumn = startToken->getCharPositionInLine();
-
-					size_t startIdx = startToken->getStartIndex();
-					size_t stopIdx = stopToken->getStopIndex();
-					// INVALID_INDEX 대신 직접 값을 비교하거나 antlr4::Token::INVALID_INDEX 사용
-					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
-						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
-					}
+			// EOF: 세미콜론 없이 끝나는 마지막 문장 처리
+			if (nTokType == static_cast<int>(antlr4::Token::EOF))
+			{
+				if (bInStmt)
+				{
+					SqlStatementInfo stInfo;
+					stInfo.index       = nIndex++;
+					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.startLine   = nStmtStartLine;
+					stInfo.startColumn = nStmtStartCol;
+					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
+					results.push_back(stInfo);
+					bInStmt = false;
 				}
+				break;
 			}
-			results.push_back(info);
+
+			// 공백/주석 건너뜀
+			if (nTokType == static_cast<int>(antlrcpp_oracle::PlSqlLexer::SPACES) ||
+				nTokType == static_cast<int>(antlrcpp_oracle::PlSqlLexer::SINGLE_LINE_COMMENT) ||
+				nTokType == static_cast<int>(antlrcpp_oracle::PlSqlLexer::MULTI_LINE_COMMENT))
+				continue;
+
+			// SEMICOLON: 현재 문장 종료
+			if (nTokType == static_cast<int>(antlrcpp_oracle::PlSqlLexer::SEMICOLON))
+			{
+				if (bInStmt)
+				{
+					SqlStatementInfo stInfo;
+					stInfo.index       = nIndex++;
+					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.startLine   = nStmtStartLine;
+					stInfo.startColumn = nStmtStartCol;
+					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
+					results.push_back(stInfo);
+					bInStmt = false;
+				}
+				continue;
+			}
+
+			// 일반 토큰: 문장 범위 갱신
+			if (!bInStmt)
+			{
+				nStmtStartChar = pTok->getStartIndex();
+				nStmtStartLine = pTok->getLine();
+				nStmtStartCol  = pTok->getCharPositionInLine();
+				bInStmt = true;
+			}
+			nLastStopChar = pTok->getStopIndex();
 		}
 	}
 	catch (...) {}
@@ -196,6 +281,52 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 	{
 		if (!stInfo.sqlText.empty())
 			stInfo.bHasError = CheckSyntaxErrorOracle(stInfo.sqlText);
+	}
+
+	// 서브쿼리 수집 (토큰 기반 분리이므로 각 문장을 재파싱)
+	for (auto& stInfo : results)
+	{
+		if (stInfo.sqlText.empty())
+			continue;
+		try
+		{
+			ANTLRInputStream subInput(stInfo.sqlText);
+			antlrcpp_oracle::PlSqlLexer subLexer(&subInput);
+			CommonTokenStream subTokens(&subLexer);
+			antlrcpp_oracle::PlSqlParser subParser(&subTokens);
+			subLexer.removeErrorListeners();
+			subParser.removeErrorListeners();
+
+			auto* pScriptCtx = subParser.sql_script();
+			if (pScriptCtx)
+			{
+				// SubqueryContext를 수집하되, 최상위 SELECT를 제외하고 실제 서브쿼리만 감지
+				// 판별 기준: 부모 체인에 SubqueryContext 조상이 있으면 → 진짜 서브쿼리
+				//           부모 체인에 SubqueryContext 조상이 없으면 → 최상위 SELECT (제외)
+				// 직접 parent 타입 비교 대신 조상 탐색으로 error recovery 구조에서도 안정 동작
+				std::vector<antlrcpp_oracle::PlSqlParser::SubqueryContext*> vecSubCtxs;
+				CollectSubQueryContextsDeep<antlrcpp_oracle::PlSqlParser::SubqueryContext>(pScriptCtx, vecSubCtxs);
+				int nSubIdx = 1;
+				for (auto* pSub : vecSubCtxs)
+				{
+					bool bHasSubqueryAncestor = false;
+					antlr4::tree::ParseTree* pAnc = pSub->parent;
+					while (pAnc)
+					{
+						if (dynamic_cast<antlrcpp_oracle::PlSqlParser::SubqueryContext*>(pAnc))
+						{
+							bHasSubqueryAncestor = true;
+							break;
+						}
+						pAnc = pAnc->parent;
+					}
+					if (bHasSubqueryAncestor)
+						stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, stInfo.sqlText, nSubIdx++));
+				}
+				stInfo.bHasSubQuery = !stInfo.vecSubQueries.empty();
+			}
+		}
+		catch (...) {}
 	}
 
 	return results;
@@ -727,6 +858,34 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 			stInfo.bHasError = CheckSyntaxErrorMySQL(stInfo.sqlText);
 	}
 
+	// 서브쿼리 수집 (MySQL은 토큰 기반 분리이므로 각 문장을 재파싱)
+	for (auto& stInfo : results)
+	{
+		if (stInfo.sqlText.empty())
+			continue;
+		try
+		{
+			ANTLRInputStream subInput(stInfo.sqlText);
+			antlrcpp_mysql::MySQLLexer subLexer(&subInput);
+			CommonTokenStream subTokens(&subLexer);
+			antlrcpp_mysql::MySQLParser subParser(&subTokens);
+			subLexer.removeErrorListeners();
+			subParser.removeErrorListeners();
+
+			auto* pQueryCtx = subParser.query();
+			if (pQueryCtx)
+			{
+				std::vector<antlrcpp_mysql::MySQLParser::SubqueryContext*> vecSubCtxs;
+				CollectSubQueryContextsDeep<antlrcpp_mysql::MySQLParser::SubqueryContext>(pQueryCtx, vecSubCtxs);
+				stInfo.bHasSubQuery = !vecSubCtxs.empty();
+				int nSubIdx = 1;
+				for (auto* pSub : vecSubCtxs)
+					stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, stInfo.sqlText, nSubIdx++));
+			}
+		}
+		catch (...) {}
+	}
+
 	return results;
 }
 
@@ -1152,8 +1311,17 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
 					}
 				}
+				// [SQLServer] batchLevel subquery collection
+				{
+					std::vector<antlrcpp_sqlserver::TSqlParser::SubqueryContext*> vecSubCtxs;
+					CollectSubQueryContextsDeep<antlrcpp_sqlserver::TSqlParser::SubqueryContext>(batchLevel, vecSubCtxs);
+					info.bHasSubQuery = !vecSubCtxs.empty();
+					int nSubIdx = 1;
+					for (auto* pSub : vecSubCtxs)
+						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+				}
+
 				results.push_back(info);
-				continue;
 			}
 
 			// sql_clauses 목록 (일반 SQL문)
@@ -1176,6 +1344,16 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
 					}
 				}
+				// [SQLServer] sqlClauses 서브쿼리 수집
+				{
+					std::vector<antlrcpp_sqlserver::TSqlParser::SubqueryContext*> vecSubCtxs;
+					CollectSubQueryContextsDeep<antlrcpp_sqlserver::TSqlParser::SubqueryContext>(sqlClauses, vecSubCtxs);
+					info.bHasSubQuery = !vecSubCtxs.empty();
+					int nSubIdx = 1;
+					for (auto* pSub : vecSubCtxs)
+						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+				}
+
 				results.push_back(info);
 			}
 		}
@@ -1540,6 +1718,16 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 					info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
 				}
 			}
+			// 서브쿼리 수집
+			{
+				std::vector<antlrcpp_postgresql::PostgreSQLParser::Select_with_parensContext*> vecSubCtxs;
+				CollectSubQueryContextsDeep<antlrcpp_postgresql::PostgreSQLParser::Select_with_parensContext>(stmtCtx, vecSubCtxs);
+				info.bHasSubQuery = !vecSubCtxs.empty();
+				int nSubIdx = 1;
+				for (auto* pSub : vecSubCtxs)
+					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+			}
+
 			results.push_back(info);
 		}
 	}
@@ -2032,6 +2220,16 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 					info.sqlText = sqlQueries.substr(nStartIdx, nStopIdx - nStartIdx + 1);
 				}
 			}
+			// 서브쿼리 수집
+			{
+				std::vector<antlrcpp_db2::Db2Parser::Fullselect_in_parenthesesContext*> vecSubCtxs;
+				CollectSubQueryContextsDeep<antlrcpp_db2::Db2Parser::Fullselect_in_parenthesesContext>(sqlStmt, vecSubCtxs);
+				info.bHasSubQuery = !vecSubCtxs.empty();
+				int nSubIdx = 1;
+				for (auto* pSub : vecSubCtxs)
+					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+			}
+
 			results.push_back(info);
 		}
 	}
@@ -2292,44 +2490,56 @@ SqlStatementType SQLEngine::IdentifySqlTypeOracle(const std::string& szSql)
 		lexer.removeErrorListeners();
 
 		PlSqlParser::Sql_scriptContext* scriptCtx = parser.sql_script();
-		if (!scriptCtx)
-			return SqlStatementType::UNKNOWN;
-
-		auto stmtList = scriptCtx->unit_statement();
-		if (stmtList.empty())
-			return SqlStatementType::UNKNOWN;
-
-		auto* unitStmt = stmtList[0];
-		if (!unitStmt)
-			return SqlStatementType::UNKNOWN;
-
-		if (auto* dmlStmt = unitStmt->data_manipulation_language_statements())
+		if (scriptCtx)
 		{
-			if (dmlStmt->select_statement()) return SqlStatementType::SELECT_STATEMENT;
-			if (dmlStmt->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
-			if (dmlStmt->update_statement()) return SqlStatementType::UPDATE_STATEMENT;
-			if (dmlStmt->delete_statement()) return SqlStatementType::DELETE_STATEMENT;
-			if (dmlStmt->merge_statement())  return SqlStatementType::MERGE_STATEMENT;
+			auto stmtList = scriptCtx->unit_statement();
+			if (!stmtList.empty() && stmtList[0])
+			{
+				auto* unitStmt = stmtList[0];
+				if (auto* dmlStmt = unitStmt->data_manipulation_language_statements())
+				{
+					if (dmlStmt->select_statement()) return SqlStatementType::SELECT_STATEMENT;
+					if (dmlStmt->insert_statement()) return SqlStatementType::INSERT_STATEMENT;
+					if (dmlStmt->update_statement()) return SqlStatementType::UPDATE_STATEMENT;
+					if (dmlStmt->delete_statement()) return SqlStatementType::DELETE_STATEMENT;
+					if (dmlStmt->merge_statement())  return SqlStatementType::MERGE_STATEMENT;
+				}
+				SqlStatementType eType = IdentifyStatementOracle(unitStmt);
+				if (eType != SqlStatementType::UNKNOWN)
+					return eType;
+			}
 		}
 
-		// 파서 오류가 있어도 부분 파싱 컨텍스트로 타입 식별 시도
-		SqlStatementType eType = IdentifyStatementOracle(unitStmt);
-		if (eType != SqlStatementType::UNKNOWN)
-			return eType;
-
-		// 파서가 문법을 완전히 지원하지 않는 경우 텍스트 기반 폴백
-		if (parser.getNumberOfSyntaxErrors() > 0)
+		// 파스 트리 식별 실패 시 텍스트 기반 폴백
+		// (syntax errors, stmtList 비어있는 경우, SELECT* 같은 비표준 형식 포함)
+		std::string szUpper = szSql;
+		std::transform(szUpper.begin(), szUpper.end(), szUpper.begin(), ::toupper);
+		size_t nPos = szUpper.find_first_not_of(" \t\r\n");
+		if (nPos != std::string::npos)
 		{
-			// 첫 토큰으로 대략적인 타입 판별
-			std::string szUpper = szSql;
-			std::transform(szUpper.begin(), szUpper.end(), szUpper.begin(), ::toupper);
-			size_t nPos = szUpper.find_first_not_of(" \t\r\n");
-			if (nPos != std::string::npos)
-			{
-				if (szUpper.compare(nPos, 6, "ALTER ") == 0)  return SqlStatementType::ALTER_STATEMENT;
-				if (szUpper.compare(nPos, 7, "CREATE ") == 0) return SqlStatementType::CREATE_STATEMENT;
-				if (szUpper.compare(nPos, 5, "DROP ") == 0)   return SqlStatementType::DROP_STATEMENT;
-			}
+			// 첫 키워드 추출 (공백, *, (, 탭 이전까지)
+			size_t nEnd = nPos;
+			while (nEnd < szUpper.size() &&
+				szUpper[nEnd] != ' ' && szUpper[nEnd] != '\t' &&
+				szUpper[nEnd] != '\r' && szUpper[nEnd] != '\n' &&
+				szUpper[nEnd] != '*' && szUpper[nEnd] != '(')
+				nEnd++;
+			std::string firstWord = szUpper.substr(nPos, nEnd - nPos);
+			if (firstWord == "SELECT")   return SqlStatementType::SELECT_STATEMENT;
+			if (firstWord == "INSERT")   return SqlStatementType::INSERT_STATEMENT;
+			if (firstWord == "UPDATE")   return SqlStatementType::UPDATE_STATEMENT;
+			if (firstWord == "DELETE")   return SqlStatementType::DELETE_STATEMENT;
+			if (firstWord == "MERGE")    return SqlStatementType::MERGE_STATEMENT;
+			if (firstWord == "CREATE")   return SqlStatementType::CREATE_STATEMENT;
+			if (firstWord == "ALTER")    return SqlStatementType::ALTER_STATEMENT;
+			if (firstWord == "DROP")     return SqlStatementType::DROP_STATEMENT;
+			if (firstWord == "TRUNCATE") return SqlStatementType::TRUNCATE_STATEMENT;
+			if (firstWord == "GRANT")    return SqlStatementType::GRANT_STATEMENT;
+			if (firstWord == "REVOKE")   return SqlStatementType::REVOKE_STATEMENT;
+			if (firstWord == "COMMIT" || firstWord == "ROLLBACK" || firstWord == "SAVEPOINT")
+				return SqlStatementType::TRANSACTION_STATEMENT;
+			if (firstWord == "CALL")     return SqlStatementType::CALL_STATEMENT;
+			if (firstWord == "SET")      return SqlStatementType::SET_STATEMENT;
 		}
 
 		return SqlStatementType::UNKNOWN;
@@ -2711,6 +2921,42 @@ bool SQLEngine::HasSyntaxError(int nIndex) const
 const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
 {
 	return m_vecStatements;
+}
+
+// 저장된 stmt 목록에서 n번째 문장에 서브쿼리가 존재하는지 반환 (0-based index)
+bool SQLEngine::HasSubQuery(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return false;
+
+	return m_vecStatements[nIndex].bHasSubQuery;
+}
+
+// 저장된 stmt 목록에서 n번째 문장의 서브쿼리 개수 반환 (0-based index)
+int SQLEngine::GetSubQueryCount(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return 0;
+
+	return static_cast<int>(m_vecStatements[nIndex].vecSubQueries.size());
+}
+
+// 저장된 stmt 목록에서 n번째 문장의 m번째 서브쿼리 정보 반환 (0-based index)
+SqlStatementInfo SQLEngine::GetSubQueryAt(int nIndex, int nSubIndex) const
+{
+	SqlStatementInfo emptyInfo;
+	emptyInfo.index = -1;
+	emptyInfo.type = SqlStatementType::UNKNOWN;
+	emptyInfo.bHasSubQuery = false;
+
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return emptyInfo;
+
+	const auto& vecSubs = m_vecStatements[nIndex].vecSubQueries;
+	if (nSubIndex < 0 || nSubIndex >= static_cast<int>(vecSubs.size()))
+		return emptyInfo;
+
+	return vecSubs[nSubIndex];
 }
 
 // -------------------------------------------------------
