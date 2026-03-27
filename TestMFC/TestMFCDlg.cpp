@@ -62,15 +62,14 @@ BOOL CTestMFCDlg::OnInitDialog()
 	SetIcon(m_hIcon, TRUE);
 	SetIcon(m_hIcon, FALSE);
 
+	CString sSQL;
 	// mysql 
 
-	CString sSQL;
-	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nGRANT SELECT ON db.* TO 'user'@'localhost';");
-	SetDlgItemText(IDC_EDIT_SQL, sSQL);
+	//sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nGRANT SELECT ON db.* TO 'user'@'localhost';");
+	//SetDlgItemText(IDC_EDIT_SQL, sSQL);
 
 	// oracle
-
-	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nSELECT* FROM emp WHERE id IN(SELECT id FROM dept)';");
+	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nSELECT* FROM emp WHERE id IN(SELECT id FROM dept);");
 	SetDlgItemText(IDC_EDIT_SQL, sSQL);
 
 	return TRUE;
@@ -151,19 +150,23 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 		return;
 	}
 
-	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_MYSQL);
+	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_MYSQL);
 
-	if (results.empty()) {
+	int nSQLCount = m_oSQLEngine.GetStatementCount();
+	if (nSQLCount == 0)
+	{
 		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
 		return;
 	}
 
 	AddTraceLog(_T("===== MySQL 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), (int)results.size());
+	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
 	AddTraceLog(_T(""));
 
-	for (const auto& info : results) {
+	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
+
+	for (const auto& info : Statements) 
+	{
 		// [변경] 모든 로직을 std::string으로 처리
 		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
 		std::string stdSql = info.sqlText;
@@ -183,64 +186,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 		AddTraceLog(_T(""));
 	}
 
-	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
-
-	// 첫번째 쿼리 접근 예시
-	SqlStatementInfo first = m_oSQLEngine.GetQueryAtMySQL(sqlQueries, 0);
-	if (first.index > 0) {
-		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(first.type);
-		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
-	}
-
-	// 두번째 쿼리가 있다면
-	if (results.size() >= 2) {
-		SqlStatementInfo second = m_oSQLEngine.GetQueryAtMySQL(sqlQueries, 1);
-		if (second.index > 0) {
-			std::string secondTypeName = m_oSQLEngine.SqlTypeToString(second.type);
-			AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
-		}
-	}
-
-	// -------------------------------------------------------
-	// [메타정보 조회 예시 1] 정적 편의 함수 - results vector 직접 활용
-	// -------------------------------------------------------
-	//AddTraceLog(_T(""));
-	//AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
-
-	// (1) SQL 문장 수 조회
-	int nCount(0);
-	//int nCount = m_oSQLEngine.GetStatementCount(results);
-	//AddTraceLog(_T("SQL 문장 수: %d"), nCount);
-
-	// (2) 각 문장의 SQL 타입 조회
-	//for (int i = 0; i < nCount; i++)
-	//{
-	//	SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
-	//	std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-	//	AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
-	//}
-
-	//// (3) 각 문장의 문법 오류 여부 조회
-	//AddTraceLog(_T(""));
-	//AddTraceLog(_T("--- 문법 오류 검사 ---"));
-	//for (int i = 0; i < nCount; i++)
-	//{
-	//	bool bError = m_oSQLEngine.HasSyntaxError(results, i);
-	//	AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
-	//}
-
-	// -------------------------------------------------------
-	// [메타정보 조회 예시 2] 인스턴스 기반 - m_oSQLEngine 멤버변수 활용
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [인스턴스 기반] 메타정보 조회 ====="));
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_MYSQL);
-
-	int nInstCount = m_oSQLEngine.GetStatementCount();
-	AddTraceLog(_T("SQL 문장 수: %d"), nInstCount);
-
-	for (int i = 0; i < nInstCount; i++)
+	for (int i = 0; i < nSQLCount; i++)
 	{
 		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
 		bool bError = m_oSQLEngine.HasSyntaxError(i);
@@ -257,7 +203,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
 
-	for (int i = 0; i < nInstCount; i++)
+	for (int i = 0; i < nSQLCount; i++)
 	{
 		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
 		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
@@ -377,7 +323,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
 	// SQLEngine은 오직 표준 자료형(std::vector, std::string)만 반환합니다.
-	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_ORACLE);
+	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_ORACLE);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -406,39 +352,23 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 		AddTraceLog(_T(""));
 	}
 
-	AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
+	//AddTraceLog(_T("===== 개별 쿼리 접근 예시 ====="));
 
-	if (!results.empty()) {
-		std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
-		AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
-	}
+	//if (!results.empty()) {
+	//	std::string firstTypeName = m_oSQLEngine.SqlTypeToString(results[0].type);
+	//	AddTraceLog(_T("첫번째 문장: %s"), CString(firstTypeName.c_str()));
+	//}
 
-	if (results.size() >= 2) {
-		std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
-		AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
-	}
+	//if (results.size() >= 2) {
+	//	std::string secondTypeName = m_oSQLEngine.SqlTypeToString(results[1].type);
+	//	AddTraceLog(_T("두번째 문장: %s"), CString(secondTypeName.c_str()));
+	//}
 
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
+	//AddTraceLog(_T(""));
+	//AddTraceLog(_T("===== [정적 편의 함수] 메타정보 조회 ====="));
 
 	int nCount = m_oSQLEngine.GetStatementCount(results);
-	AddTraceLog(_T("SQL 문장 수: %d"), nCount);
-
-	for (int i = 0; i < nCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(results, i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s"), i, CString(strType.c_str()));
-	}
-
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("--- 문법 오류 검사 ---"));
-	for (int i = 0; i < nCount; i++)
-	{
-		bool bError = m_oSQLEngine.HasSyntaxError(results, i);
-		AddTraceLog(_T("[%d번째] 문법 오류: %s"), i, bError ? _T("있음") : _T("없음"));
-	}
-
+	
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [인스턴스 기반] 메타정보 조회 ====="));
 
@@ -599,7 +529,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
+	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -817,7 +747,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
+	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty()) {
@@ -1036,7 +966,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 	}
 
 	// 2. 엔진에게 파싱 요청 (청정 구역 호출)
-	auto results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_DB2);
+	std::vector<SqlStatementInfo> results = m_oSQLEngine.ParseMultipleQueries(sqlQueries, (int)DatabaseType::DB_DB2);
 
 	// 3. 결과 출력 (MFC 영역)
 	if (results.empty())
