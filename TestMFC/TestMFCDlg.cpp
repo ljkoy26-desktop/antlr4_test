@@ -135,841 +135,148 @@ void CTestMFCDlg::AddTraceLog(LPCTSTR lpszFormat, ...)
 	pEditTrace->SendMessage(WM_VSCROLL, SB_BOTTOM, NULL);
 }
 
+void CTestMFCDlg::MultiParse(int nDatabaseType)
+{
+	CString strInput;
+	GetDlgItemText(IDC_EDIT_SQL, strInput);
+
+	// CString(유니코드) -> std::string(멀티바이트) 변환
+	std::string sqlQueries = CT2A(strInput);
+
+	if (sqlQueries.empty()) {
+		AfxMessageBox(_T("SQL을 입력해주세요."));
+		return;
+	}
+
+	m_oSQLEngine.Parse(sqlQueries, nDatabaseType);
+
+	int nSQLCount = m_oSQLEngine.GetStatementCount();
+	if (nSQLCount == 0)
+	{
+		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
+		return;
+	}
+
+	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
+	AddTraceLog(_T(""));
+
+	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
+
+	for (const auto& info : Statements)
+	{
+		// [변경] 모든 로직을 std::string으로 처리
+		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
+		std::string stdSql = info.sqlText;
+
+		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
+		if (stdSql.length() > 50) {
+			stdSql = stdSql.substr(0, 50) + "...";
+		}
+
+		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
+		CString strType(stdType.c_str());
+		CString strSql(stdSql.c_str());
+
+		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
+		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
+		AddTraceLog(_T("    SQL: %s"), strSql);
+		AddTraceLog(_T(""));
+	}
+
+	for (int i = 0; i < nSQLCount; i++)
+	{
+		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
+		bool bError = m_oSQLEngine.HasSyntaxError(i);
+		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
+		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
+			i,
+			CString(strType.c_str()),
+			bError ? _T("있음") : _T("없음"));
+	}
+
+	// -------------------------------------------------------
+	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
+
+	for (int i = 0; i < nSQLCount; i++)
+	{
+		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
+		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
+		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
+			i,
+			bHasSub ? _T("있음") : _T("없음"),
+			nSubCount);
+
+		for (int j = 0; j < nSubCount; j++)
+		{
+			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
+			std::string subSql = subInfo.sqlText;
+			if (subSql.length() > 40)
+				subSql = subSql.substr(0, 40) + "...";
+			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
+				j + 1,
+				(int)subInfo.startLine,
+				(int)subInfo.startColumn,
+				CString(subSql.c_str()));
+		}
+	}
+}
 
 void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 {
-	// 1. UI에서 데이터 가져오기 (MFC 영역)
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
-
-	if (sqlQueries.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_MYSQL);
-
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	if (nSQLCount == 0)
-	{
-		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
-		return;
-	}
-
-	AddTraceLog(_T("===== MySQL 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
-	AddTraceLog(_T(""));
-
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
-
-	for (const auto& info : Statements)
-	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
-			stdSql = stdSql.substr(0, 50) + "...";
-		}
-
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
-		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
-			if (subSql.length() > 40)
-				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
-				CString(subSql.c_str()));
-		}
-	}
+	AddTraceLog(_T("===== MySQL 복합 쿼리 파싱 시작 ====="));
+	MultiParse((int)DatabaseType::DB_MYSQL);
 }
-
 void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 {
-	// 1. UI에서 데이터 가져오기 (MFC 영역)
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
-
-	if (sqlQueries.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_ORACLE);
-
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	if (nSQLCount == 0)
-	{
-		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
-		return;
-	}
-
-	AddTraceLog(_T("===== Oracle 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
-	AddTraceLog(_T(""));
-
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
-
-	for (const auto& info : Statements)
-	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
-			stdSql = stdSql.substr(0, 50) + "...";
-		}
-
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
-		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
-			if (subSql.length() > 40)
-				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
-				CString(subSql.c_str()));
-		}
-	}
+	AddTraceLog(_T("===== Oracle 복합 쿼리 파싱 시작 ====="));
+	MultiParse((int)DatabaseType::DB_MYSQL);
 }
-
 void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 {
-	// 1. UI에서 데이터 가져오기 (MFC 영역)
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
-
-	if (sqlQueries.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_SQLSERVER);
-
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	if (nSQLCount == 0)
-	{
-		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
-		return;
-	}
-
 	AddTraceLog(_T("===== SQL Server 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
-	AddTraceLog(_T(""));
-
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
-
-	for (const auto& info : Statements)
-	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
-			stdSql = stdSql.substr(0, 50) + "...";
-		}
-
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
-		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
-			if (subSql.length() > 40)
-				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
-				CString(subSql.c_str()));
-		}
-	}
+	MultiParse((int)DatabaseType::DB_SQLSERVER);
 }
-
 void CTestMFCDlg::OnBnClickedButtonMultiParsePostgreSQL()
 {
-	// 1. UI에서 데이터 가져오기 (MFC 영역)
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
-
-	if (sqlQueries.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_POSTGRESQL);
-
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	if (nSQLCount == 0)
-	{
-		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
-		return;
-	}
-
-	AddTraceLog(_T("===== PostgreSQL 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
-	AddTraceLog(_T(""));
-
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
-
-	for (const auto& info : Statements)
-	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
-			stdSql = stdSql.substr(0, 50) + "...";
-		}
-
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
-		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
-			if (subSql.length() > 40)
-				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
-				CString(subSql.c_str()));
-		}
-	}
+	AddTraceLog(_T("===== Oracle 복합 쿼리 파싱 시작 ====="));
+	MultiParse((int)DatabaseType::DB_POSTGRESQL);
 }
-
 void CTestMFCDlg::OnBnClickedButtonMultiParseDB2()
 {
-	// 1. UI에서 데이터 가져오기 (MFC 영역)
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
-
-	if (sqlQueries.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	m_oSQLEngine.Parse(sqlQueries, (int)DatabaseType::DB_DB2);
-
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	if (nSQLCount == 0)
-	{
-		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));
-		return;
-	}
-
-	AddTraceLog(_T("===== DB2 복합 쿼리 파싱 결과 ====="));
-	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
-	AddTraceLog(_T(""));
-
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
-
-	for (const auto& info : Statements)
-	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
-			stdSql = stdSql.substr(0, 50) + "...";
-		}
-
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
-		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
-			if (subSql.length() > 40)
-				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
-				CString(subSql.c_str()));
-		}
-	}
+	AddTraceLog(_T("===== DB2 복합 쿼리 파싱 시작 ====="));
+	MultiParse((int)DatabaseType::DB_DB2);
 }
-
 void CTestMFCDlg::OnBnClickedButtonTokenizeMySQL()
 {
-	// 1. UI에서 SQL 가져오기
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// MFC CString -> 표준 std::string 변환
-	std::string sqlQuery = CT2A(strInput);
-
-	if (sqlQuery.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_MYSQL);
-
-	if (tokens.empty()) {
-		AddTraceLog(_T("MySQL 토큰이 없습니다."));
-		return;
-	}
-
-	// 3. 결과 출력 시작
-	AddTraceLog(_T("===== MySQL SQL 토큰화 결과 ====="));
-	AddTraceLog(_T("입력: %s"), strInput);
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
-	AddTraceLog(_T(""));
-
-	// 테이블 헤더 출력
-	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
-	AddTraceLog(_T("--------------------------------------------------------------"));
-
-	for (const auto& tok : tokens) {
-		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
-		CString strText(tok.text.c_str());
-		CString strType(tok.tokenType.c_str());
-
-		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		// UI 출력을 위한 길이 제한 처리
-		if (strText.GetLength() > 18) {
-			strText = strText.Left(15) + _T("...");
-		}
-		if (strType.GetLength() > 23) {
-			strType = strType.Left(20) + _T("...");
-		}
-
-		// 포맷에 맞춰 로그 출력
-		AddTraceLog(_T("%-4d %-20s %-25s %s"),
-			tok.index,
-			strText,
-			strType,
-			strRole);
-	}
-
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== 상세 정보 ====="));
-	for (const auto& tok : tokens) {
-		CString strText(tok.text.c_str());
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		AddTraceLog(_T("%d) %s ( %s )"),
-			tok.index,
-			strText,
-			strRole);
-	}
-
-	// -------------------------------------------------------
-	// [GetRoleFromLexerToken] 통합 함수 사용 예시 (첫 3개 토큰)
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
-
-	m_oSQLEngine.Parse(sqlQuery, (int)DatabaseType::DB_MYSQL);
-
-	int nDemo = min(3, (int)tokens.size());
-	for (int i = 0; i < nDemo; i++)
-	{
-		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_MYSQL);
-		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
-		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
-
-		CString strText(tokens[i].text.c_str());
-		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
-		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
-		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
-	}
+	AddTraceLog(_T("===== MySQL 토큰화 결과 ====="));
+	Tokenize((int)DatabaseType::DB_MYSQL);
 }
-
 void CTestMFCDlg::OnBnClickedButtonTokenizeOracle()
 {
-	// 1. UI에서 SQL 가져오기
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// MFC CString -> 표준 std::string 변환
-	std::string sqlQuery = CT2A(strInput);
-
-	if (sqlQuery.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_ORACLE);
-
-	if (tokens.empty()) {
-		AddTraceLog(_T("Oracle 토큰이 없습니다."));
-		return;
-	}
-
-	// 3. 결과 출력 시작
-	AddTraceLog(_T("===== Oracle SQL 토큰화 결과 ====="));
-	AddTraceLog(_T("입력: %s"), strInput);
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
-	AddTraceLog(_T(""));
-
-	// 테이블 헤더 출력
-	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
-	AddTraceLog(_T("--------------------------------------------------------------"));
-
-	for (const auto& tok : tokens) {
-		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
-		CString strText(tok.text.c_str());
-		CString strType(tok.tokenType.c_str());
-
-		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		// UI 출력을 위한 길이 제한 처리
-		if (strText.GetLength() > 18) {
-			strText = strText.Left(15) + _T("...");
-		}
-		if (strType.GetLength() > 23) {
-			strType = strType.Left(20) + _T("...");
-		}
-
-		// 포맷에 맞춰 로그 출력
-		AddTraceLog(_T("%-4d %-20s %-25s %s"),
-			tok.index,
-			strText,
-			strType,
-			strRole);
-	}
-
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== 상세 정보 ====="));
-	for (const auto& tok : tokens) {
-		CString strText(tok.text.c_str());
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		AddTraceLog(_T("%d) %s ( %s )"),
-			tok.index,
-			strText,
-			strRole);
-	}
-
-	// -------------------------------------------------------
-	// [GetRoleFromLexerToken] 통합 함수 사용 예시 (첫 3개 토큰)
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
-
-	m_oSQLEngine.Parse(sqlQuery, (int)DatabaseType::DB_ORACLE);
-
-	int nDemo = min(3, (int)tokens.size());
-	for (int i = 0; i < nDemo; i++)
-	{
-		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_ORACLE);
-		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
-		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
-
-		CString strText(tokens[i].text.c_str());
-		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
-		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
-		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
-	}
+	AddTraceLog(_T("===== Oracle 토큰화 결과 ====="));
+	Tokenize((int)DatabaseType::DB_ORACLE);
 }
-
 void CTestMFCDlg::OnBnClickedButtonTokenizeSQLServer()
 {
-	// 1. UI에서 SQL 가져오기
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// MFC CString -> 표준 std::string 변환
-	std::string sqlQuery = CT2A(strInput);
-
-	if (sqlQuery.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_SQLSERVER);
-
-	if (tokens.empty()) {
-		AddTraceLog(_T("SQL Server 토큰이 없습니다."));
-		return;
-	}
-
-	// 3. 결과 출력 시작
-	AddTraceLog(_T("===== SQLServer SQL 토큰화 결과 ====="));
-	AddTraceLog(_T("입력: %s"), strInput);
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
-	AddTraceLog(_T(""));
-
-	// 테이블 헤더 출력
-	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
-	AddTraceLog(_T("--------------------------------------------------------------"));
-
-	for (const auto& tok : tokens) {
-		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
-		CString strText(tok.text.c_str());
-		CString strType(tok.tokenType.c_str());
-
-		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		// UI 출력을 위한 길이 제한 처리
-		if (strText.GetLength() > 18) {
-			strText = strText.Left(15) + _T("...");
-		}
-		if (strType.GetLength() > 23) {
-			strType = strType.Left(20) + _T("...");
-		}
-
-		// 포맷에 맞춰 로그 출력
-		AddTraceLog(_T("%-4d %-20s %-25s %s"),
-			tok.index,
-			strText,
-			strType,
-			strRole);
-	}
-
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== 상세 정보 ====="));
-	for (const auto& tok : tokens) {
-		CString strText(tok.text.c_str());
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		AddTraceLog(_T("%d) %s ( %s )"),
-			tok.index,
-			strText,
-			strRole);
-	}
-
-	// -------------------------------------------------------
-	// [GetRoleFromLexerToken] 통합 함수 사용 예시 (첫 3개 토큰)
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
-
-	m_oSQLEngine.Parse(sqlQuery, (int)DatabaseType::DB_SQLSERVER);
-
-	int nDemo = min(3, (int)tokens.size());
-	for (int i = 0; i < nDemo; i++)
-	{
-		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_SQLSERVER);
-		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
-		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
-
-		CString strText(tokens[i].text.c_str());
-		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
-		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
-		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
-	}
+	AddTraceLog(_T("===== SQLServer 토큰화 결과 ====="));
+	Tokenize((int)DatabaseType::DB_SQLSERVER);
 }
-
 void CTestMFCDlg::OnBnClickedButtonTokenizePostgreSQL()
 {
-	// 1. UI에서 SQL 가져오기
-	CString strInput;
-	GetDlgItemText(IDC_EDIT_SQL, strInput);
-
-	// MFC CString -> 표준 std::string 변환
-	std::string sqlQuery = CT2A(strInput);
-
-	if (sqlQuery.empty()) {
-		AfxMessageBox(_T("SQL을 입력해주세요."));
-		return;
-	}
-
-	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_POSTGRESQL);
-
-	if (tokens.empty()) {
-		AddTraceLog(_T("PostgreSQL 토큰이 없습니다."));
-		return;
-	}
-
-	// 3. 결과 출력 시작
-	AddTraceLog(_T("===== PostgreSQL SQL 토큰화 결과 ====="));
-	AddTraceLog(_T("입력: %s"), strInput);
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
-	AddTraceLog(_T(""));
-
-	// 테이블 헤더 출력
-	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
-	AddTraceLog(_T("--------------------------------------------------------------"));
-
-	for (const auto& tok : tokens) {
-		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
-		CString strText(tok.text.c_str());
-		CString strType(tok.tokenType.c_str());
-
-		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		// UI 출력을 위한 길이 제한 처리
-		if (strText.GetLength() > 18) {
-			strText = strText.Left(15) + _T("...");
-		}
-		if (strType.GetLength() > 23) {
-			strType = strType.Left(20) + _T("...");
-		}
-
-		// 포맷에 맞춰 로그 출력
-		AddTraceLog(_T("%-4d %-20s %-25s %s"),
-			tok.index,
-			strText,
-			strType,
-			strRole);
-	}
-
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== 상세 정보 ====="));
-	for (const auto& tok : tokens) {
-		CString strText(tok.text.c_str());
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		AddTraceLog(_T("%d) %s ( %s )"),
-			tok.index,
-			strText,
-			strRole);
-	}
-
-	// -------------------------------------------------------
-	// [GetRoleFromLexerToken] 통합 함수 사용 예시 (첫 3개 토큰)
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
-
-	m_oSQLEngine.Parse(sqlQuery, (int)DatabaseType::DB_POSTGRESQL);
-
-	int nDemo = min(3, (int)tokens.size());
-	for (int i = 0; i < nDemo; i++)
-	{
-		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_POSTGRESQL);
-		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
-		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
-
-		CString strText(tokens[i].text.c_str());
-		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
-		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
-		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
-	}
+	AddTraceLog(_T("===== PostgreSQL 토큰화 결과 ====="));
+	Tokenize((int)DatabaseType::DB_POSTGRESQL);
 }
-
 void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 {
-	// 1. UI에서 SQL 가져오기
+	AddTraceLog(_T("===== DB2 토큰화 결과 ====="));
+	Tokenize((int)DatabaseType::DB_DB2);
+}
+
+void CTestMFCDlg::Tokenize(int nDatabaseType)
+{	// 1. UI에서 SQL 가져오기
 	CString strInput;
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
 
@@ -982,15 +289,14 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	}
 
 	// 2. 엔진 호출 (청정 구역에서 토큰화 수행)
-	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, (int)DatabaseType::DB_DB2);
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(sqlQuery, nDatabaseType);
 
 	if (tokens.empty()) {
-		AddTraceLog(_T("DB2 토큰이 없습니다."));
+		AddTraceLog(_T("토큰이 없습니다."));
 		return;
 	}
 
 	// 3. 결과 출력 시작
-	AddTraceLog(_T("===== DB2 SQL 토큰화 결과 ====="));
 	AddTraceLog(_T("입력: %s"), strInput);
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("총 %d개의 토큰 발견"), (int)tokens.size());
@@ -1000,6 +306,7 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 	AddTraceLog(_T("%-4s %-20s %-25s %s"), _T("순번"), _T("토큰"), _T("토큰타입"), _T("역할"));
 	AddTraceLog(_T("--------------------------------------------------------------"));
 
+	int i(0);
 	for (const auto& tok : tokens) {
 		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
 		CString strText(tok.text.c_str());
@@ -1023,43 +330,32 @@ void CTestMFCDlg::OnBnClickedButtonTokenizeDB2()
 			strText,
 			strType,
 			strRole);
-	}
 
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== 상세 정보 ====="));
-	for (const auto& tok : tokens) {
-		CString strText(tok.text.c_str());
-		std::string stdRole = m_oSQLEngine.TokenRoleToString(tok.role);
-		CString strRole(stdRole.c_str());
-
-		AddTraceLog(_T("%d) %s ( %s )"),
-			tok.index,
-			strText,
-			strRole);
+		if (tok.role == TokenRole::SEPARATOR_SEMICOLON)
+		{
+			AddTraceLog(_T("문장 마무리 ; ( PL/SQL 블록이 아닌경우 ) "));
+			AddTraceLog(_T(""));
+		}
 	}
 
 	// -------------------------------------------------------
 	// [GetRoleFromLexerToken] 통합 함수 사용 예시 (첫 3개 토큰)
+	// 위의 함수와 너무 중복됨 ( 아직까지는 뭐에 사용하는지 모름 ) 
 	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
 
-	m_oSQLEngine.Parse(sqlQuery, (int)DatabaseType::DB_DB2);
+	//AddTraceLog(_T(""));
+	//AddTraceLog(_T("===== [GetRoleFromLexerToken] 역할 조회 예시 ====="));
 
-	int nDemo = min(3, (int)tokens.size());
-	for (int i = 0; i < nDemo; i++)
-	{
-		// [정적] DB 타입 직접 지정
-		TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, (int)DatabaseType::DB_DB2);
-		// [인스턴스] m_oSQLEngine.Parse()로 설정된 DB 타입 사용
-		TokenRole eInstRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text);
+	//for (int i = 0; i < tokens.size(); i++)
+	//{
+	//	TokenRole eStaticRole = m_oSQLEngine.GetRoleFromLexerToken(tokens[i].tokenTypeId, tokens[i].text, nDatabaseType);
 
-		CString strText(tokens[i].text.c_str());
-		CString strStatic(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
-		CString strInst(m_oSQLEngine.TokenRoleToString(eInstRole).c_str());
-		AddTraceLog(_T("[%d] \"%s\" → %s (정적) / %s (인스턴스)"), i + 1, strText, strStatic, strInst);
-	}
+	//	CString strText(tokens[i].text.c_str());
+	//	CString strInst(m_oSQLEngine.TokenRoleToString(eStaticRole).c_str());
+	//	AddTraceLog(_T("[%3d] %20s -> %25s"), i + 1, strText, strInst);
+	//}
 }
+
 void CTestMFCDlg::OnBnClickedButtonOutputClear()
 {
 	CEdit* pEditTrace = (CEdit*)GetDlgItem(IDC_EDIT_TRACE);
