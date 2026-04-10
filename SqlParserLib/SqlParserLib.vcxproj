@@ -173,7 +173,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
-    <ClInclude Include="..\TestMFC\SQLEngine.h" />
     <ClInclude Include="Source\DB2\Db2Lexer.h" />
     <ClInclude Include="Source\DB2\Db2Parser.h" />
     <ClInclude Include="Source\DB2\Db2ParserBaseVisitor.h" />
@@ -202,11 +201,9 @@
     <ClInclude Include="Source\SQL Server\TSqlParser.h" />
     <ClInclude Include="Source\SQL Server\TSqlParserBaseVisitor.h" />
     <ClInclude Include="Source\SQL Server\TSqlParserVisitor.h" />
+    <ClInclude Include="SQLEngine.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\TestMFC\SQLEngine.cpp">
-      <PrecompiledHeader>NotUsing</PrecompiledHeader>
-    </ClCompile>
     <ClCompile Include="Source\DB2\Db2Lexer.cpp" />
     <ClCompile Include="Source\DB2\Db2Parser.cpp" />
     <ClCompile Include="Source\DB2\Db2ParserBaseVisitor.cpp" />
@@ -232,6 +229,7 @@
     <ClCompile Include="Source\SQL Server\TSqlParser.cpp" />
     <ClCompile Include="Source\SQL Server\TSqlParserBaseVisitor.cpp" />
     <ClCompile Include="Source\SQL Server\TSqlParserVisitor.cpp" />
+    <ClCompile Include="SQLEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Source\DB2\Db2Lexer.interp" />
