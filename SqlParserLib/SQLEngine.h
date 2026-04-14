@@ -58,6 +58,7 @@ enum class TokenRole {
 	KEYWORD_JOIN,
 	KEYWORD_ON,
 	KEYWORD_AS,
+	KEYWORD_RETURN,
 	KEYWORD_OTHER,
 	// 식별자
 	COLUMN_NAME,           // 컬럼명

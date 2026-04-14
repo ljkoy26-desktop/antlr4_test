@@ -46,5 +46,9 @@ public:
 
 	void Tokenize(int nDatabaseType);
 
+	// 토큰이 해시 제외 대상 타입인지 확인
+	// 대상: RETURN 키워드 / 단일 주석(--)  / 다중행 주석(/**/) / 세미콜론(;) / 공백
+	bool TokenEquals(const TokenInfo& stToken) const;
+
 	afx_msg void OnBnClickedButtonOutputClear();
 };

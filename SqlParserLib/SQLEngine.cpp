@@ -401,8 +401,8 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 	case antlrcpp_oracle::PlSqlLexer::LOOP:
 	case antlrcpp_oracle::PlSqlLexer::FOR:
 	case antlrcpp_oracle::PlSqlLexer::WHILE:
+	case antlrcpp_oracle::PlSqlLexer::RETURN:   return TR::KEYWORD_RETURN;
 	case antlrcpp_oracle::PlSqlLexer::IF:
-	case antlrcpp_oracle::PlSqlLexer::RETURN:
 	case antlrcpp_oracle::PlSqlLexer::EXECUTE:
 	case antlrcpp_oracle::PlSqlLexer::PACKAGE:
 	case antlrcpp_oracle::PlSqlLexer::BODY:
@@ -685,6 +685,7 @@ std::string SQLEngine::TokenRoleToString(TokenRole role)
 	case TokenRole::KEYWORD_JOIN:       return "예약어-JOIN";
 	case TokenRole::KEYWORD_ON:         return "예약어-ON";
 	case TokenRole::KEYWORD_AS:         return "예약어-AS";
+	case TokenRole::KEYWORD_RETURN:     return "예약어-RETURN";
 	case TokenRole::KEYWORD_OTHER:      return "예약어-기타";
 
 		// 식별자
@@ -1108,6 +1109,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::str
 	case antlrcpp_mysql::MySQLLexer::ELSE_SYMBOL:
 	case antlrcpp_mysql::MySQLLexer::END_SYMBOL:
 		return TR::KEYWORD_OTHER;
+	case antlrcpp_mysql::MySQLLexer::RETURN_SYMBOL: return TR::KEYWORD_RETURN;
 
 		// 숫자 리터럴
 	case antlrcpp_mysql::MySQLLexer::INT_NUMBER:
@@ -1435,8 +1437,8 @@ TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std:
 	case antlrcpp_sqlserver::TSqlLexer::CURSOR:
 	case antlrcpp_sqlserver::TSqlLexer::FOR:
 	case antlrcpp_sqlserver::TSqlLexer::WHILE:
+	case antlrcpp_sqlserver::TSqlLexer::RETURN:   return TR::KEYWORD_RETURN;
 	case antlrcpp_sqlserver::TSqlLexer::IF:
-	case antlrcpp_sqlserver::TSqlLexer::RETURN:
 	case antlrcpp_sqlserver::TSqlLexer::EXECUTE:
 	case antlrcpp_sqlserver::TSqlLexer::SEQUENCE:
 	case antlrcpp_sqlserver::TSqlLexer::TRUNCATE:
@@ -1810,8 +1812,8 @@ TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std
 	case PgLexer::DECLARE:
 	case PgLexer::CURSOR:
 	case PgLexer::FOR:
+	case PgLexer::RETURN:   return TR::KEYWORD_RETURN;
 	case PgLexer::WHILE:
-	case PgLexer::RETURN:
 	case PgLexer::EXECUTE:
 	case PgLexer::SEQUENCE:
 	case PgLexer::TRUNCATE:
@@ -2311,8 +2313,8 @@ TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::strin
 	case Db2Lex::CURSOR:
 	case Db2Lex::FOR:
 	case Db2Lex::WHILE:
+	case Db2Lex::RETURN:   return TR::KEYWORD_RETURN;
 	case Db2Lex::IF:
-	case Db2Lex::RETURN:
 	case Db2Lex::EXECUTE:
 	case Db2Lex::SEQUENCE:
 	case Db2Lex::TRUNCATE:

@@ -362,6 +362,29 @@ void CTestMFCDlg::Tokenize(int nDatabaseType)
 	//}
 }
 
+bool CTestMFCDlg::TokenEquals(const TokenInfo& stToken) const
+{
+	// 1. RETURN 키워드
+	if (stToken.role == TokenRole::KEYWORD_RETURN)
+		return true;
+
+	// 2. 단일 행 주석 (--)
+	// 3. 다중 행 주석 (/* ... */)
+	//    - 두 타입 모두 ANTLR TokenRole::COMMENT 로 매핑됨
+	if (stToken.role == TokenRole::COMMENT)
+		return true;
+
+	// 4. 세미콜론 (;)
+	if (stToken.role == TokenRole::SEPARATOR_SEMICOLON)
+		return true;
+
+	// 5. 공백 (스페이스, 탭 \t, 줄바꿈 \n \r)
+	if (stToken.role == TokenRole::WHITESPACE)
+		return true;
+
+	return false;
+}
+
 void CTestMFCDlg::OnBnClickedButtonOutputClear()
 {
 	CEdit* pEditTrace = (CEdit*)GetDlgItem(IDC_EDIT_TRACE);
