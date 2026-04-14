@@ -153,6 +153,10 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	m_oSQLEngine.Parse(sqlQueries, nDatabaseType);
 
 	int nSQLCount = m_oSQLEngine.GetStatementCount();
+	int nTokenCount = m_oSQLEngine.GetTokenCount();
+	AddTraceLog(_T("파싱 완료 - SQL 문장: %d개 / 토큰: %d개"), nSQLCount, nTokenCount);
+	AddTraceLog(_T(""));
+
 	if (nSQLCount == 0)
 	{
 		AddTraceLog(_T("파싱된 SQL 문이 없습니다."));

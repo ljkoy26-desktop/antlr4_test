@@ -129,7 +129,7 @@ public:
 	// [인스턴스 기반] 파싱 후 멤버변수에 저장하여 메타정보 조회
 	// -------------------------------------------------------
 
-	// 파싱 실행 후 결과를 m_vecStatements에 저장 (true: 성공, false: 결과 없음)
+	// 파싱 실행 후 결과를 m_vecStatements, m_vecTokens에 저장 (true: 성공, false: 결과 없음)
 	bool Parse(const std::string& szSqlQueries, int nDatabaseType);
 
 	// 저장된 stmt 목록의 SQL 문장 수 반환
@@ -147,8 +147,14 @@ public:
 	// Parse() 호출 여부 반환 (true: 호출됨, false: 미호출 또는 Clear() 이후)
 	bool IsParse() const;
 
-	// 파싱 결과 초기화 (m_vecStatements, m_nDatabaseType, m_bIsParsed 리셋)
+	// 파싱 결과 초기화 (m_vecStatements, m_vecTokens, m_nDatabaseType, m_bIsParsed 리셋)
 	void Clear();
+
+	// 저장된 토큰 목록 전체 반환 (Parse() 호출 시 자동 수집)
+	const std::vector<TokenInfo>& GetTokens() const;
+
+	// 저장된 토큰 수 반환
+	int GetTokenCount() const;
 
 	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
@@ -195,8 +201,11 @@ public:
 	SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
 private:
-	// 마지막 Parse() 호출 결과를 저장하는 멤버변수
+	// 마지막 Parse() 에 의해 파싱된 SQL 문장목록을 저장 
 	std::vector<SqlStatementInfo> m_vecStatements;
+
+	// 마지막 Parse() 에 의해 파싱된 SQL 토큰목록을 전체저장 
+	std::vector<TokenInfo> m_vecTokens;
 
 	// 마지막 Parse() 호출에서 사용된 DB 타입 (GetRoleFromLexerToken 인스턴스 메서드에서 사용)
 	int m_nDatabaseType = -1;

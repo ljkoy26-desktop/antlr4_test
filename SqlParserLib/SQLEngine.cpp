@@ -2880,7 +2880,7 @@ bool SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
 // [인스턴스 기반] 파싱 후 멤버변수에 저장
 // ============================================================
 
-// 파싱 실행 - 결과를 m_vecStatements에 저장
+// 파싱 실행 - 결과를 m_vecStatements, m_vecTokens에 저장
 bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
 {
 	m_nDatabaseType = nDatabaseType;
@@ -2889,6 +2889,9 @@ bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
 	// nDatabaseType을 각 문장 정보에도 기록
 	for (auto& stInfo : m_vecStatements)
 		stInfo.nDatabaseType = nDatabaseType;
+
+	// 전체 입력에 대한 토큰 목록 수집
+	m_vecTokens = TokenizeQuery(szSqlQueries, nDatabaseType);
 
 	m_bIsParsed = true;
 	return !m_vecStatements.empty();
@@ -2924,6 +2927,18 @@ const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
 	return m_vecStatements;
 }
 
+// 저장된 토큰 목록 전체 반환
+const std::vector<TokenInfo>& SQLEngine::GetTokens() const
+{
+	return m_vecTokens;
+}
+
+// 저장된 토큰 수 반환
+int SQLEngine::GetTokenCount() const
+{
+	return static_cast<int>(m_vecTokens.size());
+}
+
 // Parse() 호출 여부 반환
 bool SQLEngine::IsParse() const
 {
@@ -2934,6 +2949,7 @@ bool SQLEngine::IsParse() const
 void SQLEngine::Clear()
 {
 	m_vecStatements.clear();
+	m_vecTokens.clear();
 	m_nDatabaseType = -1;
 	m_bIsParsed = false;
 }
