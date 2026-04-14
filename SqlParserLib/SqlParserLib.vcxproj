@@ -133,7 +133,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_USRDLL;SQLPARSERLIB_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;$(SolutionDir)TestMFC</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Source;$(ProjectDir)Source\Oracle;$(ProjectDir)Source\SQL Server;$(ProjectDir)Source\MySQL;$(ProjectDir)Source\DB2;$(ProjectDir)Source\PostgreSQL;$(SolutionDir)vcpkg\installed\x64-windows\include\antlr4-runtime;</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp17</LanguageStandard>
       <AdditionalOptions>/bigobj %(AdditionalOptions)</AdditionalOptions>
       <DisableSpecificWarnings>4251;4275;4996</DisableSpecificWarnings>
@@ -147,6 +147,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>../lib64/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -169,6 +170,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImportLibrary>../lib64/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
