@@ -61,14 +61,17 @@ enum class TokenRole {
 	KEYWORD_RETURN,
 	KEYWORD_OTHER,
 	// 식별자
-	COLUMN_NAME,           // 컬럼명
-	TABLE_NAME,            // 테이블명
-	ALIAS_NAME,            // 별칭
-	SCHEMA_NAME,           // 스키마명
-	FUNCTION_NAME,         // 함수명
+	IDENTIFIER,            // 식별자 (ident) - 렉서 수준, 파서 컨텍스트 미분류 상태
+	COLUMN_NAME,           // 컬럼명 (파서 컨텍스트 기반 재분류 후)
+	TABLE_NAME,            // 테이블명 (파서 컨텍스트 기반 재분류 후)
+	ALIAS_NAME,            // 별칭 (파서 컨텍스트 기반 재분류 후)
+	SCHEMA_NAME,           // 스키마명 (파서 컨텍스트 기반 재분류 후)
+	FUNCTION_NAME,         // 함수명 (파서 컨텍스트 기반 재분류 후)
 	// 리터럴 값
-	LITERAL_NUMBER,        // 숫자 리터럴
-	LITERAL_STRING,        // 문자열 리터럴
+	LITERAL_NUMBER,        // 숫자 리터럴 (레거시 - 정수/실수 미분류)
+	LITERAL_INTEGER,       // 정수 리터럴 (iconst) ex) 100, -5
+	LITERAL_FLOAT,         // 실수 리터럴 (fconst) ex) 3.14, 10.5
+	LITERAL_STRING,        // 문자열 리터럴 (sconst)
 	LITERAL_NULL,          // NULL
 	LITERAL_BOOLEAN,       // TRUE/FALSE
 	// 연산자

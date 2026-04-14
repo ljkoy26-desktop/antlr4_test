@@ -423,9 +423,8 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 		return TR::KEYWORD_OTHER;
 
 		// 숫자 리터럴
-	case antlrcpp_oracle::PlSqlLexer::UNSIGNED_INTEGER:
-	case antlrcpp_oracle::PlSqlLexer::APPROXIMATE_NUM_LIT:
-		return TR::LITERAL_NUMBER;
+	case antlrcpp_oracle::PlSqlLexer::UNSIGNED_INTEGER:    return TR::LITERAL_INTEGER;
+	case antlrcpp_oracle::PlSqlLexer::APPROXIMATE_NUM_LIT: return TR::LITERAL_FLOAT;
 
 		// 문자열 리터럴
 	case antlrcpp_oracle::PlSqlLexer::CHAR_STRING:
@@ -487,7 +486,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 		// 식별자
 	case antlrcpp_oracle::PlSqlLexer::REGULAR_ID:
 	case antlrcpp_oracle::PlSqlLexer::DELIMITED_ID:
-		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+		return TR::IDENTIFIER;
 
 	default:
 		return TR::UNKNOWN;
@@ -689,6 +688,7 @@ std::string SQLEngine::TokenRoleToString(TokenRole role)
 	case TokenRole::KEYWORD_OTHER:      return "예약어-기타";
 
 		// 식별자
+	case TokenRole::IDENTIFIER:         return "식별자";
 	case TokenRole::COLUMN_NAME:        return "컬럼명";
 	case TokenRole::TABLE_NAME:         return "테이블명";
 	case TokenRole::ALIAS_NAME:         return "별칭";
@@ -697,6 +697,8 @@ std::string SQLEngine::TokenRoleToString(TokenRole role)
 
 		// 리터럴
 	case TokenRole::LITERAL_NUMBER:     return "숫자값";
+	case TokenRole::LITERAL_INTEGER:    return "정수값";
+	case TokenRole::LITERAL_FLOAT:      return "실수값";
 	case TokenRole::LITERAL_STRING:     return "문자열값";
 	case TokenRole::LITERAL_NULL:       return "NULL값";
 	case TokenRole::LITERAL_BOOLEAN:    return "불린값";
@@ -1115,9 +1117,10 @@ TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::str
 	case antlrcpp_mysql::MySQLLexer::INT_NUMBER:
 	case antlrcpp_mysql::MySQLLexer::LONG_NUMBER:
 	case antlrcpp_mysql::MySQLLexer::ULONGLONG_NUMBER:
+		return TR::LITERAL_INTEGER;
 	case antlrcpp_mysql::MySQLLexer::DECIMAL_NUMBER:
 	case antlrcpp_mysql::MySQLLexer::FLOAT_NUMBER:
-		return TR::LITERAL_NUMBER;
+		return TR::LITERAL_FLOAT;
 
 		// 문자열 리터럴
 	case antlrcpp_mysql::MySQLLexer::SINGLE_QUOTED_TEXT:
@@ -1180,10 +1183,10 @@ TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::str
 	case antlrcpp_mysql::MySQLLexer::AT_AT_SIGN_SYMBOL:
 		return TR::PARAMETER;
 
-		// 식별자 (기본값 - 문맥에 따라 나중에 재분류됨)
+		// 식별자
 	case antlrcpp_mysql::MySQLLexer::IDENTIFIER:
 	case antlrcpp_mysql::MySQLLexer::BACK_TICK_QUOTED_ID:
-		return TR::COLUMN_NAME;  // 기본값, 나중에 Parser에서 정확히 분류
+		return TR::IDENTIFIER;
 
 	default:
 		return TR::UNKNOWN;
@@ -1468,9 +1471,13 @@ TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std:
 
 		// 숫자 리터럴
 	case antlrcpp_sqlserver::TSqlLexer::DECIMAL:
+		// DECIMAL 토큰은 정수('100')와 실수('3.14') 모두에 사용 - '.' 포함 여부로 구분
+		if (tokenText.find('.') != std::string::npos)
+			return TR::LITERAL_FLOAT;
+		return TR::LITERAL_INTEGER;
 	case antlrcpp_sqlserver::TSqlLexer::FLOAT:
 	case antlrcpp_sqlserver::TSqlLexer::REAL:
-		return TR::LITERAL_NUMBER;
+		return TR::LITERAL_FLOAT;
 
 		// 문자열 리터럴
 	case antlrcpp_sqlserver::TSqlLexer::STRING:
@@ -1525,7 +1532,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std:
 	case antlrcpp_sqlserver::TSqlLexer::DOUBLE_QUOTE_ID:
 	case antlrcpp_sqlserver::TSqlLexer::SQUARE_BRACKET_ID:
 	case antlrcpp_sqlserver::TSqlLexer::TEMP_ID:    // #임시테이블
-		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+		return TR::IDENTIFIER;
 
 	default:
 		return TR::UNKNOWN;
@@ -1857,11 +1864,12 @@ TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std
 
 		// 숫자 리터럴
 	case PgLexer::Integral:
-	case PgLexer::Numeric:
 	case PgLexer::BinaryIntegral:
 	case PgLexer::OctalIntegral:
 	case PgLexer::HexadecimalIntegral:
-		return TR::LITERAL_NUMBER;
+		return TR::LITERAL_INTEGER;
+	case PgLexer::Numeric:
+		return TR::LITERAL_FLOAT;
 
 		// 문자열 리터럴
 	case PgLexer::StringConstant:
@@ -1931,7 +1939,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std
 	case PgLexer::UnicodeQuotedIdentifier:
 	case PgLexer::PLSQLIDENTIFIER:
 	case PgLexer::PLSQLVARIABLENAME:
-		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+		return TR::IDENTIFIER;
 
 	default:
 		return TR::UNKNOWN;
@@ -2350,11 +2358,12 @@ TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::strin
 		return TR::KEYWORD_OTHER;
 
 		// 숫자 리터럴
-	case Db2Lex::DECIMAL_LITERAL:
 	case Db2Lex::SINGLE_DIGIT:
+		return TR::LITERAL_INTEGER;
+	case Db2Lex::DECIMAL_LITERAL:
 	case Db2Lex::FLOAT_LITERAL:
 	case Db2Lex::REAL_LITERAL:
-		return TR::LITERAL_NUMBER;
+		return TR::LITERAL_FLOAT;
 
 		// 문자열 리터럴
 	case Db2Lex::SINGLE_QUOTE:
@@ -2417,7 +2426,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::strin
 		// 식별자
 	case Db2Lex::ID:
 	case Db2Lex::DOUBLE_QUOTE_ID:
-		return TR::COLUMN_NAME;  // 기본값, 문맥에 따라 재분류 가능
+		return TR::IDENTIFIER;
 
 	default:
 		return TR::UNKNOWN;
