@@ -143,11 +143,13 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	// CString(유니코드) -> std::string(멀티바이트) 변환
 	std::string sqlQueries = CT2A(strInput);
 
-	if (sqlQueries.empty()) {
+	if (sqlQueries.empty())
+	{
 		AfxMessageBox(_T("SQL을 입력해주세요."));
 		return;
 	}
 
+	m_oSQLEngine.Clear();
 	m_oSQLEngine.Parse(sqlQueries, nDatabaseType);
 
 	int nSQLCount = m_oSQLEngine.GetStatementCount();

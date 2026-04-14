@@ -144,6 +144,12 @@ public:
 	// 저장된 stmt 목록 전체 반환
 	const std::vector<SqlStatementInfo>& GetStatements() const;
 
+	// Parse() 호출 여부 반환 (true: 호출됨, false: 미호출 또는 Clear() 이후)
+	bool IsParse() const;
+
+	// 파싱 결과 초기화 (m_vecStatements, m_nDatabaseType, m_bIsParsed 리셋)
+	void Clear();
+
 	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
 
@@ -194,6 +200,9 @@ private:
 
 	// 마지막 Parse() 호출에서 사용된 DB 타입 (GetRoleFromLexerToken 인스턴스 메서드에서 사용)
 	int m_nDatabaseType = -1;
+
+	// Parse() 호출 여부 플래그
+	bool m_bIsParsed = false;
 
 	// DB별 파싱 구현 (내부 전용)
 	std::vector<SqlStatementInfo> ParseMultipleQueriesOracle(const std::string& sqlQueries);

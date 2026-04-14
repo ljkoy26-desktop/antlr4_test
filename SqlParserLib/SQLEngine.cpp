@@ -2890,6 +2890,7 @@ bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
 	for (auto& stInfo : m_vecStatements)
 		stInfo.nDatabaseType = nDatabaseType;
 
+	m_bIsParsed = true;
 	return !m_vecStatements.empty();
 }
 
@@ -2921,6 +2922,20 @@ bool SQLEngine::HasSyntaxError(int nIndex) const
 const std::vector<SqlStatementInfo>& SQLEngine::GetStatements() const
 {
 	return m_vecStatements;
+}
+
+// Parse() 호출 여부 반환
+bool SQLEngine::IsParse() const
+{
+	return m_bIsParsed;
+}
+
+// 파싱 결과 초기화
+void SQLEngine::Clear()
+{
+	m_vecStatements.clear();
+	m_nDatabaseType = -1;
+	m_bIsParsed = false;
 }
 
 // 저장된 stmt 목록에서 n번째 문장에 서브쿼리가 존재하는지 반환 (0-based index)
