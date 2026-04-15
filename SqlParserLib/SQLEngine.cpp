@@ -723,6 +723,24 @@ std::string SQLEngine::TokenRoleToString(TokenRole role)
 	default:                            return "알수없음";
 	}
 }
+
+// GSP TokenTypeComment { get_ttsimplecomment, get_ttbracketedcomment, get_ttsemicolon } 대응
+// 단일 행 주석(--)  / 다중 행 주석(/* */) / 세미콜론(;) 여부 반환
+bool SQLEngine::IsCommentType(const TokenInfo& stToken)
+{
+	// 단일 행 주석 (--)
+	// 다중 행 주석 (/* ... */)
+	//   - 두 타입 모두 TokenRole::COMMENT 로 매핑됨
+	if (stToken.role == TokenRole::COMMENT)
+		return true;
+
+	// 세미콜론 (;)
+	if (stToken.role == TokenRole::SEPARATOR_SEMICOLON)
+		return true;
+
+	return false;
+}
+
 // 1. MySQL용 내부 도우미 함수 (static으로 선언하여 외부 노출 차단)
 // 인자 타입에 antlrcpp_mysql 네임스페이스를 명시합니다.
 static SqlStatementType IdentifyFromSimpleStatementMySQL(antlrcpp_mysql::MySQLParser::SimpleStatementContext* simpleStmt)

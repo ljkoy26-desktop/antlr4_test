@@ -201,6 +201,11 @@ public:
 	std::string SqlTypeToString(SqlStatementType type);
 	std::string TokenRoleToString(TokenRole role);
 
+	// 토큰이 주석/세미콜론 타입인지 확인
+	// 대상: 단일 행 주석(--) / 다중 행 주석(/**/) / 세미콜론(;)
+	// GSP: TokenTypeComment { get_ttsimplecomment, get_ttbracketedcomment, get_ttsemicolon }
+	static bool IsCommentType(const TokenInfo& stToken);
+
 	SqlStatementInfo GetQueryAtMySQL(const std::string& sqlQueries, size_t index);
 	SqlStatementType IdentifySqlTypeMySQL(const std::string& sqlQuery);
 
