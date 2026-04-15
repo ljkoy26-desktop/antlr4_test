@@ -201,26 +201,50 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	}
 
 	// -------------------------------------------------------
-	// [테이블 참조 정보] 테이블명 / 스키마명 / DB명 추출
+	// [테이블 참조 정보] GetTableRefs - 별칭 포함
 	// -------------------------------------------------------
 	AddTraceLog(_T(""));
 	AddTraceLog(_T("===== [테이블 참조 정보] ====="));
 
-	std::vector<std::string> vecTables   = m_oSQLEngine.GetTableNames();
-	std::vector<std::string> vecSchemas  = m_oSQLEngine.GetSchemaNames();
-	std::vector<std::string> vecDatabases = m_oSQLEngine.GetDatabaseNames();
+	std::vector<TableRefInfo> vecTableRefs = m_oSQLEngine.GetTableRefs();
+	AddTraceLog(_T("테이블 참조 (%d개):"), (int)vecTableRefs.size());
 
-	AddTraceLog(_T("테이블명 (%d개):"), (int)vecTables.size());
-	for (const std::string& szName : vecTables)
-		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+	for (const TableRefInfo& stRef : vecTableRefs)
+	{
+		CString strDB(stRef.szDatabase.c_str());
+		CString strSchema(stRef.szSchema.c_str());
+		CString strTable(stRef.szTable.c_str());
+		CString strAlias(stRef.szAlias.c_str());
 
-	AddTraceLog(_T("스키마명 (%d개):"), (int)vecSchemas.size());
-	for (const std::string& szName : vecSchemas)
-		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+		AddTraceLog(_T("    DB=%-10s Schema=%-10s Table=%-15s Alias=%s"),
+			strDB.IsEmpty()     ? _T("-") : strDB,
+			strSchema.IsEmpty() ? _T("-") : strSchema,
+			strTable.IsEmpty()  ? _T("-") : strTable,
+			strAlias.IsEmpty()  ? _T("-") : strAlias);
+	}
 
-	AddTraceLog(_T("데이터베이스명 (%d개):"), (int)vecDatabases.size());
-	for (const std::string& szName : vecDatabases)
-		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+	// -------------------------------------------------------
+	// [컬럼 참조 정보] GetLinkedColumns - 테이블 매핑 포함
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [컬럼 참조 정보] ====="));
+
+	std::vector<ColumnRefInfo> vecColumns = m_oSQLEngine.GetLinkedColumns();
+	AddTraceLog(_T("컬럼 참조 (%d개):"), (int)vecColumns.size());
+
+	for (const ColumnRefInfo& stCol : vecColumns)
+	{
+		CString strQual(stCol.szQualifier.c_str());
+		CString strCol(stCol.szColumn.c_str());
+		CString strResolved(stCol.szResolvedTable.c_str());
+		BOOL bDetermined = SQLEngine::IsTableDetermined(stCol) ? TRUE : FALSE;
+
+		AddTraceLog(_T("    한정자=%-10s 컬럼=%-15s 테이블결정=%s (→%s)"),
+			strQual.IsEmpty() ? _T("-") : strQual,
+			strCol,
+			bDetermined ? _T("Y") : _T("N"),
+			strResolved.IsEmpty() ? _T("-") : strResolved);
+	}
 
 	// -------------------------------------------------------
 	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지

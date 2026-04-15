@@ -1,6 +1,8 @@
 ﻿#include "SQLEngine.h"
 #include "../Common/Include/AntlrProxy.h"
 #include <algorithm>
+#include <set>
+#include <map>
 
 using namespace antlrcpp_oracle;
 using namespace antlrcpp_mysql;
@@ -64,18 +66,22 @@ static size_t SkipWS(const std::vector<TokenInfo>& vecTokens, size_t nIdx)
 	return nIdx;
 }
 
-// 테이블 참조 정보 구조체 (db.schema.table 형태)
+// 내부 테이블 참조 구조체 (별칭 포함)
 struct TableRef
 {
 	std::string szDatabase;
 	std::string szSchema;
 	std::string szTable;
+	std::string szAlias;
 };
 
-// 토큰 목록에서 테이블 참조 목록 추출
+// 토큰 목록에서 테이블 참조 목록 추출 (별칭 + 사용된 토큰 인덱스 추적)
 // 분석 대상 키워드: FROM / JOIN / INTO(INSERT INTO) / UPDATE
 // 식별자 체인: table / schema.table / db.schema.table
-static std::vector<TableRef> ExtractTableRefs(const std::vector<TokenInfo>& vecTokens)
+// 별칭:       table [AS] alias
+static std::vector<TableRef> ExtractTableRefsEx(
+	const std::vector<TokenInfo>& vecTokens,
+	std::set<size_t>&             outUsedIdx)
 {
 	std::vector<TableRef> vecRefs;
 	size_t nCount = vecTokens.size();
@@ -84,7 +90,6 @@ static std::vector<TableRef> ExtractTableRefs(const std::vector<TokenInfo>& vecT
 	{
 		const TokenRole eRole = vecTokens[i].role;
 
-		// 테이블명이 뒤따르는 키워드인지 확인
 		bool bTableNext = (eRole == TokenRole::KEYWORD_FROM)
 			|| (eRole == TokenRole::KEYWORD_JOIN)
 			|| (eRole == TokenRole::KEYWORD_INTO)
@@ -93,71 +98,206 @@ static std::vector<TableRef> ExtractTableRefs(const std::vector<TokenInfo>& vecT
 		if (!bTableNext)
 			continue;
 
-		// 공백 건너뛰기
 		size_t nNext = SkipWS(vecTokens, i + 1);
 		if (nNext >= nCount)
 			continue;
 
-		// 서브쿼리 '(' 또는 식별자 아닌 토큰은 건너뜀
+		// 서브쿼리 '(' 이면 건너뜀
 		if (vecTokens[nNext].role != TokenRole::IDENTIFIER)
 			continue;
 
 		// --- 식별자 체인 파싱 ---
-		std::string szPart1 = vecTokens[nNext].text;
-		std::string szPart2;
-		std::string szPart3;
+		size_t nP1 = nNext;
+		std::string szPart1 = vecTokens[nP1].text;
+		size_t nD1 = nCount, nP2 = nCount;
+		size_t nD2 = nCount, nP3 = nCount;
+		std::string szPart2, szPart3;
+		size_t nLastUsed = nP1;
 
-		// part1 다음에 '.' 이 있는지 확인
-		size_t nAfterPart1 = SkipWS(vecTokens, nNext + 1);
-		if (nAfterPart1 < nCount
-			&& vecTokens[nAfterPart1].role == TokenRole::SEPARATOR_DOT)
+		size_t nAfterP1 = SkipWS(vecTokens, nP1 + 1);
+		if (nAfterP1 < nCount && vecTokens[nAfterP1].role == TokenRole::SEPARATOR_DOT)
 		{
-			size_t nPart2 = SkipWS(vecTokens, nAfterPart1 + 1);
-			if (nPart2 < nCount
-				&& vecTokens[nPart2].role == TokenRole::IDENTIFIER)
+			nD1 = nAfterP1;
+			size_t nTryP2 = SkipWS(vecTokens, nD1 + 1);
+			if (nTryP2 < nCount && vecTokens[nTryP2].role == TokenRole::IDENTIFIER)
 			{
-				szPart2 = vecTokens[nPart2].text;
+				nP2 = nTryP2;
+				szPart2  = vecTokens[nP2].text;
+				nLastUsed = nP2;
 
-				// part2 다음에 '.' 이 있는지 확인
-				size_t nAfterPart2 = SkipWS(vecTokens, nPart2 + 1);
-				if (nAfterPart2 < nCount
-					&& vecTokens[nAfterPart2].role == TokenRole::SEPARATOR_DOT)
+				size_t nAfterP2 = SkipWS(vecTokens, nP2 + 1);
+				if (nAfterP2 < nCount && vecTokens[nAfterP2].role == TokenRole::SEPARATOR_DOT)
 				{
-					size_t nPart3 = SkipWS(vecTokens, nAfterPart2 + 1);
-					if (nPart3 < nCount
-						&& vecTokens[nPart3].role == TokenRole::IDENTIFIER)
+					nD2 = nAfterP2;
+					size_t nTryP3 = SkipWS(vecTokens, nD2 + 1);
+					if (nTryP3 < nCount && vecTokens[nTryP3].role == TokenRole::IDENTIFIER)
 					{
-						szPart3 = vecTokens[nPart3].text;
+						nP3 = nTryP3;
+						szPart3  = vecTokens[nP3].text;
+						nLastUsed = nP3;
 					}
 				}
 			}
 		}
 
-		// 체인 길이에 따라 역할 결정
+		// --- 별칭 파싱 (AS keyword 또는 단순 IDENTIFIER) ---
+		std::string szAlias;
+		size_t nAliasIdx = nCount;
+		size_t nAfterTable = SkipWS(vecTokens, nLastUsed + 1);
+		if (nAfterTable < nCount)
+		{
+			// AS 키워드 건너뜀
+			if (vecTokens[nAfterTable].role == TokenRole::KEYWORD_AS)
+				nAfterTable = SkipWS(vecTokens, nAfterTable + 1);
+
+			if (nAfterTable < nCount && vecTokens[nAfterTable].role == TokenRole::IDENTIFIER)
+			{
+				szAlias   = vecTokens[nAfterTable].text;
+				nAliasIdx = nAfterTable;
+				nLastUsed = nAfterTable;
+			}
+		}
+
+		// --- 사용된 인덱스 기록 ---
+		outUsedIdx.insert(nP1);
+		if (nD1    < nCount) outUsedIdx.insert(nD1);
+		if (nP2    < nCount) outUsedIdx.insert(nP2);
+		if (nD2    < nCount) outUsedIdx.insert(nD2);
+		if (nP3    < nCount) outUsedIdx.insert(nP3);
+		if (nAliasIdx < nCount) outUsedIdx.insert(nAliasIdx);
+
+		// --- 역할 결정 ---
 		TableRef stRef;
 		if (!szPart3.empty())
 		{
-			// db.schema.table
 			stRef.szDatabase = szPart1;
 			stRef.szSchema   = szPart2;
 			stRef.szTable    = szPart3;
 		}
 		else if (!szPart2.empty())
 		{
-			// schema.table
 			stRef.szSchema = szPart1;
 			stRef.szTable  = szPart2;
 		}
 		else
 		{
-			// table
 			stRef.szTable = szPart1;
 		}
+		stRef.szAlias = szAlias;
 
 		vecRefs.push_back(stRef);
 	}
 
 	return vecRefs;
+}
+
+// 하위 호환 래퍼 (인덱스 추적 불필요 시 사용)
+static std::vector<TableRef> ExtractTableRefs(const std::vector<TokenInfo>& vecTokens)
+{
+	std::set<size_t> dummy;
+	return ExtractTableRefsEx(vecTokens, dummy);
+}
+
+// 컬럼 참조 목록 추출
+// qualifier.column 패턴과 단독 column 패턴을 모두 처리
+// - 테이블 참조에 이미 사용된 토큰(usedIdx)은 건너뜀
+// - alias → table 맵으로 테이블 결정
+static std::vector<ColumnRefInfo> ExtractColumnRefs(
+	const std::vector<TokenInfo>&       vecTokens,
+	const std::vector<TableRef>&        vecTableRefs,
+	const std::set<size_t>&             usedIdx)
+{
+	std::vector<ColumnRefInfo> vecResult;
+	size_t nCount = vecTokens.size();
+
+	// alias(또는 table명) → table명 맵 구성
+	std::map<std::string, std::string> mapQualToTable;
+	for (const TableRef& stRef : vecTableRefs)
+	{
+		if (!stRef.szTable.empty())
+		{
+			// 별칭이 있으면 별칭→테이블, 없으면 테이블명 자체→테이블
+			if (!stRef.szAlias.empty())
+				mapQualToTable[stRef.szAlias] = stRef.szTable;
+			else
+				mapQualToTable[stRef.szTable] = stRef.szTable;
+		}
+	}
+
+	for (size_t i = 0; i < nCount; ++i)
+	{
+		// 테이블 참조에 사용된 토큰은 건너뜀
+		if (usedIdx.count(i))
+			continue;
+
+		if (vecTokens[i].role != TokenRole::IDENTIFIER)
+			continue;
+
+		// 직전 비공백 토큰이 DOT이면 이미 다른 패턴에서 컬럼으로 처리됨
+		bool bPrevIsDot = false;
+		if (i > 0)
+		{
+			size_t nPrev = i - 1;
+			while (nPrev > 0 && vecTokens[nPrev].role == TokenRole::WHITESPACE)
+				--nPrev;
+			if (vecTokens[nPrev].role == TokenRole::SEPARATOR_DOT && !usedIdx.count(nPrev))
+				bPrevIsDot = true;
+		}
+		if (bPrevIsDot)
+			continue;
+
+		// qualifier.column 패턴 확인
+		size_t nDotIdx = SkipWS(vecTokens, i + 1);
+		if (nDotIdx < nCount
+			&& vecTokens[nDotIdx].role == TokenRole::SEPARATOR_DOT
+			&& !usedIdx.count(nDotIdx))
+		{
+			size_t nColIdx = SkipWS(vecTokens, nDotIdx + 1);
+			if (nColIdx < nCount
+				&& vecTokens[nColIdx].role == TokenRole::IDENTIFIER
+				&& !usedIdx.count(nColIdx))
+			{
+				ColumnRefInfo stCol;
+				stCol.szQualifier = vecTokens[i].text;
+				stCol.szColumn    = vecTokens[nColIdx].text;
+
+				auto it = mapQualToTable.find(stCol.szQualifier);
+				if (it != mapQualToTable.end())
+				{
+					stCol.bTableDetermined = true;
+					stCol.szResolvedTable  = it->second;
+				}
+				else
+				{
+					stCol.bTableDetermined = false;
+				}
+
+				vecResult.push_back(stCol);
+				i = nColIdx; // 처리된 토큰 건너뜀
+				continue;
+			}
+		}
+
+		// 단독 컬럼 패턴
+		ColumnRefInfo stCol;
+		stCol.szQualifier = "";
+		stCol.szColumn    = vecTokens[i].text;
+
+		// 테이블이 1개이면 자동 결정
+		if (vecTableRefs.size() == 1 && !vecTableRefs[0].szTable.empty())
+		{
+			stCol.bTableDetermined = true;
+			stCol.szResolvedTable  = vecTableRefs[0].szTable;
+		}
+		else
+		{
+			stCol.bTableDetermined = false;
+		}
+
+		vecResult.push_back(stCol);
+	}
+
+	return vecResult;
 }
 
 } // namespace
@@ -3119,6 +3259,45 @@ std::vector<std::string> SQLEngine::GetDatabaseNames() const
 	}
 
 	return vecResult;
+}
+
+// [GSP: getTableName / getSchemaString 대응]
+// 별칭(Alias) 포함 테이블 참조 전체 목록 반환
+std::vector<TableRefInfo> SQLEngine::GetTableRefs() const
+{
+	std::set<size_t> usedIdx;
+	std::vector<TableRef> vecInner = ExtractTableRefsEx(m_vecTokens, usedIdx);
+
+	std::vector<TableRefInfo> vecResult;
+	vecResult.reserve(vecInner.size());
+
+	for (const TableRef& stRef : vecInner)
+	{
+		TableRefInfo stInfo;
+		stInfo.szDatabase = stRef.szDatabase;
+		stInfo.szSchema   = stRef.szSchema;
+		stInfo.szTable    = stRef.szTable;
+		stInfo.szAlias    = stRef.szAlias;
+		vecResult.push_back(stInfo);
+	}
+
+	return vecResult;
+}
+
+// [GSP: getLinkedColumns 대응]
+// 컬럼 참조 목록 반환 (한정자-테이블 매핑 포함)
+std::vector<ColumnRefInfo> SQLEngine::GetLinkedColumns() const
+{
+	std::set<size_t> usedIdx;
+	std::vector<TableRef> vecTableRefs = ExtractTableRefsEx(m_vecTokens, usedIdx);
+	return ExtractColumnRefs(m_vecTokens, vecTableRefs, usedIdx);
+}
+
+// [GSP: isTableDetermined 대응]
+// 해당 컬럼 참조의 테이블이 결정되었는지 반환
+bool SQLEngine::IsTableDetermined(const ColumnRefInfo& stCol)
+{
+	return stCol.bTableDetermined;
 }
 
 // Parse() 호출 여부 반환

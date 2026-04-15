@@ -115,7 +115,25 @@ struct TokenInfo {
 	size_t stopIndex;
 };
 
-// 2. DB 종류 식별자
+// 2-1. 테이블 참조 정보 (스키마·별칭 포함)
+struct SQLPARSERLIB_API TableRefInfo
+{
+	std::string szDatabase;   // DB명     (db.schema.table 형태)
+	std::string szSchema;     // 스키마명 (schema.table 형태)
+	std::string szTable;      // 테이블명
+	std::string szAlias;      // 별칭     (FROM table [AS] alias 형태)
+};
+
+// 2-2. 컬럼 참조 정보
+struct SQLPARSERLIB_API ColumnRefInfo
+{
+	std::string szQualifier;       // 한정자 (테이블 별칭 또는 테이블명)
+	std::string szColumn;          // 컬럼명
+	bool        bTableDetermined;  // 테이블 결정 여부
+	std::string szResolvedTable;   // 결정된 테이블명 (bTableDetermined=true 시)
+};
+
+// 2-3. DB 종류 식별자
 enum class DatabaseType
 {
 	DB_ORACLE     = 0,
@@ -174,6 +192,18 @@ public:
 
 	// 파싱된 토큰에서 데이터베이스명 목록 반환 (중복 포함)
 	std::vector<std::string> GetDatabaseNames() const;
+
+	// [GSP: getTableName / getSchemaString 대응]
+	// 별칭(Alias) 포함 테이블 참조 전체 목록 반환
+	std::vector<TableRefInfo> GetTableRefs() const;
+
+	// [GSP: getLinkedColumns 대응]
+	// 컬럼 참조 목록 반환 (한정자-테이블 매핑 포함)
+	std::vector<ColumnRefInfo> GetLinkedColumns() const;
+
+	// [GSP: isTableDetermined 대응]
+	// 해당 컬럼 참조의 테이블이 결정되었는지 반환
+	static bool IsTableDetermined(const ColumnRefInfo& stCol);
 
 	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
