@@ -201,6 +201,28 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	}
 
 	// -------------------------------------------------------
+	// [테이블 참조 정보] 테이블명 / 스키마명 / DB명 추출
+	// -------------------------------------------------------
+	AddTraceLog(_T(""));
+	AddTraceLog(_T("===== [테이블 참조 정보] ====="));
+
+	std::vector<std::string> vecTables   = m_oSQLEngine.GetTableNames();
+	std::vector<std::string> vecSchemas  = m_oSQLEngine.GetSchemaNames();
+	std::vector<std::string> vecDatabases = m_oSQLEngine.GetDatabaseNames();
+
+	AddTraceLog(_T("테이블명 (%d개):"), (int)vecTables.size());
+	for (const std::string& szName : vecTables)
+		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+
+	AddTraceLog(_T("스키마명 (%d개):"), (int)vecSchemas.size());
+	for (const std::string& szName : vecSchemas)
+		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+
+	AddTraceLog(_T("데이터베이스명 (%d개):"), (int)vecDatabases.size());
+	for (const std::string& szName : vecDatabases)
+		AddTraceLog(_T("    %s"), CString(szName.c_str()));
+
+	// -------------------------------------------------------
 	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
 	// -------------------------------------------------------
 	AddTraceLog(_T(""));

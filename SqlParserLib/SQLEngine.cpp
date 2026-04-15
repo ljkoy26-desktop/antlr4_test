@@ -52,6 +52,114 @@ SqlStatementInfo BuildSubQueryInfoFromCtx(
 	return sub;
 }
 
+// -------------------------------------------------------
+// 테이블 참조 추출 헬퍼 (파일 내부 전용, anonymous namespace)
+// -------------------------------------------------------
+
+// 공백 토큰을 건너뛰고 다음 유효한 토큰의 인덱스 반환
+static size_t SkipWS(const std::vector<TokenInfo>& vecTokens, size_t nIdx)
+{
+	while (nIdx < vecTokens.size() && vecTokens[nIdx].role == TokenRole::WHITESPACE)
+		++nIdx;
+	return nIdx;
+}
+
+// 테이블 참조 정보 구조체 (db.schema.table 형태)
+struct TableRef
+{
+	std::string szDatabase;
+	std::string szSchema;
+	std::string szTable;
+};
+
+// 토큰 목록에서 테이블 참조 목록 추출
+// 분석 대상 키워드: FROM / JOIN / INTO(INSERT INTO) / UPDATE
+// 식별자 체인: table / schema.table / db.schema.table
+static std::vector<TableRef> ExtractTableRefs(const std::vector<TokenInfo>& vecTokens)
+{
+	std::vector<TableRef> vecRefs;
+	size_t nCount = vecTokens.size();
+
+	for (size_t i = 0; i < nCount; ++i)
+	{
+		const TokenRole eRole = vecTokens[i].role;
+
+		// 테이블명이 뒤따르는 키워드인지 확인
+		bool bTableNext = (eRole == TokenRole::KEYWORD_FROM)
+			|| (eRole == TokenRole::KEYWORD_JOIN)
+			|| (eRole == TokenRole::KEYWORD_INTO)
+			|| (eRole == TokenRole::KEYWORD_UPDATE);
+
+		if (!bTableNext)
+			continue;
+
+		// 공백 건너뛰기
+		size_t nNext = SkipWS(vecTokens, i + 1);
+		if (nNext >= nCount)
+			continue;
+
+		// 서브쿼리 '(' 또는 식별자 아닌 토큰은 건너뜀
+		if (vecTokens[nNext].role != TokenRole::IDENTIFIER)
+			continue;
+
+		// --- 식별자 체인 파싱 ---
+		std::string szPart1 = vecTokens[nNext].text;
+		std::string szPart2;
+		std::string szPart3;
+
+		// part1 다음에 '.' 이 있는지 확인
+		size_t nAfterPart1 = SkipWS(vecTokens, nNext + 1);
+		if (nAfterPart1 < nCount
+			&& vecTokens[nAfterPart1].role == TokenRole::SEPARATOR_DOT)
+		{
+			size_t nPart2 = SkipWS(vecTokens, nAfterPart1 + 1);
+			if (nPart2 < nCount
+				&& vecTokens[nPart2].role == TokenRole::IDENTIFIER)
+			{
+				szPart2 = vecTokens[nPart2].text;
+
+				// part2 다음에 '.' 이 있는지 확인
+				size_t nAfterPart2 = SkipWS(vecTokens, nPart2 + 1);
+				if (nAfterPart2 < nCount
+					&& vecTokens[nAfterPart2].role == TokenRole::SEPARATOR_DOT)
+				{
+					size_t nPart3 = SkipWS(vecTokens, nAfterPart2 + 1);
+					if (nPart3 < nCount
+						&& vecTokens[nPart3].role == TokenRole::IDENTIFIER)
+					{
+						szPart3 = vecTokens[nPart3].text;
+					}
+				}
+			}
+		}
+
+		// 체인 길이에 따라 역할 결정
+		TableRef stRef;
+		if (!szPart3.empty())
+		{
+			// db.schema.table
+			stRef.szDatabase = szPart1;
+			stRef.szSchema   = szPart2;
+			stRef.szTable    = szPart3;
+		}
+		else if (!szPart2.empty())
+		{
+			// schema.table
+			stRef.szSchema = szPart1;
+			stRef.szTable  = szPart2;
+		}
+		else
+		{
+			// table
+			stRef.szTable = szPart1;
+		}
+
+		vecRefs.push_back(stRef);
+	}
+
+	return vecRefs;
+}
+
 } // namespace
 
 static SqlStatementType IdentifyStatementOracle(antlrcpp_oracle::PlSqlParser::Unit_statementContext* unitStmt)
@@ -2966,6 +3074,51 @@ const std::vector<TokenInfo>& SQLEngine::GetTokens() const
 int SQLEngine::GetTokenCount() const
 {
 	return static_cast<int>(m_vecTokens.size());
+}
+
+// 파싱된 토큰에서 테이블명 목록 반환
+std::vector<std::string> SQLEngine::GetTableNames() const
+{
+	std::vector<std::string> vecResult;
+	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
+
+	for (const TableRef& stRef : vecRefs)
+	{
+		if (!stRef.szTable.empty())
+			vecResult.push_back(stRef.szTable);
+	}
+
+	return vecResult;
+}
+
+// 파싱된 토큰에서 스키마명 목록 반환
+std::vector<std::string> SQLEngine::GetSchemaNames() const
+{
+	std::vector<std::string> vecResult;
+	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
+
+	for (const TableRef& stRef : vecRefs)
+	{
+		if (!stRef.szSchema.empty())
+			vecResult.push_back(stRef.szSchema);
+	}
+
+	return vecResult;
+}
+
+// 파싱된 토큰에서 데이터베이스명 목록 반환
+std::vector<std::string> SQLEngine::GetDatabaseNames() const
+{
+	std::vector<std::string> vecResult;
+	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
+
+	for (const TableRef& stRef : vecRefs)
+	{
+		if (!stRef.szDatabase.empty())
+			vecResult.push_back(stRef.szDatabase);
+	}
+
+	return vecResult;
 }
 
 // Parse() 호출 여부 반환

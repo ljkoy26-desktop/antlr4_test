@@ -160,6 +160,21 @@ public:
 	// 저장된 토큰 수 반환
 	int GetTokenCount() const;
 
+	// -------------------------------------------------------
+	// [테이블 참조 추출] Parse() 후 m_vecTokens 기반 분석
+	// FROM / JOIN / INTO / UPDATE 뒤의 식별자 체인을 분석
+	// 식별자 체인 규칙: table / schema.table / db.schema.table
+	// -------------------------------------------------------
+
+	// 파싱된 토큰에서 테이블명 목록 반환 (중복 포함)
+	std::vector<std::string> GetTableNames() const;
+
+	// 파싱된 토큰에서 스키마명 목록 반환 (중복 포함)
+	std::vector<std::string> GetSchemaNames() const;
+
+	// 파싱된 토큰에서 데이터베이스명 목록 반환 (중복 포함)
+	std::vector<std::string> GetDatabaseNames() const;
+
 	// 마지막 Parse()에서 설정된 DB 타입으로 토큰 역할 반환 (인스턴스 기반)
 	TokenRole GetRoleFromLexerToken(size_t tokenTypeId, const std::string& tokenText) const;
 
