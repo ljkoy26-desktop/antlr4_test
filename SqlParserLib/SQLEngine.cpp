@@ -760,7 +760,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 		return TR::UNKNOWN;
 	}
 }
-std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int nDatabaseType)
+std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int nDatabaseType) const
 {
 	switch (static_cast<DatabaseType>(nDatabaseType))
 	{
@@ -779,7 +779,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuery)
+std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuery) const
 {
 	std::vector<TokenInfo> tokens;
 
@@ -829,7 +829,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuer
 
 	return tokens;
 }
-std::vector<TokenInfo> SQLEngine::TokenizeQueryMySQL(const std::string& sqlQuery)
+std::vector<TokenInfo> SQLEngine::TokenizeQueryMySQL(const std::string& sqlQuery) const
 {
 	std::vector<TokenInfo> tokens;
 
@@ -1825,7 +1825,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std:
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQuery)
+std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQuery) const
 {
 	std::vector<TokenInfo> tokens;
 
@@ -2232,7 +2232,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sqlQuery)
+std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sqlQuery) const
 {
 	std::vector<TokenInfo> tokens;
 
@@ -2719,7 +2719,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::strin
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery)
+std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery) const
 {
 	std::vector<TokenInfo> tokens;
 
