@@ -385,11 +385,11 @@ private:
 	SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
 
 	// 통합 토큰 역할 반환 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) ;
-	TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) ;
-	TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) ;
-	TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) ;
-	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) ;
+	TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const;
 
 	// 문법 오류 감지 (내부 전용 - 개별 SQL 문장을 재파싱하여 오류 확인)
 	bool CheckSyntaxErrorOracle(const std::string& szSql);

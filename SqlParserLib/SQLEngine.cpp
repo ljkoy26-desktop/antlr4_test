@@ -600,7 +600,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -1332,7 +1332,7 @@ SqlStatementInfo SQLEngine::GetQueryAtMySQL(const std::string& sqlQueries, size_
 		return emptyInfo;
 	}
 }
-TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -1660,7 +1660,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 
@@ -2037,7 +2037,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 	using PgLexer = antlrcpp_postgresql::PostgreSQLLexer;
@@ -2540,7 +2540,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText)
+TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const
 {
 	using TR = TokenRole;
 	using Db2Lex = antlrcpp_db2::Db2Lexer;
