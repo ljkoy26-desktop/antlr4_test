@@ -3233,48 +3233,48 @@ int SQLEngine::GetTokenCount() const
 	return static_cast<int>(m_vecTokens.size());
 }
 
-// 파싱된 토큰에서 테이블명 목록 반환
+// 파싱된 토큰에서 테이블명 목록 반환 (m_vecStatements 집계)
 std::vector<std::string> SQLEngine::GetTableNames() const
 {
 	std::vector<std::string> vecResult;
-	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
-
-	for (const TableRef& stRef : vecRefs)
+	for (const auto& stmt : m_vecStatements)
 	{
-		if (!stRef.szTable.empty())
-			vecResult.push_back(stRef.szTable);
+		for (const TableRefInfo& stRef : stmt.vecTableRefs)
+		{
+			if (!stRef.szTable.empty())
+				vecResult.push_back(stRef.szTable);
+		}
 	}
-
 	return vecResult;
 }
 
-// 파싱된 토큰에서 스키마명 목록 반환
+// 파싱된 토큰에서 스키마명 목록 반환 (m_vecStatements 집계)
 std::vector<std::string> SQLEngine::GetSchemaNames() const
 {
 	std::vector<std::string> vecResult;
-	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
-
-	for (const TableRef& stRef : vecRefs)
+	for (const auto& stmt : m_vecStatements)
 	{
-		if (!stRef.szSchema.empty())
-			vecResult.push_back(stRef.szSchema);
+		for (const TableRefInfo& stRef : stmt.vecTableRefs)
+		{
+			if (!stRef.szSchema.empty())
+				vecResult.push_back(stRef.szSchema);
+		}
 	}
-
 	return vecResult;
 }
 
-// 파싱된 토큰에서 데이터베이스명 목록 반환
+// 파싱된 토큰에서 데이터베이스명 목록 반환 (m_vecStatements 집계)
 std::vector<std::string> SQLEngine::GetDatabaseNames() const
 {
 	std::vector<std::string> vecResult;
-	std::vector<TableRef> vecRefs = ExtractTableRefs(m_vecTokens);
-
-	for (const TableRef& stRef : vecRefs)
+	for (const auto& stmt : m_vecStatements)
 	{
-		if (!stRef.szDatabase.empty())
-			vecResult.push_back(stRef.szDatabase);
+		for (const TableRefInfo& stRef : stmt.vecTableRefs)
+		{
+			if (!stRef.szDatabase.empty())
+				vecResult.push_back(stRef.szDatabase);
+		}
 	}
-
 	return vecResult;
 }
 

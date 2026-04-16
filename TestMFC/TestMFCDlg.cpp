@@ -167,113 +167,72 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	AddTraceLog(_T("총 %d개의 SQL문 발견"), nSQLCount);
 	AddTraceLog(_T(""));
 
-	const std::vector<SqlStatementInfo>& Statements = m_oSQLEngine.GetStatements();
+	const std::vector<SqlStatementInfo>& vecStmts = m_oSQLEngine.GetStatements();
 
-	for (const auto& info : Statements)
+	for (const auto& stInfo : vecStmts)
 	{
-		// [변경] 모든 로직을 std::string으로 처리
-		std::string stdType = m_oSQLEngine.SqlTypeToString(info.type);
-		std::string stdSql = info.sqlText;
-
-		// [변경] std::string의 substr과 length를 사용하여 50자 자르기
-		if (stdSql.length() > 50) {
+		std::string stdType = m_oSQLEngine.SqlTypeToString(stInfo.type);
+		std::string stdSql  = stInfo.sqlText;
+		if (stdSql.length() > 50)
 			stdSql = stdSql.substr(0, 50) + "...";
+
+		AddTraceLog(_T("===== [%d번째 문장] 유형: %s / 오류: %s ====="),
+			stInfo.index,
+			CString(stdType.c_str()),
+			stInfo.bHasError ? _T("있음") : _T("없음"));
+		AddTraceLog(_T("  위치: Line %d, Column %d"), (int)stInfo.startLine, (int)stInfo.startColumn);
+		AddTraceLog(_T("  SQL: %s"), CString(stdSql.c_str()));
+
+		// -------------------------------------------------------
+		// 문장별 테이블 참조 (stInfo.vecTableRefs)
+		// -------------------------------------------------------
+		AddTraceLog(_T("  [테이블 참조 %d개]"), (int)stInfo.vecTableRefs.size());
+		for (const TableRefInfo& stRef : stInfo.vecTableRefs)
+		{
+			CString strDB(stRef.szDatabase.c_str());
+			CString strSchema(stRef.szSchema.c_str());
+			CString strTable(stRef.szTable.c_str());
+			CString strAlias(stRef.szAlias.c_str());
+			AddTraceLog(_T("    DB=%-10s Schema=%-10s Table=%-15s Alias=%s"),
+				strDB.IsEmpty()     ? _T("-") : strDB,
+				strSchema.IsEmpty() ? _T("-") : strSchema,
+				strTable.IsEmpty()  ? _T("-") : strTable,
+				strAlias.IsEmpty()  ? _T("-") : strAlias);
 		}
 
-		// [변경] 출력 시점에만 CString으로 변환 (유니코드 대응)
-		CString strType(stdType.c_str());
-		CString strSql(stdSql.c_str());
-
-		AddTraceLog(_T("[%d번째 문장] 유형: %s"), info.index, strType);
-		AddTraceLog(_T("    위치: Line %d, Column %d"), (int)info.startLine, (int)info.startColumn);
-		AddTraceLog(_T("    SQL: %s"), strSql);
-		AddTraceLog(_T(""));
-	}
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		SqlStatementType eType = m_oSQLEngine.GetStatementTypeAt(i);
-		bool bError = m_oSQLEngine.HasSyntaxError(i);
-		std::string strType = m_oSQLEngine.SqlTypeToString(eType);
-		AddTraceLog(_T("[%d번째] 타입: %s / 문법 오류: %s"),
-			i,
-			CString(strType.c_str()),
-			bError ? _T("있음") : _T("없음"));
-	}
-
-	// -------------------------------------------------------
-	// [테이블 참조 정보] GetTableRefs - 별칭 포함
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [테이블 참조 정보] ====="));
-
-	std::vector<TableRefInfo> vecTableRefs = m_oSQLEngine.GetTableRefs();
-	AddTraceLog(_T("테이블 참조 (%d개):"), (int)vecTableRefs.size());
-
-	for (const TableRefInfo& stRef : vecTableRefs)
-	{
-		CString strDB(stRef.szDatabase.c_str());
-		CString strSchema(stRef.szSchema.c_str());
-		CString strTable(stRef.szTable.c_str());
-		CString strAlias(stRef.szAlias.c_str());
-
-		AddTraceLog(_T("    DB=%-10s Schema=%-10s Table=%-15s Alias=%s"),
-			strDB.IsEmpty()     ? _T("-") : strDB,
-			strSchema.IsEmpty() ? _T("-") : strSchema,
-			strTable.IsEmpty()  ? _T("-") : strTable,
-			strAlias.IsEmpty()  ? _T("-") : strAlias);
-	}
-
-	// -------------------------------------------------------
-	// [컬럼 참조 정보] GetLinkedColumns - 테이블 매핑 포함
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [컬럼 참조 정보] ====="));
-
-	std::vector<ColumnRefInfo> vecColumns = m_oSQLEngine.GetLinkedColumns();
-	AddTraceLog(_T("컬럼 참조 (%d개):"), (int)vecColumns.size());
-
-	for (const ColumnRefInfo& stCol : vecColumns)
-	{
-		CString strQual(stCol.szQualifier.c_str());
-		CString strCol(stCol.szColumn.c_str());
-		CString strResolved(stCol.szResolvedTable.c_str());
-		BOOL bDetermined = SQLEngine::IsTableDetermined(stCol) ? TRUE : FALSE;
-
-		AddTraceLog(_T("    한정자=%-10s 컬럼=%-15s 테이블결정=%s (→%s)"),
-			strQual.IsEmpty() ? _T("-") : strQual,
-			strCol,
-			bDetermined ? _T("Y") : _T("N"),
-			strResolved.IsEmpty() ? _T("-") : strResolved);
-	}
-
-	// -------------------------------------------------------
-	// [서브쿼리 정보] 인스턴스 기반 서브쿼리 감지
-	// -------------------------------------------------------
-	AddTraceLog(_T(""));
-	AddTraceLog(_T("===== [서브쿼리 정보] 서브쿼리 감지 ====="));
-
-	for (int i = 0; i < nSQLCount; i++)
-	{
-		bool bHasSub = m_oSQLEngine.HasSubQuery(i);
-		int nSubCount = m_oSQLEngine.GetSubQueryCount(i);
-		AddTraceLog(_T("[%d번째] 서브쿼리: %s (개수: %d)"),
-			i,
-			bHasSub ? _T("있음") : _T("없음"),
-			nSubCount);
-
-		for (int j = 0; j < nSubCount; j++)
+		// -------------------------------------------------------
+		// 문장별 컬럼 참조 (stInfo.vecColumnRefs)
+		// -------------------------------------------------------
+		AddTraceLog(_T("  [컬럼 참조 %d개]"), (int)stInfo.vecColumnRefs.size());
+		for (const ColumnRefInfo& stCol : stInfo.vecColumnRefs)
 		{
-			SqlStatementInfo subInfo = m_oSQLEngine.GetSubQueryAt(i, j);
-			std::string subSql = subInfo.sqlText;
+			CString strQual(stCol.szQualifier.c_str());
+			CString strCol(stCol.szColumn.c_str());
+			CString strResolved(stCol.szResolvedTable.c_str());
+			BOOL bDetermined = SQLEngine::IsTableDetermined(stCol) ? TRUE : FALSE;
+			AddTraceLog(_T("    한정자=%-10s 컬럼=%-15s 테이블결정=%s (->%s)"),
+				strQual.IsEmpty()    ? _T("-") : strQual,
+				strCol,
+				bDetermined          ? _T("Y") : _T("N"),
+				strResolved.IsEmpty() ? _T("-") : strResolved);
+		}
+
+		// -------------------------------------------------------
+		// 문장별 서브쿼리 (stInfo.vecSubQueries)
+		// -------------------------------------------------------
+		AddTraceLog(_T("  [서브쿼리 %d개]"), (int)stInfo.vecSubQueries.size());
+		for (const SqlStatementInfo& stSub : stInfo.vecSubQueries)
+		{
+			std::string subSql = stSub.sqlText;
 			if (subSql.length() > 40)
 				subSql = subSql.substr(0, 40) + "...";
-			AddTraceLog(_T("    [서브쿼리 %d] Line %d, Col %d: %s"),
-				j + 1,
-				(int)subInfo.startLine,
-				(int)subInfo.startColumn,
+			AddTraceLog(_T("    Line %d, Col %d: %s"),
+				(int)stSub.startLine,
+				(int)stSub.startColumn,
 				CString(subSql.c_str()));
 		}
+
+		AddTraceLog(_T(""));
 	}
 }
 

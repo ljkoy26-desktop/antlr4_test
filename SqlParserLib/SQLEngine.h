@@ -143,6 +143,70 @@ struct SqlStatementInfo {
 	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
 	std::vector<TableRefInfo>  vecTableRefs;   // [GSP: getTableList] 이 문장의 테이블 참조 목록
 	std::vector<ColumnRefInfo> vecColumnRefs;  // [GSP: getLinkedColumns] 이 문장의 컬럼 참조 목록
+
+	// -------------------------------------------------------
+	// [편의 메서드] vecTableRefs / vecColumnRefs 에서 특정 항목만 추출
+	// -------------------------------------------------------
+
+	// 이 문장에서 참조된 테이블명 목록 반환 (중복 포함)
+	std::vector<std::string> GetTableNames() const
+	{
+		std::vector<std::string> vec;
+		for (const auto& r : vecTableRefs)
+		{
+			if (!r.szTable.empty())
+				vec.push_back(r.szTable);
+		}
+		return vec;
+	}
+
+	// 이 문장에서 참조된 스키마명 목록 반환 (중복 포함)
+	std::vector<std::string> GetSchemaNames() const
+	{
+		std::vector<std::string> vec;
+		for (const auto& r : vecTableRefs)
+		{
+			if (!r.szSchema.empty())
+				vec.push_back(r.szSchema);
+		}
+		return vec;
+	}
+
+	// 이 문장에서 참조된 데이터베이스명 목록 반환 (중복 포함)
+	std::vector<std::string> GetDatabaseNames() const
+	{
+		std::vector<std::string> vec;
+		for (const auto& r : vecTableRefs)
+		{
+			if (!r.szDatabase.empty())
+				vec.push_back(r.szDatabase);
+		}
+		return vec;
+	}
+
+	// 이 문장에서 참조된 테이블 별칭 목록 반환 (중복 포함)
+	std::vector<std::string> GetTableAliases() const
+	{
+		std::vector<std::string> vec;
+		for (const auto& r : vecTableRefs)
+		{
+			if (!r.szAlias.empty())
+				vec.push_back(r.szAlias);
+		}
+		return vec;
+	}
+
+	// 이 문장에서 참조된 컬럼명 목록 반환 (중복 포함)
+	std::vector<std::string> GetColumnNames() const
+	{
+		std::vector<std::string> vec;
+		for (const auto& c : vecColumnRefs)
+		{
+			if (!c.szColumn.empty())
+				vec.push_back(c.szColumn);
+		}
+		return vec;
+	}
 };
 
 // 3. 엔진 클래스
