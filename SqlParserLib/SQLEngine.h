@@ -303,18 +303,18 @@ public:
 	// n번째 문장의 WHERE절 텍스트 반환 (UPDATE / DELETE / SELECT 공통)
 	// 반환 예) "WHERE id = 1 AND name = 'hong'"
 	// WHERE절이 없으면 빈 문자열 반환
-	std::string GetWhereClauseText(int nIndex) const;
+	std::string GetWhereClauseText(int nIndex);
 
 	// [GSP: TUpdateSqlStatement.getResultColumnList() 대응]
 	// n번째 UPDATE 문장의 SET절 컬럼=값 쌍 목록 반환
 	// 반환 예) {{"name", "'hong'"}, {"age", "30"}}
 	// UPDATE 문이 아니거나 SET절이 없으면 빈 벡터 반환
-	std::vector<std::pair<std::string, std::string>> GetSetPairs(int nIndex) const;
+	std::vector<std::pair<std::string, std::string>> GetSetPairs(int nIndex);
 
 	// [GSP: TInsertSqlStatement 대응]
 	// n번째 INSERT 문장의 컬럼명 / 값 / 서브쿼리 정보 반환
 	// INSERT가 아니면 빈 InsertInfo 반환
-	InsertInfo GetInsertInfo(int nIndex) const;
+	InsertInfo GetInsertInfo(int nIndex);
 
 	// -------------------------------------------------------
 	// [편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
@@ -337,7 +337,7 @@ public:
 	std::vector<SqlStatementInfo> ParseMultipleQueries(const std::string& sqlQueries, int nDatabaseType);
 
 	// 통합 토큰화 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType) const;
+	std::vector<TokenInfo> TokenizeQuery(const std::string& sqlQuery, int nDatabaseType);
 
 	std::string SqlTypeToString(SqlStatementType type);
 	std::string TokenRoleToString(TokenRole role);
@@ -371,11 +371,11 @@ private:
 	std::vector<SqlStatementInfo> ParseMultipleQueriesDB2(const std::string& sqlQueries);
 
 	// DB별 토큰화 구현 (내부 전용)
-	std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery) const;
-	std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery) const;
-	std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery) const;
-	std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery) const;
-	std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery) const;
+	std::vector<TokenInfo> TokenizeQueryOracle(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryMySQL(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQuerySQLServer(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryPostgreSQL(const std::string& sqlQuery);
+	std::vector<TokenInfo> TokenizeQueryDB2(const std::string& sqlQuery);
 
 	// DB별 문장 유형 판별 (내부 전용)
 	SqlStatementType IdentifySqlTypeOracle(const std::string& szSql);
@@ -385,11 +385,11 @@ private:
 	SqlStatementType IdentifySqlTypeAny(const std::string& szSql);
 
 	// 통합 토큰 역할 반환 함수 (nDatabaseType: DatabaseType enum 값 사용)
-	TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const;
-	TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const;
-	TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const;
-	TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const;
-	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const;
+	TokenRole GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) ;
+	TokenRole GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) ;
+	TokenRole GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) ;
+	TokenRole GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) ;
+	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) ;
 
 	// 문법 오류 감지 (내부 전용 - 개별 SQL 문장을 재파싱하여 오류 확인)
 	bool CheckSyntaxErrorOracle(const std::string& szSql);

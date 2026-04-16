@@ -600,7 +600,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText) const
+TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::string& tokenText)
 {
 	using TR = TokenRole;
 
@@ -760,7 +760,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenOracle(size_t tokenType, const std::st
 		return TR::UNKNOWN;
 	}
 }
-std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int nDatabaseType) const
+std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int nDatabaseType)
 {
 	switch (static_cast<DatabaseType>(nDatabaseType))
 	{
@@ -779,7 +779,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQuery(const std::string& sqlQuery, int
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuery) const
+std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -829,7 +829,7 @@ std::vector<TokenInfo> SQLEngine::TokenizeQueryOracle(const std::string& sqlQuer
 
 	return tokens;
 }
-std::vector<TokenInfo> SQLEngine::TokenizeQueryMySQL(const std::string& sqlQuery) const
+std::vector<TokenInfo> SQLEngine::TokenizeQueryMySQL(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -1332,7 +1332,7 @@ SqlStatementInfo SQLEngine::GetQueryAtMySQL(const std::string& sqlQueries, size_
 		return emptyInfo;
 	}
 }
-TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText) const
+TokenRole SQLEngine::GetRoleFromLexerTokenMySQL(size_t tokenType, const std::string& tokenText)
 {
 	using TR = TokenRole;
 
@@ -1660,7 +1660,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText) const
+TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std::string& tokenText)
 {
 	using TR = TokenRole;
 
@@ -1825,7 +1825,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenSQLServer(size_t tokenType, const std:
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQuery) const
+std::vector<TokenInfo> SQLEngine::TokenizeQuerySQLServer(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -2037,7 +2037,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText) const
+TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std::string& tokenText)
 {
 	using TR = TokenRole;
 	using PgLexer = antlrcpp_postgresql::PostgreSQLLexer;
@@ -2232,7 +2232,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenPostgreSQL(size_t tokenType, const std
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sqlQuery) const
+std::vector<TokenInfo> SQLEngine::TokenizeQueryPostgreSQL(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -2540,7 +2540,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 	return results;
 }
 
-TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const
+TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText)
 {
 	using TR = TokenRole;
 	using Db2Lex = antlrcpp_db2::Db2Lexer;
@@ -2719,7 +2719,7 @@ TokenRole SQLEngine::GetRoleFromLexerTokenDB2(size_t tokenType, const std::strin
 	}
 }
 
-std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery) const
+std::vector<TokenInfo> SQLEngine::TokenizeQueryDB2(const std::string& sqlQuery)
 {
 	std::vector<TokenInfo> tokens;
 
@@ -3304,7 +3304,7 @@ std::vector<ColumnRefInfo> SQLEngine::GetLinkedColumns() const
 
 // [GSP: TWhereClause 대응]
 // n번째 문장의 WHERE절 텍스트 반환
-std::string SQLEngine::GetWhereClauseText(int nIndex) const
+std::string SQLEngine::GetWhereClauseText(int nIndex)
 {
 	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
 		return "";
@@ -3351,7 +3351,7 @@ std::string SQLEngine::GetWhereClauseText(int nIndex) const
 
 // [GSP: TUpdateSqlStatement.getResultColumnList() 대응]
 // n번째 UPDATE 문장의 SET절 col=val 쌍 목록 반환
-std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nIndex) const
+std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nIndex)
 {
 	std::vector<std::pair<std::string, std::string>> vecResult;
 
@@ -3456,7 +3456,7 @@ std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nInd
 
 // [GSP: TInsertSqlStatement 대응]
 // n번째 INSERT 문장의 컬럼명 / 값 / 서브쿼리 정보 반환
-InsertInfo SQLEngine::GetInsertInfo(int nIndex) const
+InsertInfo SQLEngine::GetInsertInfo(int nIndex)
 {
 	InsertInfo stResult;
 
