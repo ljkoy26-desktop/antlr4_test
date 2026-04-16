@@ -3298,6 +3298,344 @@ std::vector<ColumnRefInfo> SQLEngine::GetLinkedColumns() const
 	return vecResult;
 }
 
+// ============================================================
+// [SQL 절 추출] WHERE절 / SET절 / INSERT 정보
+// ============================================================
+
+// [GSP: TWhereClause 대응]
+// n번째 문장의 WHERE절 텍스트 반환
+std::string SQLEngine::GetWhereClauseText(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return "";
+
+	const SqlStatementInfo& stInfo = m_vecStatements[nIndex];
+	std::vector<TokenInfo> vecTokens = TokenizeQuery(stInfo.sqlText, stInfo.nDatabaseType);
+
+	// WHERE 키워드 위치 탐색
+	int nWhereIdx = -1;
+	for (int i = 0; i < static_cast<int>(vecTokens.size()); ++i)
+	{
+		if (vecTokens[i].role == TokenRole::KEYWORD_WHERE)
+		{
+			nWhereIdx = i;
+			break;
+		}
+	}
+
+	if (nWhereIdx < 0)
+		return "";
+
+	// WHERE 이후 토큰을 ORDER BY / GROUP BY / HAVING / 세미콜론 전까지 수집
+	std::string szResult;
+	for (int i = nWhereIdx; i < static_cast<int>(vecTokens.size()); ++i)
+	{
+		TokenRole eRole = vecTokens[i].role;
+		if (eRole == TokenRole::KEYWORD_ORDER_BY
+			|| eRole == TokenRole::KEYWORD_GROUP_BY
+			|| eRole == TokenRole::KEYWORD_HAVING
+			|| eRole == TokenRole::SEPARATOR_SEMICOLON)
+			break;
+
+		szResult += vecTokens[i].text;
+	}
+
+	// 후행 공백 제거
+	while (!szResult.empty()
+		&& (szResult.back() == ' ' || szResult.back() == '\t'
+			|| szResult.back() == '\r' || szResult.back() == '\n'))
+		szResult.pop_back();
+
+	return szResult;
+}
+
+// [GSP: TUpdateSqlStatement.getResultColumnList() 대응]
+// n번째 UPDATE 문장의 SET절 col=val 쌍 목록 반환
+std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nIndex) const
+{
+	std::vector<std::pair<std::string, std::string>> vecResult;
+
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return vecResult;
+
+	const SqlStatementInfo& stInfo = m_vecStatements[nIndex];
+	if (stInfo.type != SqlStatementType::UPDATE_STATEMENT)
+		return vecResult;
+
+	std::vector<TokenInfo> vecTokens = TokenizeQuery(stInfo.sqlText, stInfo.nDatabaseType);
+
+	// SET 키워드 위치 탐색
+	int nSetIdx = -1;
+	for (int i = 0; i < static_cast<int>(vecTokens.size()); ++i)
+	{
+		if (vecTokens[i].role == TokenRole::KEYWORD_SET)
+		{
+			nSetIdx = i;
+			break;
+		}
+	}
+
+	if (nSetIdx < 0)
+		return vecResult;
+
+	auto fnTrim = [](std::string& s)
+	{
+		while (!s.empty() && (s.front() == ' ' || s.front() == '\t'))
+			s.erase(s.begin());
+		while (!s.empty() && (s.back() == ' ' || s.back() == '\t'))
+			s.pop_back();
+	};
+
+	std::string szCol, szVal;
+	bool bInCol = true;  // true: 좌변(컬럼명) 수집 중, false: 우변(값) 수집 중
+	int  nDepth = 0;     // 괄호 깊이 – 함수 호출 내부 콤마 무시용
+
+	auto fnCommit = [&]()
+	{
+		fnTrim(szCol);
+		fnTrim(szVal);
+		if (!szCol.empty())
+			vecResult.push_back({ szCol, szVal });
+		szCol.clear();
+		szVal.clear();
+		bInCol = true;
+	};
+
+	for (int i = nSetIdx + 1; i < static_cast<int>(vecTokens.size()); ++i)
+	{
+		const TokenInfo& tok = vecTokens[i];
+		TokenRole eRole = tok.role;
+
+		if (nDepth == 0)
+		{
+			// SET절 종료
+			if (eRole == TokenRole::KEYWORD_WHERE
+				|| eRole == TokenRole::SEPARATOR_SEMICOLON
+				|| eRole == TokenRole::KEYWORD_ORDER_BY)
+				break;
+
+			// 최상위 콤마 → 현재 쌍 확정
+			if (eRole == TokenRole::SEPARATOR_COMMA)
+			{
+				fnCommit();
+				continue;
+			}
+
+			// 좌변 수집 중 첫 번째 '=' → 우변 수집으로 전환
+			if (bInCol && tok.text == "=")
+			{
+				bInCol = false;
+				continue;
+			}
+		}
+
+		if (eRole == TokenRole::WHITESPACE)
+		{
+			if (bInCol && !szCol.empty())
+				szCol += tok.text;
+			else if (!bInCol && !szVal.empty())
+				szVal += tok.text;
+			continue;
+		}
+
+		if (eRole == TokenRole::SEPARATOR_PAREN_OPEN)
+			++nDepth;
+		else if (eRole == TokenRole::SEPARATOR_PAREN_CLOSE)
+			--nDepth;
+
+		if (bInCol)
+			szCol += tok.text;
+		else
+			szVal += tok.text;
+	}
+
+	fnCommit(); // 마지막 쌍 처리
+
+	return vecResult;
+}
+
+// [GSP: TInsertSqlStatement 대응]
+// n번째 INSERT 문장의 컬럼명 / 값 / 서브쿼리 정보 반환
+InsertInfo SQLEngine::GetInsertInfo(int nIndex) const
+{
+	InsertInfo stResult;
+
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return stResult;
+
+	const SqlStatementInfo& stInfo = m_vecStatements[nIndex];
+	if (stInfo.type != SqlStatementType::INSERT_STATEMENT)
+		return stResult;
+
+	std::vector<TokenInfo> vecTokens = TokenizeQuery(stInfo.sqlText, stInfo.nDatabaseType);
+	int nCount = static_cast<int>(vecTokens.size());
+
+	auto fnSkipWS = [&](int nIdx) -> int
+	{
+		while (nIdx < nCount && vecTokens[nIdx].role == TokenRole::WHITESPACE)
+			++nIdx;
+		return nIdx;
+	};
+
+	auto fnTrim = [](std::string& s)
+	{
+		while (!s.empty() && (s.front() == ' ' || s.front() == '\t'))
+			s.erase(s.begin());
+		while (!s.empty() && (s.back() == ' ' || s.back() == '\t'))
+			s.pop_back();
+	};
+
+	// INTO 키워드 탐색
+	int nPos = 0;
+	while (nPos < nCount && vecTokens[nPos].role != TokenRole::KEYWORD_INTO)
+		++nPos;
+
+	if (nPos >= nCount)
+		return stResult;
+
+	++nPos; // INTO 다음으로 이동
+
+	// 테이블명 식별자 체인 건너뜀 (IDENTIFIER + SEPARATOR_DOT 조합)
+	nPos = fnSkipWS(nPos);
+	while (nPos < nCount)
+	{
+		TokenRole eRole = vecTokens[nPos].role;
+		if (eRole == TokenRole::IDENTIFIER || eRole == TokenRole::SEPARATOR_DOT)
+		{
+			++nPos;
+			continue;
+		}
+		break;
+	}
+
+	nPos = fnSkipWS(nPos);
+	if (nPos >= nCount)
+		return stResult;
+
+	// 컬럼 목록 파싱: ( col1, col2, ... )
+	if (vecTokens[nPos].role == TokenRole::SEPARATOR_PAREN_OPEN)
+	{
+		++nPos; // '(' 건너뜀
+		std::string szCol;
+		int nDepth = 1;
+
+		while (nPos < nCount && nDepth > 0)
+		{
+			const TokenInfo& tok = vecTokens[nPos];
+			TokenRole eRole = tok.role;
+
+			if (eRole == TokenRole::SEPARATOR_PAREN_OPEN)
+			{
+				++nDepth;
+				szCol += tok.text;
+			}
+			else if (eRole == TokenRole::SEPARATOR_PAREN_CLOSE)
+			{
+				--nDepth;
+				if (nDepth == 0)
+				{
+					fnTrim(szCol);
+					if (!szCol.empty())
+						stResult.vecColumns.push_back(szCol);
+					szCol.clear();
+				}
+				else
+					szCol += tok.text;
+			}
+			else if (nDepth == 1 && eRole == TokenRole::SEPARATOR_COMMA)
+			{
+				fnTrim(szCol);
+				if (!szCol.empty())
+					stResult.vecColumns.push_back(szCol);
+				szCol.clear();
+			}
+			else if (eRole == TokenRole::WHITESPACE)
+			{
+				if (!szCol.empty())
+					szCol += tok.text;
+			}
+			else
+				szCol += tok.text;
+
+			++nPos;
+		}
+	}
+
+	nPos = fnSkipWS(nPos);
+
+	// VALUES 처리: ( val1, val2, ... )
+	if (nPos < nCount && vecTokens[nPos].role == TokenRole::KEYWORD_VALUES)
+	{
+		++nPos;
+		nPos = fnSkipWS(nPos);
+
+		if (nPos < nCount && vecTokens[nPos].role == TokenRole::SEPARATOR_PAREN_OPEN)
+		{
+			++nPos; // '(' 건너뜀
+			std::string szVal;
+			int nDepth = 1;
+
+			while (nPos < nCount && nDepth > 0)
+			{
+				const TokenInfo& tok = vecTokens[nPos];
+				TokenRole eRole = tok.role;
+
+				if (eRole == TokenRole::SEPARATOR_PAREN_OPEN)
+				{
+					++nDepth;
+					szVal += tok.text;
+				}
+				else if (eRole == TokenRole::SEPARATOR_PAREN_CLOSE)
+				{
+					--nDepth;
+					if (nDepth == 0)
+					{
+						fnTrim(szVal);
+						if (!szVal.empty())
+							stResult.vecValues.push_back(szVal);
+						szVal.clear();
+					}
+					else
+						szVal += tok.text;
+				}
+				else if (nDepth == 1 && eRole == TokenRole::SEPARATOR_COMMA)
+				{
+					fnTrim(szVal);
+					if (!szVal.empty())
+						stResult.vecValues.push_back(szVal);
+					szVal.clear();
+				}
+				else if (eRole == TokenRole::WHITESPACE)
+				{
+					if (!szVal.empty())
+						szVal += tok.text;
+				}
+				else
+					szVal += tok.text;
+
+				++nPos;
+			}
+		}
+	}
+	// INSERT INTO … SELECT 서브쿼리 처리
+	else if (nPos < nCount && vecTokens[nPos].role == TokenRole::KEYWORD_SELECT)
+	{
+		for (int i = nPos; i < nCount; ++i)
+		{
+			if (vecTokens[i].role == TokenRole::SEPARATOR_SEMICOLON)
+				break;
+			stResult.szSubQuery += vecTokens[i].text;
+		}
+
+		while (!stResult.szSubQuery.empty()
+			&& (stResult.szSubQuery.back() == ' ' || stResult.szSubQuery.back() == '\t'
+				|| stResult.szSubQuery.back() == '\r' || stResult.szSubQuery.back() == '\n'))
+			stResult.szSubQuery.pop_back();
+	}
+
+	return stResult;
+}
+
 // [GSP: isTableDetermined 대응]
 // 해당 컬럼 참조의 테이블이 결정되었는지 반환
 bool SQLEngine::IsTableDetermined(const ColumnRefInfo& stCol)

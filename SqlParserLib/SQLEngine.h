@@ -209,6 +209,14 @@ struct SqlStatementInfo {
 	}
 };
 
+// 4. INSERT 문장 분해 정보
+struct SQLPARSERLIB_API InsertInfo
+{
+	std::vector<std::string> vecColumns;  // 컬럼명 목록  INSERT INTO t (col1, col2) …
+	std::vector<std::string> vecValues;   // 값 목록      … VALUES (v1, v2)
+	std::string              szSubQuery;  // INSERT INTO … SELECT 형태인 경우 SELECT 텍스트
+};
+
 // 3. 엔진 클래스
 class SQLPARSERLIB_API SQLEngine
 {
@@ -285,6 +293,28 @@ public:
 
 	// 저장된 stmt 목록에서 n번째 문장의 m번째 서브쿼리 정보 반환 (0-based index)
 	SqlStatementInfo GetSubQueryAt(int nIndex, int nSubIndex) const;
+
+	// -------------------------------------------------------
+	// [SQL 절 추출] Parse() 후 특정 절의 텍스트/구조 반환
+	// 대상 절: WHERE / SET / INSERT VALUES
+	// -------------------------------------------------------
+
+	// [GSP: TWhereClause 대응]
+	// n번째 문장의 WHERE절 텍스트 반환 (UPDATE / DELETE / SELECT 공통)
+	// 반환 예) "WHERE id = 1 AND name = 'hong'"
+	// WHERE절이 없으면 빈 문자열 반환
+	std::string GetWhereClauseText(int nIndex) const;
+
+	// [GSP: TUpdateSqlStatement.getResultColumnList() 대응]
+	// n번째 UPDATE 문장의 SET절 컬럼=값 쌍 목록 반환
+	// 반환 예) {{"name", "'hong'"}, {"age", "30"}}
+	// UPDATE 문이 아니거나 SET절이 없으면 빈 벡터 반환
+	std::vector<std::pair<std::string, std::string>> GetSetPairs(int nIndex) const;
+
+	// [GSP: TInsertSqlStatement 대응]
+	// n번째 INSERT 문장의 컬럼명 / 값 / 서브쿼리 정보 반환
+	// INSERT가 아니면 빈 InsertInfo 반환
+	InsertInfo GetInsertInfo(int nIndex) const;
 
 	// -------------------------------------------------------
 	// [편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회
