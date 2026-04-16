@@ -68,8 +68,9 @@ BOOL CTestMFCDlg::OnInitDialog()
 	//sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nGRANT SELECT ON db.* TO 'user'@'localhost';");
 	//SetDlgItemText(IDC_EDIT_SQL, sSQL);
 
+	
 	// oracle
-	sSQL = _T("SELECT * FROM emp;\r\nINSERT INTO emp VALUES(1, 'John');\r\nSELECT* FROM emp WHERE id IN(SELECT id FROM dept);");
+	sSQL = _T("SELECT* FROM scott.emp;	\r\nINSERT INTO emp a VALUES(1, 'John');	\r\nSELECT* FROM scott.emp a WHERE a.id IN(SELECT b.id FROM scott.dept b);");
 	SetDlgItemText(IDC_EDIT_SQL, sSQL);
 
 	return TRUE;
