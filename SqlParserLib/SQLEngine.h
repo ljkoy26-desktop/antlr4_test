@@ -90,18 +90,6 @@ enum class TokenRole {
 	PARAMETER              // ? 또는 @param
 };
 
-struct SqlStatementInfo {
-	int index;
-	SqlStatementType type;
-	std::string sqlText;
-	size_t startLine;
-	size_t startColumn;
-	bool bHasError;       // 문법 오류 여부
-	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
-	bool bHasSubQuery;    // 서브쿼리 존재 여부
-	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
-};
-
 struct TokenInfo {
 	int index;
 	std::string text;
@@ -141,6 +129,20 @@ enum class DatabaseType
 	DB_SQLSERVER  = 2,
 	DB_POSTGRESQL = 3,
 	DB_DB2        = 4
+};
+
+struct SqlStatementInfo {
+	int index;
+	SqlStatementType type;
+	std::string sqlText;
+	size_t startLine;
+	size_t startColumn;
+	bool bHasError;       // 문법 오류 여부
+	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
+	bool bHasSubQuery;    // 서브쿼리 존재 여부
+	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
+	std::vector<TableRefInfo>  vecTableRefs;   // [GSP: getTableList] 이 문장의 테이블 참조 목록
+	std::vector<ColumnRefInfo> vecColumnRefs;  // [GSP: getLinkedColumns] 이 문장의 컬럼 참조 목록
 };
 
 // 3. 엔진 클래스

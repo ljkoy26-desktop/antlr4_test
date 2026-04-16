@@ -435,7 +435,27 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueries(const std::string&
 
 	// nDatabaseType 설정 (bHasError는 각 ParseMultipleQueriesXXX에서 개별 설정됨)
 	for (auto& stInfo : vecResult)
+	{
 		stInfo.nDatabaseType = nDatabaseType;
+
+		// [GSP: TCustomSqlStatement.getTableList() / getLinkedColumns() 대응]
+		// 문장 텍스트를 개별 토큰화하여 테이블·컬럼 참조 추출
+		std::vector<TokenInfo> stmtTokens = TokenizeQuery(stInfo.sqlText, nDatabaseType);
+		std::set<size_t> usedIdx;
+		std::vector<TableRef> innerRefs = ExtractTableRefsEx(stmtTokens, usedIdx);
+
+		stInfo.vecTableRefs.reserve(innerRefs.size());
+		for (const TableRef& r : innerRefs)
+		{
+			TableRefInfo info;
+			info.szDatabase = r.szDatabase;
+			info.szSchema   = r.szSchema;
+			info.szTable    = r.szTable;
+			info.szAlias    = r.szAlias;
+			stInfo.vecTableRefs.push_back(info);
+		}
+		stInfo.vecColumnRefs = ExtractColumnRefs(stmtTokens, innerRefs, usedIdx);
+	}
 
 	return vecResult;
 }
@@ -3162,10 +3182,7 @@ bool SQLEngine::Parse(const std::string& szSqlQueries, int nDatabaseType)
 {
 	m_nDatabaseType = nDatabaseType;
 	m_vecStatements = ParseMultipleQueries(szSqlQueries, nDatabaseType);
-
-	// nDatabaseType을 각 문장 정보에도 기록
-	for (auto& stInfo : m_vecStatements)
-		stInfo.nDatabaseType = nDatabaseType;
+	// ParseMultipleQueries() 내부에서 nDatabaseType 및 vecTableRefs/vecColumnRefs 설정됨
 
 	// 전체 입력에 대한 토큰 목록 수집
 	m_vecTokens = TokenizeQuery(szSqlQueries, nDatabaseType);
@@ -3265,22 +3282,9 @@ std::vector<std::string> SQLEngine::GetDatabaseNames() const
 // 별칭(Alias) 포함 테이블 참조 전체 목록 반환
 std::vector<TableRefInfo> SQLEngine::GetTableRefs() const
 {
-	std::set<size_t> usedIdx;
-	std::vector<TableRef> vecInner = ExtractTableRefsEx(m_vecTokens, usedIdx);
-
 	std::vector<TableRefInfo> vecResult;
-	vecResult.reserve(vecInner.size());
-
-	for (const TableRef& stRef : vecInner)
-	{
-		TableRefInfo stInfo;
-		stInfo.szDatabase = stRef.szDatabase;
-		stInfo.szSchema   = stRef.szSchema;
-		stInfo.szTable    = stRef.szTable;
-		stInfo.szAlias    = stRef.szAlias;
-		vecResult.push_back(stInfo);
-	}
-
+	for (const auto& stmt : m_vecStatements)
+		vecResult.insert(vecResult.end(), stmt.vecTableRefs.begin(), stmt.vecTableRefs.end());
 	return vecResult;
 }
 
@@ -3288,9 +3292,10 @@ std::vector<TableRefInfo> SQLEngine::GetTableRefs() const
 // 컬럼 참조 목록 반환 (한정자-테이블 매핑 포함)
 std::vector<ColumnRefInfo> SQLEngine::GetLinkedColumns() const
 {
-	std::set<size_t> usedIdx;
-	std::vector<TableRef> vecTableRefs = ExtractTableRefsEx(m_vecTokens, usedIdx);
-	return ExtractColumnRefs(m_vecTokens, vecTableRefs, usedIdx);
+	std::vector<ColumnRefInfo> vecResult;
+	for (const auto& stmt : m_vecStatements)
+		vecResult.insert(vecResult.end(), stmt.vecColumnRefs.begin(), stmt.vecColumnRefs.end());
+	return vecResult;
 }
 
 // [GSP: isTableDetermined 대응]
