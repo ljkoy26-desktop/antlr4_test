@@ -375,110 +375,79 @@ bool CWVSqlParser::Parse(LPCTSTR sqlText)
 	return false;
 }
 
-// std::set<CWVSqlParser::Object> CWVSqlParser::setObject(nodes::TTable table)
+// [GSP→Antlr4 마이그레이션]
+// setObject: SqlStatementInfo의 vecTableRefs/vecColumnRefs를 이용해 Object 집합 생성
 std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInfo)
 {
 	TRACE(_T(" ========= CWVSqlParser::setObject()   ========= \n"));
-	/*
-	* 
-	*/
-
 
 	std::set<std::vector<TOString>> objs;
 
+	// 테이블 참조 처리: Object = {column="", table, schema, db}
+	for (const auto& tableRef : stmtInfo.vecTableRefs)
+	{
+		TOString table  = CA2W(tableRef.szTable.c_str(),    CP_UTF8);
+		TOString schema = CA2W(tableRef.szSchema.c_str(),   CP_UTF8);
+		TOString db     = CA2W(tableRef.szDatabase.c_str(), CP_UTF8);
 
-	stmtInfo.GetTableNames();
+		table.Trim(L"\"");
+		schema.Trim(L"\"");
+		db.Trim(L"\"");
 
-	m_oSQLEngine.GetTableNames()
-	std::vector<TOString> object = { L"
-		
-		"
-		, JS2TT(table.getTableName(FL_).getObjectString(FL_))
-		, JS2TT(table.getTableName(FL_).getSchemaString(FL_))
-		, JS2TT(table.getTableName(FL_).getDatabaseString(FL_))
-	};
-	object[1].Trim(L"\"");
-	object[2].Trim(L"\"");
-	object[3].Trim(L"\"");
-	if (m_bUppercase) {
-		object[1].MakeUpper();
-		object[2].MakeUpper();
-		object[3].MakeUpper();
+		if (m_bUppercase) { table.MakeUpper(); schema.MakeUpper(); db.MakeUpper(); }
+
+		Object tableObj = { L"", table, schema, db };
+		objs.insert(tableObj);
 	}
 
-	objs.insert(object);
-
-	for (int j = 0; j < table.getLinkedColumns(FL_).size(FL_); j++)
+	// 컬럼 참조 처리: 테이블 결정 여부에 따라 Object 분기
+	for (const auto& colRef : stmtInfo.vecColumnRefs)
 	{
-		nodes::TObjectName objectname = table.getLinkedColumns(FL_).getObjectName(j, FL_);
+		if (colRef.szColumn.empty()) continue;
 
-		if (objectname.isTableDetermined(FL_) == 1)
+		TOString col = CA2W(colRef.szColumn.c_str(), CP_UTF8);
+		col.Trim(L"\"");
+		if (m_bUppercase) col.MakeUpper();
+
+		if (colRef.bTableDetermined && !colRef.szResolvedTable.empty())
 		{
-			object[0] = JS2TT(objectname.getPartToken(FL_));
-			if (m_bUppercase) object[0].MakeUpper();
-			objs.insert(object);
+			TOString table = CA2W(colRef.szResolvedTable.c_str(), CP_UTF8);
+			if (m_bUppercase) table.MakeUpper();
+
+			// 해당 테이블의 스키마·DB 조회
+			TOString schema, db;
+			for (const auto& t : stmtInfo.vecTableRefs)
+			{
+				TOString tname = CA2W(t.szTable.c_str(), CP_UTF8);
+				if (m_bUppercase) tname.MakeUpper();
+				if (tname.CompareNoCase(table) == 0)
+				{
+					schema = CA2W(t.szSchema.c_str(),   CP_UTF8);
+					db     = CA2W(t.szDatabase.c_str(), CP_UTF8);
+					if (m_bUppercase) { schema.MakeUpper(); db.MakeUpper(); }
+					break;
+				}
+			}
+
+			Object colObj = { col, table, schema, db };
+			objs.insert(colObj);
 		}
 		else
 		{
-			TRACE(_T("isTableDetermined FALSE %s %s\n"), (LPCTSTR)JS2T(objectname), (LPCTSTR)JS2T(table));
-			Object object = { JS2TT(objectname.getPartToken(FL_))
-				, L""
-				, L""
-				, JS2TT(table.getTableName(FL_).getDatabaseString(FL_))
-			};
-			object[0].Trim(L"\"");
-			object[1].Trim(L"\"");
-			object[2].Trim(L"\"");
-			object[3].Trim(L"\"");
-			if (m_bUppercase) {
-				object[0].MakeUpper();
-				object[1].MakeUpper();
-				object[2].MakeUpper();
-				object[3].MakeUpper();
-			}
-
-			objs.insert(object);
+			// 테이블 미결정: column만 저장
+			Object colObj = { col, L"", L"", L"" };
+			objs.insert(colObj);
 		}
 	}
 
 	return objs;
 }
 
+// [마이그레이션 스텁] GSP TCustomSqlStatement 기반 traverseSql → SQLEngine 위임
 void CWVSqlParser::traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt)
 {
 	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
-
-
-
-	jvm::local_frame lf;
-	nodes::TTableList tables;
-	tables = stmt.getTables(FL_);
-	
-	TRACE(_T("%s\n"), (LPCTSTR)JS2T(stmt));
-
-	for (int i = 0; i<tables.size(FL_); i++)
-	{
-		nodes::TTable table;
-		table = tables.getTable(i, FL_);
-
-		TRACE(_T("%s\n"), (LPCTSTR)JS2T(table));
-
-		if (table.getTableType(FL_).equals(ETableSource::get_subquery(), FL_))
-		{
-			traverseSql(idx, table.getSubquery(FL_));
-		}
-		else
-		{
-			std::set<CWVSqlParser::Object> objs = setObject(table);
-			if (idx < m_objects.size())
-				m_objects[idx].insert(objs.begin(), objs.end());
-		}
-	}
-
-	for (int i=0; i<stmt.getStatements(FL_).size(FL_); i++)
-	{
-		traverseSql(idx, stmt.getStatements(FL_).get(i, FL_));
-	}	
+	traverseSql(idx);
 }
 
 void CWVSqlParser::debugObjects(std::set<Object> objects)
@@ -493,13 +462,65 @@ void CWVSqlParser::debugObjects(std::set<Object> objects)
 	}
 }
 
+// [GSP→Antlr4 마이그레이션] vecTableRefs/vecColumnRefs 기반 m_objects 채우기
 bool CWVSqlParser::traverseSql(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
-	jvm::local_frame lf;
-	if (idx >= GetStatementCount()) return false;
 
-	traverseSql(idx, m_parser.get_sqlstatements().get(idx, FL_));
+	if (idx >= (UINT)m_oSQLEngine.GetStatementCount()) return false;
+
+	while (m_objects.size() <= (size_t)idx)
+		m_objects.push_back({});
+
+	const SqlStatementInfo& stmtInfo = m_oSQLEngine.GetStatements()[idx];
+
+	// 테이블명 → {스키마, DB} 매핑 (컬럼 결정 시 사용)
+	std::map<TOString, std::pair<TOString, TOString>> tableMap;
+	for (const auto& tableRef : stmtInfo.vecTableRefs)
+	{
+		TOString table  = CA2W(tableRef.szTable.c_str(),    CP_UTF8);
+		TOString schema = CA2W(tableRef.szSchema.c_str(),   CP_UTF8);
+		TOString db     = CA2W(tableRef.szDatabase.c_str(), CP_UTF8);
+		if (m_bUppercase) { table.MakeUpper(); schema.MakeUpper(); db.MakeUpper(); }
+
+		tableMap[table] = { schema, db };
+
+		// 테이블 엔트리: {column="", table, schema, db}
+		Object tableObj = { L"", table, schema, db };
+		m_objects[idx].insert(tableObj);
+	}
+
+	// 컬럼 엔트리 추가
+	for (const auto& colRef : stmtInfo.vecColumnRefs)
+	{
+		if (colRef.szColumn.empty()) continue;
+
+		TOString col = CA2W(colRef.szColumn.c_str(), CP_UTF8);
+		if (m_bUppercase) col.MakeUpper();
+
+		if (colRef.bTableDetermined && !colRef.szResolvedTable.empty())
+		{
+			TOString resolvedTable = CA2W(colRef.szResolvedTable.c_str(), CP_UTF8);
+			if (m_bUppercase) resolvedTable.MakeUpper();
+
+			auto it = tableMap.find(resolvedTable);
+			if (it != tableMap.end())
+			{
+				Object colObj = { col, resolvedTable, it->second.first, it->second.second };
+				m_objects[idx].insert(colObj);
+			}
+			else
+			{
+				Object colObj = { col, resolvedTable, L"", L"" };
+				m_objects[idx].insert(colObj);
+			}
+		}
+		else
+		{
+			Object colObj = { col, L"", L"", L"" };
+			m_objects[idx].insert(colObj);
+		}
+	}
 
 #ifdef DEBUG
 	//debugObjects(m_objects[idx]);
@@ -511,149 +532,157 @@ bool CWVSqlParser::traverseSql(UINT idx)
 UINT CWVSqlParser::GetStatementCount()
 {
 	TRACE(_T(" ========= CWVSqlParser::GetStatementCount()   ========= \n"));
-	try
-	{
-		jvm::local_frame lf;
-		if (m_parser.is_null())
-			return 0;
-		return (UINT) m_parser.get_sqlstatements().size(FL_);
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return 0;
+	return (UINT)m_oSQLEngine.GetStatementCount();
 }
 
 TOString CWVSqlParser::GetStatementText(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetStatementText idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= (UINT)m_parser.get_sqlstatements().size(FL_)) return L"";
-		TOString statement = JS2TT(m_parser.get_sqlstatements().get(idx, FL_));
-
-		return statement;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return L"";
+	if (idx >= GetStatementCount()) return L"";
+	return CA2W(m_oSQLEngine.GetStatements()[idx].sqlText.c_str(), CP_UTF8);
 }
 
+// [GSP→Antlr4] 첫 번째 의미 있는 토큰(길이 > 1) 반환
 TOString CWVSqlParser::GetSqlCommand(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetSqlCommand idx [%d]   ========= \n"), idx);
-	try
+	if (idx >= GetStatementCount()) return L"";
+
+	const SqlStatementInfo& stmtInfo = m_oSQLEngine.GetStatements()[idx];
+	int dbType = (stmtInfo.nDatabaseType >= 0) ? stmtInfo.nDatabaseType : m_dbType;
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(stmtInfo.sqlText, dbType);
+
+	for (const auto& tok : tokens)
 	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return L"";
-
-		TOString sqlcommand = L"";
-		TSourceTokenList stl = m_parser.getSqlstatements(FL_).get(idx, FL_).get_sourcetokenlist();
-
-		//sqlcommand = JS2TT(m_parser.getSqlstatements(FL_).get(idx, FL_).getStartToken(FL_));
-		for (int i = 0; i < stl.size(FL_); i++)
-		{
-			TSourceToken tok = stl.get(i, FL_);
-			sqlcommand = JS2TT(tok.get_astext());
-			if (sqlcommand.GetLength() > 1)
-				break;
-		}
-
-		return sqlcommand;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+		if (tok.role == TokenRole::WHITESPACE || tok.role == TokenRole::COMMENT)
+			continue;
+		TOString cmd = CA2W(tok.text.c_str(), CP_UTF8);
+		if (cmd.GetLength() > 1)
+			return cmd;
 	}
 
 	return L"";
 }
 
+// [GSP→Antlr4] SqlStatementType → CWVSqlParser::SqlType 매핑
 CWVSqlParser::SqlType CWVSqlParser::GetSqlType(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetSqlType idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return SqlTypeUnknown;
+	if (idx >= GetStatementCount()) return SqlTypeUnknown;
 
-#define CheckAndReturn(Type) for (auto f : SqlTypeSet##Type) if (m_parser.getSqlstatements(FL_).get(idx, FL_).get_sqlstatementtype().equals(f(), FL_)) return SqlType##Type;
-		CheckAndReturn(Query);
-		CheckAndReturn(DML);
-		CheckAndReturn(DDL);
-		CheckAndReturn(DCL);
-		CheckAndReturn(PLSQL);
-#undef CheckAndReturn
-	}
-	catch (exception & e)
+	switch (m_oSQLEngine.GetStatementTypeAt((int)idx))
 	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
+	case SqlStatementType::SELECT_STATEMENT:
+		return SqlTypeQuery;
 
-	return SqlTypeETC;
+	case SqlStatementType::INSERT_STATEMENT:
+	case SqlStatementType::UPDATE_STATEMENT:
+	case SqlStatementType::DELETE_STATEMENT:
+	case SqlStatementType::MERGE_STATEMENT:
+	case SqlStatementType::REPLACE_STATEMENT:
+		return SqlTypeDML;
+
+	case SqlStatementType::CREATE_STATEMENT:
+	case SqlStatementType::ALTER_STATEMENT:
+	case SqlStatementType::DROP_STATEMENT:
+	case SqlStatementType::TRUNCATE_STATEMENT:
+		return SqlTypeDDL;
+
+	case SqlStatementType::GRANT_STATEMENT:
+	case SqlStatementType::REVOKE_STATEMENT:
+	case SqlStatementType::TRANSACTION_STATEMENT:
+		return SqlTypeDCL;
+
+	case SqlStatementType::CALL_STATEMENT:
+	case SqlStatementType::CREATE_PROCEDURE:
+	case SqlStatementType::CREATE_FUNCTION:
+	case SqlStatementType::CREATE_TRIGGER:
+	case SqlStatementType::CREATE_EVENT:
+		return SqlTypePLSQL;
+
+	case SqlStatementType::SET_STATEMENT:
+	case SqlStatementType::SHOW_STATEMENT:
+	case SqlStatementType::USE_STATEMENT:
+		return SqlTypeETC;
+
+	default:
+		return SqlTypeETC;
+	}
 }
 
 std::set<CWVSqlParser::Object>& CWVSqlParser::GetAllObjects(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetAllObjects idx [%d]   ========= \n"), idx);
-	jvm::local_frame lf;
 	static std::set<Object> dummy;
-	if (m_objects.size() <= idx) return dummy; // XXX: Error
+	if (idx >= GetStatementCount()) return dummy;
 
-	if (m_objects[idx].empty()) {
+	while (m_objects.size() <= (size_t)idx)
+		m_objects.push_back({});
+
+	if (m_objects[idx].empty())
 		traverseSql(idx);
-	}
+
 	return m_objects[idx];
 }
 
+// [GSP→Antlr4] DML이면 첫 번째 테이블을 대상 테이블로 반환
 std::set<CWVSqlParser::Object> CWVSqlParser::GetAllTargetObjects(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetAllTargetObjects idx [%d]   ========= \n"), idx);
 	std::set<Object> objects;
-	try
+
+	if (idx >= GetStatementCount()) return objects;
+
+	const SqlStatementInfo& stmtInfo = m_oSQLEngine.GetStatements()[idx];
+
+	if (GetSqlType(idx) == SqlTypeDML)
 	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return objects;
-		if (idx >= m_objects.size()) return objects;
-
-		TOString sqlcommand = L"";
-		if (GetSqlType(idx) == SqlTypeDML)
+		// DML: 첫 번째 테이블 참조가 대상 테이블
+		if (!stmtInfo.vecTableRefs.empty())
 		{
-			TCustomSqlStatement stmt = m_parser.get_sqlstatements().get(idx, FL_);
-			nodes::TTable table;
+			const TableRefInfo& target = stmtInfo.vecTableRefs[0];
+			TOString table  = CA2W(target.szTable.c_str(),    CP_UTF8);
+			TOString schema = CA2W(target.szSchema.c_str(),   CP_UTF8);
+			TOString db     = CA2W(target.szDatabase.c_str(), CP_UTF8);
+			if (m_bUppercase) { table.MakeUpper(); schema.MakeUpper(); db.MakeUpper(); }
 
-			table = stmt.getTargetTable(FL_);
-			if (table.getTableType(FL_).equals(ETableSource::get_subquery(), FL_))
+			Object tableObj = { L"", table, schema, db };
+			objects.insert(tableObj);
+
+			for (const auto& colRef : stmtInfo.vecColumnRefs)
 			{
-				traverseSql(idx, table.getSubquery(FL_));
-				objects = m_objects[idx];
-			}
-			else
-			{
-				objects = setObject(table);
+				if (colRef.szColumn.empty()) continue;
+				TOString col = CA2W(colRef.szColumn.c_str(), CP_UTF8);
+				if (m_bUppercase) col.MakeUpper();
+
+				if (colRef.bTableDetermined)
+				{
+					TOString resolvedTable = CA2W(colRef.szResolvedTable.c_str(), CP_UTF8);
+					if (m_bUppercase) resolvedTable.MakeUpper();
+					if (resolvedTable.CompareNoCase(table) == 0)
+					{
+						Object colObj = { col, table, schema, db };
+						objects.insert(colObj);
+					}
+				}
+				else
+				{
+					Object colObj = { col, L"", L"", L"" };
+					objects.insert(colObj);
+				}
 			}
 		}
-		else
-		{
-			traverseSql(idx);
+	}
+	else
+	{
+		traverseSql(idx);
+		if (idx < m_objects.size())
 			objects = m_objects[idx];
-		}
+	}
 
 #ifdef DEBUG
-		//debugObjects(objects);
+	//debugObjects(objects);
 #endif // DEBUG
-		return objects;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
 
 	return objects;
 }
@@ -663,7 +692,6 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectStmt(LPCTSTR sqlText, TOString& str
 	TRACE(_T(" ========= CWVSqlParser::MakeSelectStmt sqlText [%s]   ========= \n"), sqlText);
 	try
 	{
-		jvm::local_frame lf;
 		UINT idx = 0;
 
 		if (doParse(sqlText) == false)
@@ -675,46 +703,20 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectStmt(LPCTSTR sqlText, TOString& str
 		}
 		else if (isMergeStmt(0))
 		{
-			stmt::TMergeSqlStatement stmt = (stmt::TMergeSqlStatement&)m_parser.get_sqlstatements().get(idx, FL_);
-			nodes::TTable tableTarget, tableSource;
-			nodes::TAliasClause aliasTarget, aliasSource;
-			nodes::TMergeWhenClause node;
-
-			bool bMatched = false, bNotMatched = false;
-			bMatched = hasMatchedClasuse(true, node);
-			bNotMatched = hasMatchedClasuse(false, node);
-
-			tableTarget = stmt.getTargetTable(FL_);
-			aliasTarget = tableTarget.getAliasClause(FL_);
-			tableSource = stmt.getUsingTable(FL_);
-			aliasSource = tableSource.getAliasClause(FL_);
-
-			strSelect.Format(L"SELECT %s.* FROM %s %s JOIN %s %s ON %s "
-				, aliasTarget.is_null()? JS2TT(tableTarget) :JS2TT(aliasTarget)
-				, JS2TT(tableTarget), aliasTarget.is_null() ? L"" : JS2TT(aliasTarget)
-				, JS2TT(tableSource), aliasSource.is_null() ? L"" : JS2TT(aliasSource)
-				, stmt.getCondition(FL_).is_null() ? L"": JS2TT(stmt.getCondition(FL_))
-			);
-
-			if (!bMatched && bNotMatched)
-			{
-				strSelect.Format(L"SELECT * FROM %s WHERE 1=2", JS2TT(tableTarget));
-			}
+			// [마이그레이션 스텁] MERGE 문장 AST 분석 미지원 → MakeAfterSelect4Merge 위임
+			return MakeAfterSelect4Merge(sqlText, strSelect);
 		}
 		else
-		{ 
-			TOString sTable, sWhere, sColumns;
-			sTable = getTable(idx);
-			sWhere = getWhere(idx);
+		{
+			TOString sTable = getTable(idx);
+			TOString sWhere = getWhere(idx);
 
 			if (sTable.IsEmpty())
 				return RT_EMPTY_TABLE_NAME;
 
 			strSelect = L"select ";
 			if (isUpdateStmt(0))
-			{
 				strSelect.Append(getSelectColumnsForUpdate(idx));
-			}				
 			else
 				strSelect.AppendChar(L'*');
 
@@ -724,7 +726,7 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectStmt(LPCTSTR sqlText, TOString& str
 			strSelect.Append(sWhere);
 		}
 	}
-	catch (exception & e)
+	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
@@ -737,7 +739,6 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString
 	TRACE(_T(" ========= CWVSqlParser::MakeSelectAfterStmt sqlText [%s]   ========= \n"), sqlText);
 	try
 	{
-		jvm::local_frame lf;
 		UINT idx = 0;
 		int pos = 0;
 
@@ -756,30 +757,36 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString
 			sWhere = getWhere(idx);
 			vSetCols = getSetInColumn(idx);
 
-			// Alias Check And Remove
-			if (vSetCols.size() > 0) for (int i = 0; i < vSetCols.size(); i++) {
+			// Alias Check And Remove (alias.column → column)
+			for (int i = 0; i < (int)vSetCols.size(); i++)
+			{
+				pos = 0;
 				int t = 0;
-				for (CString token; L"" != (token = vSetCols.at(i).first.Tokenize(_T("."), pos));) {
+				for (CString token; L"" != (token = vSetCols.at(i).first.Tokenize(_T("."), pos));)
+				{
 					if (t == 1)
 						vSetCols.at(i).first = token;
 					t++;
 				}
-				pos = 0;
 			}
 
 			strSelect = L"select ";
-			if (isUpdateStmt(idx)) {
+			if (isUpdateStmt(idx))
+			{
 				TOString t;
-				for (std::vector<std::pair<CString, CString>>::iterator iter = vSetCols.begin(); iter != vSetCols.end(); ++iter) {
+				for (auto iter = vSetCols.begin(); iter != vSetCols.end(); ++iter)
+				{
 					t.Append((TOString)iter->second + L" as ");
 					t.Append((TOString)iter->first);
 					t.Append(L", ");
 				}
-				t.Delete(t.GetLength() - 2, 2);
+				if (t.GetLength() >= 2)
+					t.Delete(t.GetLength() - 2, 2);
 				strSelect.Append(t);
 			}
 			else
 				strSelect.AppendChar(L'*');
+
 			strSelect.Append(L" from ");
 			strSelect.Append(sTable);
 			strSelect.Append(L" ");
@@ -788,7 +795,7 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString
 		else // insert
 			return getSelectStmtForInsert(strSelect);
 	}
-	catch (exception & e)
+	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
@@ -796,24 +803,17 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString
 	return RT_SUCCESS;
 }
 
-// �������� Set, Where ���� �÷��� �������� üũ
+// UPDATE 문의 SET 컬럼과 WHERE 컬럼이 겹치는지 확인
 bool CWVSqlParser::IsIncludeWhereInSet(CString sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::IsIncludeWhereInSet sqlText [%s]   ========= \n"), sqlText);
 	try
 	{
-		jvm::local_frame lf;
-		std::vector<std::pair<CString, CString>> vWhereCols;
-		TOString sColumns, sWhere;
-		bool isFind = false;
-
 		if (!Parse(sqlText))
 			return false;
-
 		return IsIncludeWhereInSet(0);
-
 	}
-	catch (exception & e)
+	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
@@ -823,213 +823,138 @@ bool CWVSqlParser::IsIncludeWhereInSet(CString sqlText)
 bool CWVSqlParser::IsIncludeWhereInSet(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::IsIncludeWhereInSet idx [%d]   ========= \n"), idx);
-	jvm::local_frame lf;
 	if (idx >= GetStatementCount()) return false;
 
-	std::vector<std::pair<CString, CString>> vWhereCols;
-	TOString sColumns, sWhere;
-	bool isFind = false;
-
+	// [마이그레이션 스텁] MERGE: WHEN NOT MATCHED만 있으면 true (WHERE in SET 없음)
 	if (isMergeStmt(idx))
-	{
-		stmt::TMergeSqlStatement stmt = (stmt::TMergeSqlStatement&)m_parser.get_sqlstatements().get(idx, FL_);
-		bool bMatched = false, bNotMatched = false;
-
-		for (int i = 0; i < stmt.getWhenClauses(FL_).size(FL_); i++)
-		{
-			int type = ((nodes::TMergeWhenClause&) stmt.getWhenClauses(FL_).elementAt(i, FL_)).getType(FL_);
-			if (type == nodes::TMergeWhenClause::get_matched())
-				bMatched = true;
-
-			if (type == nodes::TMergeWhenClause::get_not_matched())
-				bNotMatched = true;
-		}
-
-		return (!bMatched && bNotMatched);
-	}
-
-	if (!isUpdateStmt(idx)) {
 		return false;
-	}
 
-	sColumns = getSelectColumnsForUpdate(idx);
-	sColumns.Replace(L" ", L"");						// Remove Blank
-	sWhere = getWhere(idx);
-	vWhereCols = getWhereInColumn(idx);
+	if (!isUpdateStmt(idx))
+		return false;
+
+	TOString sColumns = getSelectColumnsForUpdate(idx);
+	sColumns.Replace(L" ", L"");
+	std::vector<std::pair<CString, CString>> vWhereCols = getWhereInColumn(idx);
 
 	std::set<TOString> colSet;
 	int pos = 0;
-	for (TOString token; L"" != (token = sColumns.Tokenize(L",", pos));) {
+	for (TOString token; L"" != (token = sColumns.Tokenize(L",", pos));)
 		colSet.insert(token);
-	}
 
-	for (std::vector<std::pair<CString, CString>>::iterator iter = vWhereCols.begin(); iter != vWhereCols.end(); ++iter) {
-		for (CString col : colSet) {
-			int res = iter->first.CompareNoCase(col);
-			if (iter->first.CompareNoCase(col) == 0) {
-				isFind = true;
-				break;
-			}
+	for (const auto& whereCol : vWhereCols)
+	{
+		for (const CString& col : colSet)
+		{
+			if (whereCol.first.CompareNoCase(col) == 0)
+				return true;
 		}
-		if (isFind)
-			break;
 	}
 
-	return isFind;
+	return false;
 }
 
+// [GSP→Antlr4] DML 대상 테이블 반환 (별칭 포함)
 TOString CWVSqlParser::getTable(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getTable idx [%d]   ========= \n"), idx);
 	TOString sTable;
-	try
+
+	if (idx >= GetStatementCount()) return sTable;
+	if (GetSqlType(idx) != SqlTypeDML) return sTable;
+
+	const auto& stmts = m_oSQLEngine.GetStatements();
+	const SqlStatementInfo& stmtInfo = stmts[idx];
+
+	if (!stmtInfo.vecTableRefs.empty())
 	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return L"";
+		const TableRefInfo& ref = stmtInfo.vecTableRefs[0];
+		sTable = CA2W(ref.szTable.c_str(), CP_UTF8);
 
-		TCustomSqlStatement stmt = m_parser.get_sqlstatements().get(idx, FL_);
-		nodes::TTable table;
-		nodes::TAliasClause alias;
-
-		if (GetSqlType(idx) == SqlTypeDML)
+		if (!ref.szAlias.empty())
 		{
-			table = stmt.getTargetTable(FL_);
-			alias = table.getAliasClause(FL_);
-
-			sTable = JS2TT(table);
-
-			if (!alias.is_null()){
-				sTable += L" ";
-				sTable += JS2TT(alias);
-			}
+			sTable += L" ";
+			sTable += CA2W(ref.szAlias.c_str(), CP_UTF8);
 		}
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
 
 	return sTable;
 }
 
+// [GSP→Antlr4] UPDATE/DELETE WHERE 절 텍스트 반환
 TOString CWVSqlParser::getWhere(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getWhere idx [%d]   ========= \n"), idx);
 	TOString sWhere;
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return L"";
 
-		TCustomSqlStatement stmt = m_parser.get_sqlstatements().get(idx, FL_);
+	if (idx >= GetStatementCount()) return sWhere;
 
-		if (isUpdateStmt(idx) || isDeleteStmt(idx))
-		{
-			sWhere = JS2TT(stmt.getWhereClause(FL_));
-		}
-	}
-	catch (exception & e)
+	if (isUpdateStmt(idx) || isDeleteStmt(idx))
 	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+		std::string whereText = m_oSQLEngine.GetWhereClauseText((int)idx);
+		sWhere = CA2W(whereText.c_str(), CP_UTF8);
 	}
+
 	return sWhere;
 }
 
+// [GSP→Antlr4] UPDATE SET 절 컬럼명 목록을 콤마 구분 문자열로 반환
 TOString CWVSqlParser::getSelectColumnsForUpdate(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSelectColumnsForUpdate idx [%d]   ========= \n"), idx);
-	TOString sColumns, sColumn;
-	try
+	TOString sColumns;
+
+	if (idx >= GetStatementCount()) return sColumns;
+
+	auto pairs = m_oSQLEngine.GetSetPairs((int)idx);
+	for (const auto& p : pairs)
 	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return L"";
-
-		stmt::TUpdateSqlStatement stmt = (stmt::TUpdateSqlStatement&)m_parser.getSqlstatements(FL_).get(idx, FL_);
-		nodes::TResultColumnList columnList = stmt.getResultColumnList(FL_);
-
-		for (int i = 0; i < columnList.size(FL_); i++)
-		{
-			columnList.getResultColumn(i, FL_);
-
-			if (sColumns.IsEmpty() == false)
-				sColumns += L", ";
-			nodes::TExpressionList l = columnList.getResultColumn(i, FL_).getExpr(FL_).getLeftOperand(FL_).getExprList(FL_);
-			if (l.is_null() == false)
-				sColumns += JS2TT(l);
-			else
-				sColumns += JS2TT(columnList.getResultColumn(i, FL_).getExpr(FL_).getLeftOperand(FL_));
-		}
-
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+		if (!sColumns.IsEmpty())
+			sColumns += L", ";
+		sColumns += CA2W(p.first.c_str(), CP_UTF8);
 	}
 
 	return sColumns;
 }
 
+// [GSP→Antlr4] INSERT 문으로부터 SELECT 문 생성
 EM_MAKESELECT_RESULT CWVSqlParser::getSelectStmtForInsert(TOString& sSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSelectStmtForInsert()   ========= \n"));
-	TOString sColumnValues;
 	try
 	{
-		jvm::local_frame lf;
-		if (isInsertStmt(0))
-		{
-			stmt::TInsertSqlStatement insertStmt = (stmt::TInsertSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-			if (insertStmt.getInsertConditions(FL_).is_null() == false)
-			{
-				return RT_NOT_SUPPORT_INSERT_TYPE;
-				// not support 
-				// ex)
-				// insert 
-				// where exits(select 1 from emp where name = 'JOE')
-				//	then
-				//	into bar(name, age)
-				//	select 'JOE', 40 from dual;
-			}
-
-			stmt::TSelectSqlStatement selectStmt = insertStmt.getSubQuery(FL_);
-			if (selectStmt.is_null() == false)
-			{
-				sSelect = JS2TT(selectStmt);
-				return RT_INSERT_SHOW_AFTERDATA;
-			}
-
-			nodes::TObjectNameList columns = insertStmt.getColumnList(FL_);
-			nodes::TMultiTargetList values = insertStmt.getValues(FL_);
-			for (int i = 0; i < values.size(FL_) ; i++)
-			{
-				nodes::TMultiTarget targetValue = values.getMultiTarget(i, FL_);
-				nodes::TResultColumnList columnList = targetValue.getColumnList(FL_);
-				for (int j = 0; j < columnList.size(FL_) ; j++)
-				{
-					TOString sColumn;
-					sColumn = JS2TT(columnList.getResultColumn(j, FL_));
-					if (!sColumnValues.IsEmpty())
-						sColumnValues.Append(L", ");
-					sColumnValues.Append(sColumn);
-				}
-			}
-
-			if (!sColumnValues.IsEmpty())
-			{
-				sSelect.Append(L"select ");
-				sSelect.Append(sColumnValues);
-				if (m_dbType == DB_TYPE::tstORACLE || m_dbType == 0)
-					sSelect.Append(L" from dual");
-				else if (m_dbType == DB_TYPE::tstSapHana)
-					sSelect.Append(L" from dummy");
-				return RT_INSERT_SHOW_AFTERDATA;
-			}
-
-		}
-		else 
+		if (!isInsertStmt(0))
 			return RT_NOT_SUPPORT_INSERT_TYPE;
+
+		InsertInfo info = m_oSQLEngine.GetInsertInfo(0);
+
+		// INSERT ... SELECT 형태
+		if (!info.szSubQuery.empty())
+		{
+			sSelect = CA2W(info.szSubQuery.c_str(), CP_UTF8);
+			return RT_INSERT_SHOW_AFTERDATA;
+		}
+
+		// INSERT ... VALUES 형태: SELECT v1, v2, ... FROM DUAL
+		TOString sColumnValues;
+		for (const auto& val : info.vecValues)
+		{
+			if (!sColumnValues.IsEmpty())
+				sColumnValues.Append(L", ");
+			sColumnValues.Append(CA2W(val.c_str(), CP_UTF8));
+		}
+
+		if (!sColumnValues.IsEmpty())
+		{
+			sSelect.Append(L"select ");
+			sSelect.Append(sColumnValues);
+			if (m_dbType == DB_TYPE::tstORACLE || m_dbType == 0)
+				sSelect.Append(L" from dual");
+			else if (m_dbType == DB_TYPE::tstSapHana)
+				sSelect.Append(L" from dummy");
+			return RT_INSERT_SHOW_AFTERDATA;
+		}
 	}
-	catch (exception & e)
+	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
@@ -1043,164 +968,76 @@ CString CWVSqlParser::GetErrMessage()
 	return (LPCSTR)getError().c_str();
 }
 
+// [마이그레이션 스텁] SELECT 결과 컬럼 별칭→원본컬럼 매핑
+// Antlr4 기반 파서에서는 SELECT AST 표현식 트리 미지원 → 빈 맵 반환
 void CWVSqlParser::GetOriginColumnsOfAlias(std::multimap<TOString, Object>& mapOrgColumn)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetOriginColumnsOfAlias()   ========= \n"));
-	int nColIdx = 0;
-	try
-	{
-		jvm::local_frame lf;
-		if (GetStatementCount() < 0) return;
-
-		if (GetSqlType(0) == SqlTypeQuery)
-		{
-			stmt::TSelectSqlStatement stmt = (stmt::TSelectSqlStatement&)m_parser.getSqlstatements(FL_).get(0, FL_);
-			nodes::TResultColumnList columnList = stmt.getResultColumnList(FL_);
-
-			for (int i = 0; i < columnList.size(FL_); i++)
-			{
-				nodes::TResultColumn cell = columnList.getResultColumn(i, FL_);
-				nodes::TAliasClause alias = cell.getAliasClause(FL_);
-				//bool isFunctionCall = false;
-
-				//TRACE(_T("%s\n"), (LPCTSTR)JS2T(cell));
-				//TRACE(_T("%s\n"), (LPCTSTR)JS2T(cell.getExpr(FL_)));
-				//TRACE(_T("%s\n"), (LPCTSTR)JS2T(cell.getColumnNameOnly(FL_)));
-				////TRACE(_T("%s\n"), (LPCTSTR)JS2T(cell.getExpr(FL_).getTypeName(FL_)));
-
-				//if (cell.getExpr(FL_).getExpressionType(FL_).equals(EExpressionType::get_function_t(), FL_) == true)
-				//{
-				//	isFunctionCall = true;
-				//	nodes::TFunctionCall fc = cell.getExpr(FL_).getFunctionCall(FL_);
-
-				//	TRACE(_T("Function call\n"));
-				//	TRACE(_T("%s\n"), (LPCTSTR)JS2T(fc.getFunctionName(FL_)));
-
-				//	for (auto f : s_apszUnmaskingFunctionList)
-				//	{
-				//		CString userFunct;
-				//		userFunct = JS2TT(fc.getFunctionName(FL_));
-
-				//		if (userFunct.CompareNoCase(f) == 0)
-				//		{
-				//			isFunctionCall = false;
-				//			break;
-				//		}
-				//	}
-
-				//	if (isFunctionCall == true)
-				//	{
-				//		nodes::TObjectNameList objList = fc.getMatchColumns(FL_);
-				//		for (int o = 0; o < objList.size(FL_); o++)
-				//		{
-				//			TOString sColumn = JS2TT(objList.getObjectName(o, FL_));
-				//			// TOString sAlias = JS2TT(alias);
-				//			mapOrgColumn[nColIdx] = sColumn;
-				//		}
-				//	}
-
-				//}
-				//else
-				{ 
-					if (alias.is_null() == false)
-					{
-						Object object = {  // 0:alias, 1:column, 2:table
-						JS2TT(alias)
-							, JS2TT(cell.getExpr(FL_))
-							, JS2TT(cell.getPrefixTable(FL_))
-						};
-
-						object[0].MakeUpper();
-						object[1].MakeUpper();
-						object[2].MakeUpper();
-
-						mapOrgColumn.insert( std::make_pair(object[0], object) );
-					}
-				}
-			}
-
-		}
-
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
+	// 미지원: mapOrgColumn 비어있는 채로 반환
 }
 
+// [GSP→Antlr4] UPDATE SET 절 col=val 쌍 목록 반환
 std::vector<std::pair<CString, CString>> CWVSqlParser::getSetInColumn(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSetInColumn idx [%d]   ========= \n"), idx);
 	std::vector<std::pair<CString, CString>> columList;
-	try
+
+	if (idx >= GetStatementCount()) return columList;
+
+	auto pairs = m_oSQLEngine.GetSetPairs((int)idx);
+	for (const auto& p : pairs)
 	{
-		jvm::local_frame lf;
-
-		if (idx >= GetStatementCount()) return columList;
-		stmt::TUpdateSqlStatement stmt = (stmt::TUpdateSqlStatement&)m_parser.getSqlstatements(FL_).get(idx, FL_);
-		nodes::TResultColumnList columnList = stmt.getResultColumnList(FL_);
-
-		for (int i = 0; i < columnList.size(FL_); i++)
-		{
-			TOString cols, vals;
-			nodes::TResultColumn cell = columnList.getResultColumn(i, FL_);
-			if (cell.getExpr(FL_).is_null() == false
-				&& cell.getExpr(FL_).getLeftOperand(FL_).is_null() == false
-				&& cell.getExpr(FL_).getRightOperand(FL_).is_null() == false)
-			{
-				cols = JS2TT(cell.getExpr(FL_).getLeftOperand(FL_));
-				vals = JS2TT(cell.getExpr(FL_).getRightOperand(FL_));
-				std::pair<CString, CString> c;
-				c.first = cols;
-				c.second = vals;
-				columList.push_back(c);
-			}
-		}
-
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+		std::pair<CString, CString> c;
+		c.first  = CA2W(p.first.c_str(),  CP_UTF8);
+		c.second = CA2W(p.second.c_str(), CP_UTF8);
+		columList.push_back(c);
 	}
 
 	return columList;
 }
 
+// [GSP→Antlr4] WHERE 절에 등장하는 컬럼명 목록 반환
+// WHERE 텍스트를 토큰화하여 비교연산자 앞의 식별자를 컬럼으로 추출
 std::vector<std::pair<CString, CString>> CWVSqlParser::getWhereInColumn(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getWhereInColumn idx [%d]   ========= \n"), idx);
 	std::vector<std::pair<CString, CString>> columList;
-	try
+
+	if (idx >= GetStatementCount()) return columList;
+
+	std::string whereText = m_oSQLEngine.GetWhereClauseText((int)idx);
+	if (whereText.empty()) return columList;
+
+	const SqlStatementInfo& stmtInfo = m_oSQLEngine.GetStatements()[idx];
+	int dbType = (stmtInfo.nDatabaseType >= 0) ? stmtInfo.nDatabaseType : m_dbType;
+	std::vector<TokenInfo> tokens = m_oSQLEngine.TokenizeQuery(whereText, dbType);
+
+	std::set<std::string> seenCols;
+	for (size_t i = 0; i < tokens.size(); i++)
 	{
-		jvm::local_frame lf;
+		const TokenInfo& tok = tokens[i];
+		if (tok.role != TokenRole::IDENTIFIER && tok.role != TokenRole::COLUMN_NAME)
+			continue;
 
-		if (idx >= GetStatementCount()) return columList;
-
-		stmt::TUpdateSqlStatement stmt = (stmt::TUpdateSqlStatement&)m_parser.getSqlstatements(FL_).get(idx, FL_);
-		
-		nodes::TTable tt = stmt.getTargetTable(FL_);
-		if (!tt.is_null())
+		// 다음 의미있는 토큰이 비교 연산자인지 확인
+		bool followedByOp = false;
+		for (size_t j = i + 1; j < tokens.size(); j++)
 		{
-			map<wstring, int> mapWhereColumns;
-			for (int i = 0; i<tt.getLinkedColumns(FL_).size(FL_); i++)
-			{
-				nodes::TObjectName o = tt.getLinkedColumns(FL_).getObjectName(i, FL_);
-				if (o.getLocation(FL_).equals(ESqlClause::get_where(), FL_))
-				{
-					std::pair<CString, CString> t;
-					t.first = o.getColumnNameOnly(FL_).wstr().c_str();
-					t.second = L"";
-					columList.push_back(t);
-					TRACE(_T("%s %s\n"), t.first, t.second);
-
-				}
-			}
-
+			if (tokens[j].role == TokenRole::WHITESPACE) continue;
+			if (tokens[j].role == TokenRole::OPERATOR_COMPARISON)
+				followedByOp = true;
+			break;
 		}
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+
+		if (followedByOp && seenCols.find(tok.text) == seenCols.end())
+		{
+			seenCols.insert(tok.text);
+			std::pair<CString, CString> c;
+			c.first  = CA2W(tok.text.c_str(), CP_UTF8);
+			c.second = L"";
+			columList.push_back(c);
+			TRACE(_T("%s\n"), (LPCTSTR)c.first);
+		}
 	}
 
 	return columList;
@@ -1209,177 +1046,73 @@ std::vector<std::pair<CString, CString>> CWVSqlParser::getWhereInColumn(UINT idx
 bool CWVSqlParser::isUpdateStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isUpdateStmt idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return false;
-
-		TCustomSqlStatement stmt = m_parser.getSqlstatements(FL_).get(idx, FL_);
-		ESqlStatementType type = stmt.get_sqlstatementtype();
-		if (type.equals(ESqlStatementType::get_sstupdate(), FL_))
-			return true;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
+	if (idx >= GetStatementCount()) return false;
+	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::UPDATE_STATEMENT;
 }
 
 bool CWVSqlParser::isInsertStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isInsertStmt idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return false;
-
-		TCustomSqlStatement stmt = m_parser.getSqlstatements(FL_).get(idx, FL_);
-		ESqlStatementType type = stmt.get_sqlstatementtype();
-		if (type.equals(ESqlStatementType::get_sstinsert(), FL_)
-			//|| type.equals(ESqlStatementType::get_sstmysqlreplace(), FL_)
-			)
-			return true;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
+	if (idx >= GetStatementCount()) return false;
+	SqlStatementType t = m_oSQLEngine.GetStatementTypeAt((int)idx);
+	return t == SqlStatementType::INSERT_STATEMENT || t == SqlStatementType::REPLACE_STATEMENT;
 }
 
 bool CWVSqlParser::isDeleteStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isDeleteStmt idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return false;
-
-		TCustomSqlStatement stmt = m_parser.getSqlstatements(FL_).get(idx, FL_);
-		ESqlStatementType type = stmt.get_sqlstatementtype();
-		if (type.equals(ESqlStatementType::get_sstdelete(), FL_))
-			return true;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
+	if (idx >= GetStatementCount()) return false;
+	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::DELETE_STATEMENT;
 }
 
 bool CWVSqlParser::isMergeStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isMergeStmt idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return false;
-
-		TCustomSqlStatement stmt = m_parser.getSqlstatements(FL_).get(idx, FL_);
-		ESqlStatementType type = stmt.get_sqlstatementtype();
-		if (type.equals(ESqlStatementType::get_sstmerge(), FL_))
-			return true;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
+	if (idx >= GetStatementCount()) return false;
+	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::MERGE_STATEMENT;
 }
 
 bool CWVSqlParser::isSelectStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isSelectStmt idx [%d]   ========= \n"), idx);
-	try
-	{
-		jvm::local_frame lf;
-		if (idx >= GetStatementCount()) return false;
-
-		TCustomSqlStatement stmt = m_parser.getSqlstatements(FL_).get(idx, FL_);
-		ESqlStatementType type = stmt.get_sqlstatementtype();
-		if (type.equals(ESqlStatementType::get_sstselect(), FL_))
-			return true;
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
+	if (idx >= GetStatementCount()) return false;
+	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::SELECT_STATEMENT;
 }
 
+// [마이그레이션 스텁] SQL 포매터 - Antlr4 기반 파서 미지원
 CString CWVSqlParser::Formatter()
 {
 	TRACE(_T(" ========= CWVSqlParser::Formatter()   ========= \n"));
-	CString result;
-	try
-	{
-		jvm::local_frame lf;
-
-		pp::stmtformatter::FormatterFactory ff;
-		pp::para::GFmtOpt option = pp::para::GFmtOptFactory::newInstance(FL_);
-		option.set_wsPaddingParenthesesInExpression(java::lang::Boolean::get_FALSE(), FL_);
-
-		result = CW2T(ff.pp(m_parser, option, FL_).wstr().c_str());
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-	return result;
-
+	return _T("");
 }
 
+// [GSP→Antlr4] INSERT 컬럼·값 목록 반환 (서브쿼리 형태면 false)
 bool CWVSqlParser::GetInsertValues(TOString sqlInsert, std::vector<TOString>& colReturn, std::vector<TOString>& valReturn)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetInsertValues sqlInsert [%s]   ========= \n"), (LPCTSTR)sqlInsert);
 	try
 	{
-		jvm::local_frame lf;
-
 		if (!Parse(CW2T(sqlInsert)))
 			return false;
 
-		if (isInsertStmt(0))
-		{
-			stmt::TInsertSqlStatement insertStmt = (stmt::TInsertSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-			if (insertStmt.getInsertConditions(FL_).is_null() == false)
-				return false;
+		if (!isInsertStmt(0))
+			return false;
 
-			stmt::TSelectSqlStatement selectStmt = insertStmt.getSubQuery(FL_);
-			if (selectStmt.is_null() == false)
-				return false;
+		InsertInfo info = m_oSQLEngine.GetInsertInfo(0);
 
-			nodes::TObjectNameList columns = insertStmt.getColumnList(FL_);
-			for (int i = 0; i < columns.size(FL_); i++)
-			{
-				colReturn.push_back(JS2TT(columns.getObjectName(i, FL_)));
-			}
+		// 서브쿼리 형태(INSERT ... SELECT)는 미지원
+		if (!info.szSubQuery.empty())
+			return false;
 
-			nodes::TMultiTargetList values = insertStmt.getValues(FL_);
-			for (int i = 0; i < values.size(FL_); i++)
-			{
-				nodes::TMultiTarget targetValue = values.getMultiTarget(i, FL_);
-				nodes::TResultColumnList columnList = targetValue.getColumnList(FL_);
-				for (int j = 0; j < columnList.size(FL_); j++)
-				{
-					TOString sColumn;
-					sColumn = JS2TT(columnList.getResultColumn(j, FL_));
+		for (const auto& col : info.vecColumns)
+			colReturn.push_back(CA2W(col.c_str(), CP_UTF8));
 
-					valReturn.push_back(sColumn);
-				}
-			}
+		for (const auto& val : info.vecValues)
+			valReturn.push_back(CA2W(val.c_str(), CP_UTF8));
 
-			return true;
-		}
-
+		return !colReturn.empty() || !valReturn.empty();
 	}
-	catch (exception & e)
+	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
 	}
@@ -1387,175 +1120,53 @@ bool CWVSqlParser::GetInsertValues(TOString sqlInsert, std::vector<TOString>& co
 	return false;
 }
 
+// [마이그레이션 스텁] MERGE WHEN NOT MATCHED INSERT 절 SELECT 생성
+// Antlr4 파서에서 MERGE AST 상세 분석 미지원 → MakeSelectStmt 위임
 EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOString& strSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeAfterSelect4Merge sqlText [%s]   ========= \n"), sqlText);
-	try
-	{
-		jvm::local_frame lf;
-
-		stmt::TMergeSqlStatement stmt = (stmt::TMergeSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-		nodes::TMergeWhenClause nodeNotMatch;
-		bool bMatched = false, bNotMatched = false;
-
-		bMatched = hasMatchedClasuse(true, nodeNotMatch);
-		bNotMatched = hasMatchedClasuse(false, nodeNotMatch);
-
-		if (bMatched || !bNotMatched)
-			return MakeSelectStmt(sqlText, strSelect);
-
-		TOString sColumnValues;
-		nodes::TMergeInsertClause stmtInsert = nodeNotMatch.getInsertClause(FL_);
-		nodes::TResultColumnList columnList = stmtInsert.getValuelist(FL_);
-		for (int j = 0; j < columnList.size(FL_); j++)
-		{
-			TOString sColumn;
-			sColumn = JS2TT(columnList.getResultColumn(j, FL_));
-			if (!sColumnValues.IsEmpty())
-				sColumnValues.Append(L", ");
-			sColumnValues.Append(sColumn);
-		}
-
-		nodes::TTable tableTarget, tableSource;
-		nodes::TAliasClause aliasTarget, aliasSource;
-
-		tableTarget = stmt.getTargetTable(FL_);
-		aliasTarget = tableTarget.getAliasClause(FL_);
-
-		tableSource = stmt.getUsingTable(FL_);
-		aliasSource = tableSource.getAliasClause(FL_);
-
-		strSelect.Format(L"SELECT %s FROM %s %s WHERE NOT EXISTS ( SELECT 1 FROM %s %s WHERE %s )"
-			, sColumnValues
-			, JS2TT(tableSource), aliasSource.is_null() ? L"" : JS2TT(aliasSource)
-			, JS2TT(tableTarget), aliasTarget.is_null() ? L"" : JS2TT(aliasTarget)
-			, stmt.getCondition(FL_).is_null()? L"":JS2TT(stmt.getCondition(FL_)));
-
-	}
-	catch (exception & e)
-	{
-		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return RT_SUCCESS;
+	return MakeSelectStmt(sqlText, strSelect);
 }
 
-bool CWVSqlParser::hasMatchedClasuse(bool bMatched, nodes::TMergeWhenClause & node)
+// [마이그레이션 스텁] MERGE WHEN [NOT] MATCHED 절 존재 여부
+// Antlr4 파서에서 MERGE WHEN 절 분석 미지원 → false 반환
+bool CWVSqlParser::hasMatchedClasuse(bool bMatched, nodes::TMergeWhenClause& node)
 {
 	TRACE(_T(" ========= CWVSqlParser::hasMatchedClasuse bMatched [%d]   ========= \n"), bMatched);
-	stmt::TMergeSqlStatement stmt = (stmt::TMergeSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-
-	for (int i = 0; i < stmt.getWhenClauses(FL_).size(FL_); i++)
-	{
-		int type = ((nodes::TMergeWhenClause&) stmt.getWhenClauses(FL_).elementAt(i, FL_)).getType(FL_);
-		if (bMatched && type == nodes::TMergeWhenClause::get_matched())
-		{
-			node = (nodes::TMergeWhenClause&) stmt.getWhenClauses(FL_).elementAt(i, FL_);
-			return true;
-		}
-
-		if (!bMatched && type == nodes::TMergeWhenClause::get_not_matched())
-		{
-			node = (nodes::TMergeWhenClause&) stmt.getWhenClauses(FL_).elementAt(i, FL_);
-			return true;
-		}
-	}
 	return false;
 }
 
-bool CWVSqlParser::MakeInsertAfterData(std::vector< std::vector<TOString> >& afterData)
+// [GSP→Antlr4] INSERT 후 데이터: [컬럼명 행, 값 행]
+bool CWVSqlParser::MakeInsertAfterData(std::vector<std::vector<TOString>>& afterData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeInsertAfterData()   ========= \n"));
-	std::vector<TOString> ret;
-	stmt::TInsertSqlStatement insertStmt = (stmt::TInsertSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
 
-	nodes::TObjectNameList columns = insertStmt.getColumnList(FL_);
-	for (int i = 0; i < columns.size(FL_); i++)
-	{
-		ret.push_back(JS2TT(columns.getObjectName(i, FL_)));
-	}
+	InsertInfo info = m_oSQLEngine.GetInsertInfo(0);
 
-	if (ret.size() > 0)
-		afterData.push_back(ret);
-	ret.clear();
+	std::vector<TOString> cols;
+	for (const auto& col : info.vecColumns)
+		cols.push_back(CA2W(col.c_str(), CP_UTF8));
+	if (!cols.empty())
+		afterData.push_back(cols);
 
-
-	nodes::TMultiTargetList values = insertStmt.getValues(FL_);
-	for (int i = 0; i < values.size(FL_); i++)
-	{
-		nodes::TMultiTarget targetValue = values.getMultiTarget(i, FL_);
-		nodes::TResultColumnList columnList = targetValue.getColumnList(FL_);
-		for (int j = 0; j < columnList.size(FL_); j++)
-		{
-			TOString sColumn;
-			sColumn = JS2TT(columnList.getResultColumn(j, FL_));
-
-			ret.push_back(sColumn);
-		}
-	}
-
-	if (ret.size() > 0)
-		afterData.push_back(ret);
-	ret.clear();
+	std::vector<TOString> vals;
+	for (const auto& val : info.vecValues)
+		vals.push_back(CA2W(val.c_str(), CP_UTF8));
+	if (!vals.empty())
+		afterData.push_back(vals);
 
 	return true;
 }
 
-
-void _traverser(nodes::TExpression exp, std::vector<TOString> &columns, std::vector<TOString> &values)
-{
-	TRACE(_T(" ========= _traverser()   ========= \n"));
-	auto _isLeaf = [&](EExpressionType ep) {
-		if (ep.equals(EExpressionType::get_simple_comparison_t(), FL_))
-			return true;
-		if (ep.equals(EExpressionType::get_function_t(), FL_))
-			return true;
-		if (ep.equals(EExpressionType::get_subquery_t(), FL_))
-			return true;
-
-		return false;
-	};
-
-	EExpressionType exptype = exp.getExpressionType(FL_);
-	TRACE(L"%s\n", JS2TT(exptype));
-	nodes::TExpression lo = exp.getLeftOperand(FL_);
-	TRACE(L"%s\n", JS2TT(lo));
-	nodes::TExpression ro = exp.getRightOperand(FL_);
-	TRACE(L"%s\n", JS2TT(ro));
-
-	if (_isLeaf(exptype) == true)
-	{
-		columns.push_back(JS2TT(lo));
-		values.push_back(JS2TT(ro));
-	}
-	else {
-		_traverser(lo, columns, values);
-		_traverser(ro, columns, values);
-	}
-}
-
-bool CWVSqlParser::MakeDeleteBeforeData(std::vector< std::vector<TOString> >& attachmentData)
+// [GSP→Antlr4] DELETE 이전 데이터: WHERE 조건 텍스트를 [["condition"], [whereText]] 형태로 반환
+bool CWVSqlParser::MakeDeleteBeforeData(std::vector<std::vector<TOString>>& attachmentData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeDeleteBeforeData()   ========= \n"));
-	bool ret = true;
 
-	std::vector<TOString> columns, values;
-	TOString sColumn, sValue;
+	std::string whereText = m_oSQLEngine.GetWhereClauseText(0);
 
-	stmt::TDeleteSqlStatement deleteStmt = (stmt::TDeleteSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-	nodes::TWhereClause whereClause = deleteStmt.getWhereClause(FL_);
-	nodes::TExpression cond = whereClause.getCondition(FL_);
-
-	TRACE(L"%s\n", JS2TT(whereClause));
-	TRACE(L"%s\n", JS2TT(cond));
-
-	_traverser(cond, columns, values);
-
-	if (columns.size() == 0)
-	{
-		columns.push_back(L"condition");
-		values.push_back(JS2TT(cond));
-	}
+	std::vector<TOString> columns = { L"condition" };
+	std::vector<TOString> values  = { CA2W(whereText.c_str(), CP_UTF8) };
 
 	attachmentData.push_back(columns);
 	attachmentData.push_back(values);
@@ -1563,28 +1174,15 @@ bool CWVSqlParser::MakeDeleteBeforeData(std::vector< std::vector<TOString> >& at
 	return true;
 }
 
-bool CWVSqlParser::MakeUpdateBeforeData(std::vector< std::vector<TOString> >& attachmentData)
+// [GSP→Antlr4] UPDATE 이전 데이터: WHERE 조건 텍스트를 [["condition"], [whereText]] 형태로 반환
+bool CWVSqlParser::MakeUpdateBeforeData(std::vector<std::vector<TOString>>& attachmentData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeUpdateBeforeData()   ========= \n"));
-	bool ret = true;
 
-	std::vector<TOString> columns, values;
-	TOString sColumn, sValue;
+	std::string whereText = m_oSQLEngine.GetWhereClauseText(0);
 
-	stmt::TUpdateSqlStatement sqlStmt = (stmt::TUpdateSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-	nodes::TWhereClause whereClause = sqlStmt.getWhereClause(FL_);
-	nodes::TExpression cond = whereClause.getCondition(FL_);
-
-	TRACE(L"%s\n", JS2TT(whereClause));
-	TRACE(L"%s\n", JS2TT(cond));
-
-	_traverser(cond, columns, values);
-
-	if (columns.size() == 0)
-	{
-		columns.push_back(L"condition");
-		values.push_back(JS2TT(cond));
-	}
+	std::vector<TOString> columns = { L"condition" };
+	std::vector<TOString> values  = { CA2W(whereText.c_str(), CP_UTF8) };
 
 	attachmentData.push_back(columns);
 	attachmentData.push_back(values);
@@ -1592,42 +1190,24 @@ bool CWVSqlParser::MakeUpdateBeforeData(std::vector< std::vector<TOString> >& at
 	return true;
 }
 
-bool CWVSqlParser::MakeUpdateAfterData(std::vector< std::vector<TOString> >& afterData)
+// [GSP→Antlr4] UPDATE 이후 데이터: SET 절 컬럼·값 목록 반환
+bool CWVSqlParser::MakeUpdateAfterData(std::vector<std::vector<TOString>>& afterData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeUpdateAfterData()   ========= \n"));
-	bool ret = true;
+
+	auto pairs = m_oSQLEngine.GetSetPairs(0);
 
 	std::vector<TOString> columns, values;
-	TOString sColumn, sValue;
-
-	stmt::TUpdateSqlStatement sqlStmt = (stmt::TUpdateSqlStatement&)m_parser.get_sqlstatements().get(0, FL_);
-
-	nodes::TResultColumnList columnList = sqlStmt.getResultColumnList(FL_);
-	for (int i = 0; i < columnList.size(FL_); i++)
+	for (const auto& p : pairs)
 	{
-		columnList.getResultColumn(i, FL_);
-
-		nodes::TExpressionList l = columnList.getResultColumn(i, FL_).getExpr(FL_).getLeftOperand(FL_).getExprList(FL_);
-		if (l.is_null() == false)
-			sColumn = JS2TT(l);
-		else
-			sColumn = JS2TT(columnList.getResultColumn(i, FL_).getExpr(FL_).getLeftOperand(FL_));
-
-		nodes::TExpressionList r = columnList.getResultColumn(i, FL_).getExpr(FL_).getRightOperand(FL_).getExprList(FL_);
-		if (r.is_null() == false)
-			sValue = JS2TT(r);
-		else
-			sValue = JS2TT(columnList.getResultColumn(i, FL_).getExpr(FL_).getRightOperand(FL_));
-
-		values.push_back(sValue);
+		columns.push_back(CA2W(p.first.c_str(),  CP_UTF8));
+		values.push_back(CA2W(p.second.c_str(), CP_UTF8));
 	}
 
-	if (columns.empty() == false)
+	if (!columns.empty())
 		afterData.push_back(columns);
-
-	if (values.empty() == false)
+	if (!values.empty())
 		afterData.push_back(values);
-
 
 	return true;
 }
