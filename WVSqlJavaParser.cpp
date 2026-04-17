@@ -1175,14 +1175,43 @@ bool CWVSqlParser::hasMatchedClasuse(bool bMatched, nodes::TMergeWhenClause& nod
 
 // [GSP→Antlr4] MERGE WHEN NOT MATCHED INSERT 절 → SELECT 문 생성
 // - MATCHED 절이 있거나 NOT MATCHED 절만 있을 때 분기
-// - ON 조건 텍스트는 Antlr4 파서에서 직접 추출 불가 → getWhere 대체 시도
+// - ON 조건 텍스트는 Antlr4 파서에서 직접 추출 불가
 EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOString& strSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeAfterSelect4Merge sqlText [%s]   ========= \n"), sqlText);
 
-	nodes::TMergeWhenClause dummyNode;
-	bool bMatched    = hasMatchedClasuse(true,  dummyNode);
-	bool bNotMatched = hasMatchedClasuse(false, dummyNode);
+	// hasMatchedClasuse 는 node(GSP 타입) 파라미터를 받으므로 호출 대신
+	// 동일한 텍스트 탐색 로직을 인라인으로 수행
+	bool bMatched = false, bNotMatched = false;
+	if (GetStatementCount() > 0)
+	{
+		std::string sql = m_oSQLEngine.GetStatements()[0].sqlText;
+		std::string upper = sql;
+		std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+		auto isWordChar = [](unsigned char c) { return std::isalnum(c) || c == '_'; };
+		size_t p = 0;
+		while ((p = upper.find("WHEN", p)) != std::string::npos)
+		{
+			if (p > 0 && isWordChar((unsigned char)upper[p - 1])) { p++; continue; }
+			size_t aw = p + 4;
+			if (aw < upper.size() && isWordChar((unsigned char)upper[aw])) { p++; continue; }
+			while (aw < upper.size() && std::isspace((unsigned char)upper[aw])) aw++;
+
+			if (upper.substr(aw, 3) == "NOT" && (aw + 3 >= upper.size() || !isWordChar((unsigned char)upper[aw + 3])))
+			{
+				size_t an = aw + 3;
+				while (an < upper.size() && std::isspace((unsigned char)upper[an])) an++;
+				if (upper.substr(an, 7) == "MATCHED" && (an + 7 >= upper.size() || !isWordChar((unsigned char)upper[an + 7])))
+					bNotMatched = true;
+			}
+			else if (upper.substr(aw, 7) == "MATCHED" && (aw + 7 >= upper.size() || !isWordChar((unsigned char)upper[aw + 7])))
+			{
+				bMatched = true;
+			}
+			p++;
+		}
+	}
 
 	if (!isMergeStmt(0) || bMatched || !bNotMatched)
 	{
