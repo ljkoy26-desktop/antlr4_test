@@ -1120,20 +1120,117 @@ bool CWVSqlParser::GetInsertValues(TOString sqlInsert, std::vector<TOString>& co
 	return false;
 }
 
-// [마이그레이션 스텁] MERGE WHEN NOT MATCHED INSERT 절 SELECT 생성
-// Antlr4 파서에서 MERGE AST 상세 분석 미지원 → MakeSelectStmt 위임
-EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOString& strSelect)
-{
-	TRACE(_T(" ========= CWVSqlParser::MakeAfterSelect4Merge sqlText [%s]   ========= \n"), sqlText);
-	return MakeSelectStmt(sqlText, strSelect);
-}
-
-// [마이그레이션 스텁] MERGE WHEN [NOT] MATCHED 절 존재 여부
-// Antlr4 파서에서 MERGE WHEN 절 분석 미지원 → false 반환
+// [GSP→Antlr4] MERGE WHEN [NOT] MATCHED 절 존재 여부
+// - bool 반환: SQL 텍스트에서 "WHEN [NOT] MATCHED" 패턴 탐색으로 대체 가능
+// - node 출력 파라미터: GSP 타입이므로 채울 수 없음 (호출측에서 미사용)
 bool CWVSqlParser::hasMatchedClasuse(bool bMatched, nodes::TMergeWhenClause& node)
 {
 	TRACE(_T(" ========= CWVSqlParser::hasMatchedClasuse bMatched [%d]   ========= \n"), bMatched);
+
+	if (GetStatementCount() == 0) return false;
+
+	std::string sql = m_oSQLEngine.GetStatements()[0].sqlText;
+
+	// 대문자 변환
+	std::string upper = sql;
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+	auto isWordChar = [](unsigned char c) { return std::isalnum(c) || c == '_'; };
+
+	size_t pos = 0;
+	while ((pos = upper.find("WHEN", pos)) != std::string::npos)
+	{
+		// 단어 경계 확인 (WHENEVER 등 부분 매칭 방지)
+		if (pos > 0 && isWordChar((unsigned char)upper[pos - 1])) { pos++; continue; }
+		size_t afterWhen = pos + 4;
+		if (afterWhen < upper.size() && isWordChar((unsigned char)upper[afterWhen])) { pos++; continue; }
+
+		// WHEN 이후 공백 건너뜀
+		while (afterWhen < upper.size() && std::isspace((unsigned char)upper[afterWhen])) afterWhen++;
+
+		// WHEN NOT MATCHED 패턴 확인
+		if (upper.substr(afterWhen, 3) == "NOT" && !isWordChar((unsigned char)upper[afterWhen + 3]))
+		{
+			size_t afterNot = afterWhen + 3;
+			while (afterNot < upper.size() && std::isspace((unsigned char)upper[afterNot])) afterNot++;
+			if (upper.substr(afterNot, 7) == "MATCHED" && (afterNot + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterNot + 7])))
+			{
+				if (!bMatched) return true;  // WHEN NOT MATCHED 발견
+				pos++;
+				continue;
+			}
+		}
+
+		// WHEN MATCHED (NOT 없음) 패턴 확인
+		if (upper.substr(afterWhen, 7) == "MATCHED" && (afterWhen + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterWhen + 7])))
+		{
+			if (bMatched) return true;  // WHEN MATCHED 발견
+		}
+
+		pos++;
+	}
+
 	return false;
+}
+
+// [GSP→Antlr4] MERGE WHEN NOT MATCHED INSERT 절 → SELECT 문 생성
+// - MATCHED 절이 있거나 NOT MATCHED 절만 있을 때 분기
+// - ON 조건 텍스트는 Antlr4 파서에서 직접 추출 불가 → getWhere 대체 시도
+EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOString& strSelect)
+{
+	TRACE(_T(" ========= CWVSqlParser::MakeAfterSelect4Merge sqlText [%s]   ========= \n"), sqlText);
+
+	nodes::TMergeWhenClause dummyNode;
+	bool bMatched    = hasMatchedClasuse(true,  dummyNode);
+	bool bNotMatched = hasMatchedClasuse(false, dummyNode);
+
+	if (!isMergeStmt(0) || bMatched || !bNotMatched)
+	{
+		// MATCHED 절 있음 → 일반 SELECT (MakeSelectStmt MERGE 분기 재진입 방지를 위해 직접 구성)
+		UINT idx = 0;
+		TOString sTable = getTable(idx);
+		if (sTable.IsEmpty()) return RT_EMPTY_TABLE_NAME;
+
+		strSelect.Format(L"SELECT * FROM %s", (LPCWSTR)sTable);
+		TOString sWhere = getWhere(idx);
+		if (!sWhere.IsEmpty())
+		{
+			strSelect.Append(L" ");
+			strSelect.Append(sWhere);
+		}
+		return RT_SUCCESS;
+	}
+
+	// WHEN NOT MATCHED 만 있는 경우
+	// vecTableRefs[0] = 대상 테이블, vecTableRefs[1] = 소스 테이블 (일반적인 MERGE 구조)
+	const auto& stmts = m_oSQLEngine.GetStatements();
+	if (stmts.empty() || stmts[0].vecTableRefs.size() < 2)
+		return RT_NOT_SUPPORT_INSERT_TYPE;
+
+	TOString tableTarget = CA2W(stmts[0].vecTableRefs[0].szTable.c_str(), CP_UTF8);
+	TOString aliasTarget = CA2W(stmts[0].vecTableRefs[0].szAlias.c_str(), CP_UTF8);
+	TOString tableSource = CA2W(stmts[0].vecTableRefs[1].szTable.c_str(), CP_UTF8);
+	TOString aliasSource = CA2W(stmts[0].vecTableRefs[1].szAlias.c_str(), CP_UTF8);
+
+	// INSERT 컬럼값 목록
+	InsertInfo info = m_oSQLEngine.GetInsertInfo(0);
+	TOString sColumnValues;
+	for (const auto& val : info.vecValues)
+	{
+		if (!sColumnValues.IsEmpty()) sColumnValues.Append(L", ");
+		sColumnValues.Append(CA2W(val.c_str(), CP_UTF8));
+	}
+	if (sColumnValues.IsEmpty()) sColumnValues = L"*";
+
+	strSelect.Format(L"SELECT %s FROM %s%s WHERE NOT EXISTS ( SELECT 1 FROM %s%s )"
+		, (LPCWSTR)sColumnValues
+		, (LPCWSTR)tableSource
+		, aliasSource.IsEmpty() ? L"" : (L" " + aliasSource)
+		, (LPCWSTR)tableTarget
+		, aliasTarget.IsEmpty() ? L"" : (L" " + aliasTarget)
+	);
+
+	return RT_SUCCESS;
 }
 
 // [GSP→Antlr4] INSERT 후 데이터: [컬럼명 행, 값 행]
