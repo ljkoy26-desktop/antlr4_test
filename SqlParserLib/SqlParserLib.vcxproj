@@ -145,9 +145,9 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\debug\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../vcpkg\installed\x64-windows\debug\lib;</AdditionalLibraryDirectories>
       <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>../lib64/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>../lib64/antlr4/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -168,9 +168,9 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>$(SolutionDir)vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>../vcpkg\installed\x64-windows\lib</AdditionalLibraryDirectories>
       <AdditionalDependencies>antlr4-runtime.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <ImportLibrary>../lib64/$(TargetName).lib</ImportLibrary>
+      <ImportLibrary>../lib64/antlr4/$(TargetName).lib</ImportLibrary>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>

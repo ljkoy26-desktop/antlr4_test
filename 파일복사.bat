@@ -12,11 +12,13 @@ echo 파일 복사를 시작합니다...
 echo [복사 중] TestMFCDlg 파일...
 xcopy "%BASE_DIR%\TestMFC\TestMFCDlg.h" "%DEST_DIR%\TestMFC\" /y
 xcopy "%BASE_DIR%\TestMFC\TestMFCDlg.cpp" "%DEST_DIR%\TestMFC\" /y
+xcopy "%BASE_DIR%\TestMFC\TestMFC.vcxproj" "%DEST_DIR%\TestMFC\" /y
 
 :: 2. SqlParserLib 폴더 파일 복사
 echo [복사 중] SQLEngine 파일...
 xcopy "%BASE_DIR%\SqlParserLib\SQLEngine.h" "%DEST_DIR%\SqlParserLib\" /y
 xcopy "%BASE_DIR%\SqlParserLib\SQLEngine.cpp" "%DEST_DIR%\SqlParserLib\" /y
+xcopy "%BASE_DIR%\SqlParserLib\SqlParserLib.vcxproj" "%DEST_DIR%\SqlParserLib\" /y
 
 echo.
 echo 모든 파일 복사가 완료되었습니다!

@@ -105,9 +105,8 @@ C:\USERS\USER\DESKTOP\GITHUB_CLONE\ANTLR4_TEST\TESTMFC
 ¦¢   pch.cpp
 ¦¢   pch.h
 ¦¢   resource.h
-¦¢   SQLEngine.cpp
-¦¢   SQLEngine.h
 ¦¢   targetver.h
+¦¢   TestMFC.aps
 ¦¢   TestMFC.cpp
 ¦¢   TestMFC.h
 ¦¢   TestMFC.rc
