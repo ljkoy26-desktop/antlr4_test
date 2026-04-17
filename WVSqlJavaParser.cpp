@@ -21,6 +21,7 @@
 
 // Orange DB Type -> GSP DB Type
 // (GSP �ļ� ���� �Լ� ) 
+// 
 //static EDbVendor ConvertDbType(int dbType)
 //{
 //	switch (dbType)
@@ -82,15 +83,8 @@ CWVSqlParser::~CWVSqlParser()
 std::string CWVSqlParser::getError()
 {
 	TRACE(_T(" ========= CWVSqlParser::getError()   ========= \n"));
-	/*
-		�����丵 ��� �Լ�
-
-		wstring ���� �����ִ� �Լ��ε� string ���� �������� Ȯ�� �ʿ� 
-
-	*/
 
 	std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
-
 	return myconv.to_bytes(_error.str());
 	// return myconv.to_bytes(_error.str());
 }
@@ -130,7 +124,6 @@ bool CWVSqlParser::doParse(LPCTSTR sqlText)
 
 	if (!m_oSQLEngine.Parse(m_strsql, m_dbType))
 	{
-		// ������ ��� 
 	}
 
 	return true;
@@ -139,13 +132,7 @@ bool CWVSqlParser::doParse(LPCTSTR sqlText)
 std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::SeparateSQL databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
-	/*
-		�����丵 ��� �Լ� 
-
-		const std::vector<SqlStatementInfo>&  ���� �ٷ� ����Ҽ� �ִ��� ���� �ʿ� 	
 	
-	*/
-
 	std::vector<CString> ret;
 
 	if (m_oSQLEngine.GetStatementCount() == 0)
@@ -167,11 +154,6 @@ std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText
 bool CWVSqlParser::CheckSyntax(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::CheckSyntax databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
-	/*
-		�����丵 ��� �Լ�
-		sqlengine ��ü ������ ���� �ٸ���. �̷��� ��ȯ �ؼ� ����ص� ������ ������??
-		( ��������� ��ü - �������� ��ü ���ε��� �Ѱǵ� ������������? )
-	*/
 
 	SQLEngine engine;
 	std::string sql = CT2A(sqlText);
@@ -302,11 +284,6 @@ CString CWVSqlParser::MakeHash2(int databaseType, LPCTSTR sqlText)
 CString CWVSqlParser::RemoveComment1(LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::RemoveComment1 sqlText [%s]   ========= \n"), sqlText);
-	/*
-		�����丵 ��� �Լ�
-		sqlengine ��ü ������ ���� �ٸ���. �̷��� ��ȯ �ؼ� ����ص� ������ ������??
-		( ��������� ��ü - �������� ��ü ���ε��� �Ѱǵ� ������������? )
-	*/
 
 	std::string result;
 
@@ -396,14 +373,15 @@ std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInf
 
 		if (m_bUppercase) { table.MakeUpper(); schema.MakeUpper(); db.MakeUpper(); }
 
-		Object tableObj = { L"", table, schema, db };
+		std::vector<TOString> tableObj = { L"", table, schema, db };
 		objs.insert(tableObj);
 	}
 
 	// 컬럼 참조 처리: 테이블 결정 여부에 따라 Object 분기
 	for (const auto& colRef : stmtInfo.vecColumnRefs)
 	{
-		if (colRef.szColumn.empty()) continue;
+		if (colRef.szColumn.empty()) 
+			continue;
 
 		TOString col = CA2W(colRef.szColumn.c_str(), CP_UTF8);
 		col.Trim(L"\"");
@@ -429,13 +407,13 @@ std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInf
 				}
 			}
 
-			Object colObj = { col, table, schema, db };
+			std::vector<TOString> colObj = { col, table, schema, db };
 			objs.insert(colObj);
 		}
 		else
 		{
 			// 테이블 미결정: column만 저장
-			Object colObj = { col, L"", L"", L"" };
+			std::vector<TOString> colObj = { col, L"", L"", L"" };
 			objs.insert(colObj);
 		}
 	}
@@ -444,20 +422,27 @@ std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInf
 }
 
 // [마이그레이션 스텁] GSP TCustomSqlStatement 기반 traverseSql → SQLEngine 위임
-void CWVSqlParser::traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt)
-{
-	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
-	traverseSql(idx);
-}
+//void CWVSqlParser::traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt)
+//{
+//	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
+//	traverseSql(idx);
+//}
 
-void CWVSqlParser::debugObjects(std::set<Object> objects)
+void CWVSqlParser::debugObjects(std::set<std::vector<TOString>> objects)
 {
 	TRACE(_T(" ========= CWVSqlParser::debugObjects()   ========= \n"));
 	int ii = 0;
 	TRACE(_T("objects size = %d\n"), objects.size());
+
 	for (auto obj : objects)
 	{
-		TRACE(_T("[%d] [column:%s] [table: %s] [schema: %s] [db: %s] \n"), ii, (LPCTSTR)CW2T(obj[0]), (LPCTSTR)CW2T(obj[1]), (LPCTSTR)CW2T(obj[2]), (LPCTSTR)CW2T(obj[3]));
+		TRACE(_T("[%d] [column:%s] [table: %s] [schema: %s] [db: %s] \n"), ii, 
+			(LPCTSTR)CW2T(obj[0]),
+			(LPCTSTR)CW2T(obj[1]),
+			(LPCTSTR)CW2T(obj[2]), 
+			(LPCTSTR)CW2T(obj[3])
+		);
+
 		ii++;
 	}
 }
@@ -467,7 +452,8 @@ bool CWVSqlParser::traverseSql(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
 
-	if (idx >= (UINT)m_oSQLEngine.GetStatementCount()) return false;
+	if (idx >= (UINT)m_oSQLEngine.GetStatementCount()) 
+		return false;
 
 	while (m_objects.size() <= (size_t)idx)
 		m_objects.push_back({});
@@ -476,6 +462,7 @@ bool CWVSqlParser::traverseSql(UINT idx)
 
 	// 테이블명 → {스키마, DB} 매핑 (컬럼 결정 시 사용)
 	std::map<TOString, std::pair<TOString, TOString>> tableMap;
+
 	for (const auto& tableRef : stmtInfo.vecTableRefs)
 	{
 		TOString table  = CA2W(tableRef.szTable.c_str(),    CP_UTF8);
@@ -486,7 +473,7 @@ bool CWVSqlParser::traverseSql(UINT idx)
 		tableMap[table] = { schema, db };
 
 		// 테이블 엔트리: {column="", table, schema, db}
-		Object tableObj = { L"", table, schema, db };
+		std::vector<TOString> tableObj = { L"", table, schema, db };
 		m_objects[idx].insert(tableObj);
 	}
 
@@ -1105,69 +1092,16 @@ bool CWVSqlParser::GetInsertValues(TOString sqlInsert, std::vector<TOString>& co
 			return false;
 
 		for (const auto& col : info.vecColumns)
-			colReturn.push_back(CA2W(col.c_str(), CP_UTF8));
+			colReturn.push_back(col.c_str());
 
 		for (const auto& val : info.vecValues)
-			valReturn.push_back(CA2W(val.c_str(), CP_UTF8));
+			valReturn.push_back(val.c_str());
 
 		return !colReturn.empty() || !valReturn.empty();
 	}
 	catch (exception& e)
 	{
 		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
-	}
-
-	return false;
-}
-
-// [GSP→Antlr4] MERGE WHEN [NOT] MATCHED 절 존재 여부
-// - bool 반환: SQL 텍스트에서 "WHEN [NOT] MATCHED" 패턴 탐색으로 대체 가능
-// - node 출력 파라미터: GSP 타입이므로 채울 수 없음 (호출측에서 미사용)
-bool CWVSqlParser::hasMatchedClasuse(bool bMatched, nodes::TMergeWhenClause& node)
-{
-	TRACE(_T(" ========= CWVSqlParser::hasMatchedClasuse bMatched [%d]   ========= \n"), bMatched);
-
-	if (GetStatementCount() == 0) return false;
-
-	std::string sql = m_oSQLEngine.GetStatements()[0].sqlText;
-
-	// 대문자 변환
-	std::string upper = sql;
-	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
-
-	auto isWordChar = [](unsigned char c) { return std::isalnum(c) || c == '_'; };
-
-	size_t pos = 0;
-	while ((pos = upper.find("WHEN", pos)) != std::string::npos)
-	{
-		// 단어 경계 확인 (WHENEVER 등 부분 매칭 방지)
-		if (pos > 0 && isWordChar((unsigned char)upper[pos - 1])) { pos++; continue; }
-		size_t afterWhen = pos + 4;
-		if (afterWhen < upper.size() && isWordChar((unsigned char)upper[afterWhen])) { pos++; continue; }
-
-		// WHEN 이후 공백 건너뜀
-		while (afterWhen < upper.size() && std::isspace((unsigned char)upper[afterWhen])) afterWhen++;
-
-		// WHEN NOT MATCHED 패턴 확인
-		if (upper.substr(afterWhen, 3) == "NOT" && !isWordChar((unsigned char)upper[afterWhen + 3]))
-		{
-			size_t afterNot = afterWhen + 3;
-			while (afterNot < upper.size() && std::isspace((unsigned char)upper[afterNot])) afterNot++;
-			if (upper.substr(afterNot, 7) == "MATCHED" && (afterNot + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterNot + 7])))
-			{
-				if (!bMatched) return true;  // WHEN NOT MATCHED 발견
-				pos++;
-				continue;
-			}
-		}
-
-		// WHEN MATCHED (NOT 없음) 패턴 확인
-		if (upper.substr(afterWhen, 7) == "MATCHED" && (afterWhen + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterWhen + 7])))
-		{
-			if (bMatched) return true;  // WHEN MATCHED 발견
-		}
-
-		pos++;
 	}
 
 	return false;
@@ -1261,6 +1195,59 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOStri
 
 	return RT_SUCCESS;
 }
+// [GSP→Antlr4] MERGE WHEN [NOT] MATCHED 절 존재 여부
+// - bool 반환: SQL 텍스트에서 "WHEN [NOT] MATCHED" 패턴 탐색으로 대체 가능
+// - node 출력 파라미터: GSP 타입이므로 채울 수 없음 (호출측에서 미사용)
+
+bool CWVSqlParser::hasMatchedClasuse(bool bMatched)
+{
+	TRACE(_T(" ========= CWVSqlParser::hasMatchedClasuse bMatched [%d]   ========= \n"), bMatched);
+
+	if (GetStatementCount() == 0) return false;
+
+	std::string sql = m_oSQLEngine.GetStatements()[0].sqlText;
+
+	// 대문자 변환
+	std::string upper = sql;
+	std::transform(upper.begin(), upper.end(), upper.begin(), ::toupper);
+
+	auto isWordChar = [](unsigned char c) { return std::isalnum(c) || c == '_'; };
+
+	size_t pos = 0;
+	while ((pos = upper.find("WHEN", pos)) != std::string::npos)
+	{
+		// 단어 경계 확인 (WHENEVER 등 부분 매칭 방지)
+		if (pos > 0 && isWordChar((unsigned char)upper[pos - 1])) { pos++; continue; }
+		size_t afterWhen = pos + 4;
+		if (afterWhen < upper.size() && isWordChar((unsigned char)upper[afterWhen])) { pos++; continue; }
+
+		// WHEN 이후 공백 건너뜀
+		while (afterWhen < upper.size() && std::isspace((unsigned char)upper[afterWhen])) afterWhen++;
+
+		// WHEN NOT MATCHED 패턴 확인
+		if (upper.substr(afterWhen, 3) == "NOT" && !isWordChar((unsigned char)upper[afterWhen + 3]))
+		{
+			size_t afterNot = afterWhen + 3;
+			while (afterNot < upper.size() && std::isspace((unsigned char)upper[afterNot])) afterNot++;
+			if (upper.substr(afterNot, 7) == "MATCHED" && (afterNot + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterNot + 7])))
+			{
+				if (!bMatched) return true;  // WHEN NOT MATCHED 발견
+				pos++;
+				continue;
+			}
+		}
+
+		// WHEN MATCHED (NOT 없음) 패턴 확인
+		if (upper.substr(afterWhen, 7) == "MATCHED" && (afterWhen + 7 >= upper.size() || !isWordChar((unsigned char)upper[afterWhen + 7])))
+		{
+			if (bMatched) return true;  // WHEN MATCHED 발견
+		}
+
+		pos++;
+	}
+
+	return false;
+}
 
 // [GSP→Antlr4] INSERT 후 데이터: [컬럼명 행, 값 행]
 bool CWVSqlParser::MakeInsertAfterData(std::vector<std::vector<TOString>>& afterData)
@@ -1271,13 +1258,13 @@ bool CWVSqlParser::MakeInsertAfterData(std::vector<std::vector<TOString>>& after
 
 	std::vector<TOString> cols;
 	for (const auto& col : info.vecColumns)
-		cols.push_back(CA2W(col.c_str(), CP_UTF8));
+		cols.push_back(col.c_str());
 	if (!cols.empty())
 		afterData.push_back(cols);
 
 	std::vector<TOString> vals;
 	for (const auto& val : info.vecValues)
-		vals.push_back(CA2W(val.c_str(), CP_UTF8));
+		vals.push_back(val.c_str());
 	if (!vals.empty())
 		afterData.push_back(vals);
 
@@ -1292,7 +1279,7 @@ bool CWVSqlParser::MakeDeleteBeforeData(std::vector<std::vector<TOString>>& atta
 	std::string whereText = m_oSQLEngine.GetWhereClauseText(0);
 
 	std::vector<TOString> columns = { L"condition" };
-	std::vector<TOString> values  = { CA2W(whereText.c_str(), CP_UTF8) };
+	std::vector<TOString> values  = { whereText.c_str() };
 
 	attachmentData.push_back(columns);
 	attachmentData.push_back(values);
@@ -1308,7 +1295,7 @@ bool CWVSqlParser::MakeUpdateBeforeData(std::vector<std::vector<TOString>>& atta
 	std::string whereText = m_oSQLEngine.GetWhereClauseText(0);
 
 	std::vector<TOString> columns = { L"condition" };
-	std::vector<TOString> values  = { CA2W(whereText.c_str(), CP_UTF8) };
+	std::vector<TOString> values  = { whereText.c_str() };
 
 	attachmentData.push_back(columns);
 	attachmentData.push_back(values);
@@ -1326,8 +1313,10 @@ bool CWVSqlParser::MakeUpdateAfterData(std::vector<std::vector<TOString>>& after
 	std::vector<TOString> columns, values;
 	for (const auto& p : pairs)
 	{
-		columns.push_back(CA2W(p.first.c_str(),  CP_UTF8));
-		values.push_back(CA2W(p.second.c_str(), CP_UTF8));
+		columns.push_back(_T("asdasd"));
+
+		columns.push_back(p.first.c_str());
+		values.push_back(p.second.c_str());
 	}
 
 	if (!columns.empty())
