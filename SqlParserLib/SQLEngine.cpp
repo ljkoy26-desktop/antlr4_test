@@ -548,7 +548,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 	for (auto& stInfo : results)
 	{
 		if (!stInfo.sqlText.empty())
-			stInfo.bHasError = CheckSyntaxErrorOracle(stInfo.sqlText);
+		{
+			stInfo.szParseErrorMsg = CheckSyntaxErrorOracle(stInfo.sqlText);
+			stInfo.bHasError       = !stInfo.szParseErrorMsg.empty();
+		}
 	}
 
 	// 서브쿼리 수집 (토큰 기반 분리이므로 각 문장을 재파싱)
@@ -1144,7 +1147,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 	for (auto& stInfo : results)
 	{
 		if (!stInfo.sqlText.empty())
-			stInfo.bHasError = CheckSyntaxErrorMySQL(stInfo.sqlText);
+		{
+			stInfo.szParseErrorMsg = CheckSyntaxErrorMySQL(stInfo.sqlText);
+			stInfo.bHasError       = !stInfo.szParseErrorMsg.empty();
+		}
 	}
 
 	// 서브쿼리 수집 (MySQL은 토큰 기반 분리이므로 각 문장을 재파싱)
@@ -1654,7 +1660,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 	for (auto& stInfo : results)
 	{
 		if (!stInfo.sqlText.empty())
-			stInfo.bHasError = CheckSyntaxErrorSQLServer(stInfo.sqlText);
+		{
+			stInfo.szParseErrorMsg = CheckSyntaxErrorSQLServer(stInfo.sqlText);
+			stInfo.bHasError       = !stInfo.szParseErrorMsg.empty();
+		}
 	}
 
 	return results;
@@ -2031,7 +2040,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 	for (auto& stInfo : results)
 	{
 		if (!stInfo.sqlText.empty())
-			stInfo.bHasError = CheckSyntaxErrorPostgreSQL(stInfo.sqlText);
+		{
+			stInfo.szParseErrorMsg = CheckSyntaxErrorPostgreSQL(stInfo.sqlText);
+			stInfo.bHasError       = !stInfo.szParseErrorMsg.empty();
+		}
 	}
 
 	return results;
@@ -2534,7 +2546,10 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 	for (auto& stInfo : results)
 	{
 		if (!stInfo.sqlText.empty())
-			stInfo.bHasError = CheckSyntaxErrorDB2(stInfo.sqlText);
+		{
+			stInfo.szParseErrorMsg = CheckSyntaxErrorDB2(stInfo.sqlText);
+			stInfo.bHasError       = !stInfo.szParseErrorMsg.empty();
+		}
 	}
 
 	return results;
@@ -3026,17 +3041,23 @@ namespace
 	class SqlSyntaxErrorListener : public antlr4::BaseErrorListener
 	{
 	public:
-		bool m_bHasError = false;
+		bool        m_bHasError  = false;
+		std::string m_szErrorMsg;  // 누적 오류 메시지 (여러 오류 시 개행 구분)
 
 		void syntaxError(
 			antlr4::Recognizer* /*recognizer*/,
 			antlr4::Token* /*offendingSymbol*/,
-			size_t /*line*/,
-			size_t /*charPositionInLine*/,
-			const std::string& /*msg*/,
+			size_t line,
+			size_t charPositionInLine,
+			const std::string& msg,
 			std::exception_ptr /*e*/) override
 		{
 			m_bHasError = true;
+			if (!m_szErrorMsg.empty())
+				m_szErrorMsg += "\n";
+			m_szErrorMsg += "line " + std::to_string(line)
+				+ ":" + std::to_string(charPositionInLine)
+				+ " " + msg;
 		}
 	};
 }
@@ -3046,7 +3067,7 @@ namespace
 // 문법 오류 감지 (내부 전용) - 개별 SQL 문장을 재파싱하여 확인
 // ============================================================
 
-bool SQLEngine::CheckSyntaxErrorOracle(const std::string& szSql)
+std::string SQLEngine::CheckSyntaxErrorOracle(const std::string& szSql)
 {
 	try
 	{
@@ -3062,15 +3083,15 @@ bool SQLEngine::CheckSyntaxErrorOracle(const std::string& szSql)
 		parser.addErrorListener(&oErrListener);
 
 		parser.sql_script();
-		return oErrListener.m_bHasError;
+		return oErrListener.m_szErrorMsg;  // 빈 문자열 = 오류 없음
 	}
 	catch (...)
 	{
-		return true;
+		return "Exception during Oracle parse";
 	}
 }
 
-bool SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
+std::string SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
 {
 	try
 	{
@@ -3092,15 +3113,15 @@ bool SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
 		parser.addErrorListener(&oErrListener);
 
 		parser.query();
-		return oErrListener.m_bHasError;
+		return oErrListener.m_szErrorMsg;  // 빈 문자열 = 오류 없음
 	}
 	catch (...)
 	{
-		return true;
+		return "Exception during MySQL parse";
 	}
 }
 
-bool SQLEngine::CheckSyntaxErrorSQLServer(const std::string& szSql)
+std::string SQLEngine::CheckSyntaxErrorSQLServer(const std::string& szSql)
 {
 	try
 	{
@@ -3116,15 +3137,15 @@ bool SQLEngine::CheckSyntaxErrorSQLServer(const std::string& szSql)
 		parser.addErrorListener(&oErrListener);
 
 		parser.tsql_file();
-		return oErrListener.m_bHasError;
+		return oErrListener.m_szErrorMsg;
 	}
 	catch (...)
 	{
-		return true;
+		return "Exception during SQL Server parse";
 	}
 }
 
-bool SQLEngine::CheckSyntaxErrorPostgreSQL(const std::string& szSql)
+std::string SQLEngine::CheckSyntaxErrorPostgreSQL(const std::string& szSql)
 {
 	try
 	{
@@ -3140,15 +3161,15 @@ bool SQLEngine::CheckSyntaxErrorPostgreSQL(const std::string& szSql)
 		parser.addErrorListener(&oErrListener);
 
 		parser.root();
-		return oErrListener.m_bHasError;
+		return oErrListener.m_szErrorMsg;
 	}
 	catch (...)
 	{
-		return true;
+		return "Exception during PostgreSQL parse";
 	}
 }
 
-bool SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
+std::string SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
 {
 	try
 	{
@@ -3164,11 +3185,11 @@ bool SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
 		parser.addErrorListener(&oErrListener);
 
 		parser.db2_file();
-		return oErrListener.m_bHasError;
+		return oErrListener.m_szErrorMsg;
 	}
 	catch (...)
 	{
-		return true;
+		return "Exception during DB2 parse";
 	}
 }
 
@@ -3213,6 +3234,39 @@ bool SQLEngine::HasSyntaxError(int nIndex) const
 		return true;
 
 	return m_vecStatements[nIndex].bHasError;
+}
+
+// 파싱 실패 문장 수 반환
+int SQLEngine::GetParseErrorCount() const
+{
+	int nCount = 0;
+	for (const auto& stmt : m_vecStatements)
+	{
+		if (stmt.bHasError)
+			++nCount;
+	}
+	return nCount;
+}
+
+// 파싱 성공 문장 수 반환
+int SQLEngine::GetParseSuccessCount() const
+{
+	int nCount = 0;
+	for (const auto& stmt : m_vecStatements)
+	{
+		if (!stmt.bHasError)
+			++nCount;
+	}
+	return nCount;
+}
+
+// n번째 문장의 파싱 오류 메시지 반환
+std::string SQLEngine::GetParseErrorMsg(int nIndex) const
+{
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return "";
+
+	return m_vecStatements[nIndex].szParseErrorMsg;
 }
 
 // 저장된 stmt 목록 전체 반환
@@ -3765,15 +3819,15 @@ bool SQLEngine::HasSyntaxError(const std::vector<SqlStatementInfo>& vecStmts, in
 	switch (static_cast<DatabaseType>(stInfo.nDatabaseType))
 	{
 	case DatabaseType::DB_ORACLE:
-		return CheckSyntaxErrorOracle(stInfo.sqlText);
+		return !CheckSyntaxErrorOracle(stInfo.sqlText).empty();
 	case DatabaseType::DB_MYSQL:
-		return CheckSyntaxErrorMySQL(stInfo.sqlText);
+		return !CheckSyntaxErrorMySQL(stInfo.sqlText).empty();
 	case DatabaseType::DB_SQLSERVER:
-		return CheckSyntaxErrorSQLServer(stInfo.sqlText);
+		return !CheckSyntaxErrorSQLServer(stInfo.sqlText).empty();
 	case DatabaseType::DB_POSTGRESQL:
-		return CheckSyntaxErrorPostgreSQL(stInfo.sqlText);
+		return !CheckSyntaxErrorPostgreSQL(stInfo.sqlText).empty();
 	case DatabaseType::DB_DB2:
-		return CheckSyntaxErrorDB2(stInfo.sqlText);
+		return !CheckSyntaxErrorDB2(stInfo.sqlText).empty();
 	default:
 		return false;
 	}

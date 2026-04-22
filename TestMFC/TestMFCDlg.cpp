@@ -153,9 +153,12 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	m_oSQLEngine.Clear();
 	m_oSQLEngine.Parse(sqlQueries, nDatabaseType);
 
-	int nSQLCount = m_oSQLEngine.GetStatementCount();
-	int nTokenCount = m_oSQLEngine.GetTokenCount();
+	int nSQLCount     = m_oSQLEngine.GetStatementCount();
+	int nTokenCount   = m_oSQLEngine.GetTokenCount();
+	int nErrorCount   = m_oSQLEngine.GetParseErrorCount();
+	int nSuccessCount = m_oSQLEngine.GetParseSuccessCount();
 	AddTraceLog(_T("파싱 완료 - SQL 문장: %d개 / 토큰: %d개"), nSQLCount, nTokenCount);
+	AddTraceLog(_T("파싱 결과: 성공 %d개 / 실패 %d개"), nSuccessCount, nErrorCount);
 	AddTraceLog(_T(""));
 
 	if (nSQLCount == 0)
@@ -182,6 +185,8 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 			stInfo.bHasError ? _T("있음") : _T("없음"));
 		AddTraceLog(_T("  위치: Line %d, Column %d"), (int)stInfo.startLine, (int)stInfo.startColumn);
 		AddTraceLog(_T("  SQL: %s"), CString(stdSql.c_str()));
+		if (stInfo.bHasError && !stInfo.szParseErrorMsg.empty())
+			AddTraceLog(_T("  오류 메시지: %s"), CString(stInfo.szParseErrorMsg.c_str()));
 
 		// -------------------------------------------------------
 		// 문장별 테이블 참조 (stInfo.vecTableRefs)

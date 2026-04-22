@@ -137,7 +137,8 @@ struct SqlStatementInfo {
 	std::string sqlText;
 	size_t startLine;
 	size_t startColumn;
-	bool bHasError;       // 문법 오류 여부
+	bool bHasError;             // 문법 오류 여부
+	std::string szParseErrorMsg; // 문법 오류 메시지 (bHasError=true 시 ANTLR4 오류 내용)
 	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
 	bool bHasSubQuery;    // 서브쿼리 존재 여부
 	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
@@ -236,6 +237,15 @@ public:
 
 	// 저장된 stmt 목록에서 n번째 SQL 문장의 문법 오류 여부 반환 (0-based index)
 	bool HasSyntaxError(int nIndex) const;
+
+	// 파싱 실패 문장 수 반환 (bHasError=true 인 문장 수)
+	int GetParseErrorCount() const;
+
+	// 파싱 성공 문장 수 반환 (bHasError=false 인 문장 수)
+	int GetParseSuccessCount() const;
+
+	// n번째 문장의 파싱 오류 메시지 반환 (오류 없으면 빈 문자열)
+	std::string GetParseErrorMsg(int nIndex) const;
 
 	// 저장된 stmt 목록 전체 반환
 	const std::vector<SqlStatementInfo>& GetStatements() const;
@@ -392,9 +402,10 @@ private:
 	TokenRole GetRoleFromLexerTokenDB2(size_t tokenType, const std::string& tokenText) const;
 
 	// 문법 오류 감지 (내부 전용 - 개별 SQL 문장을 재파싱하여 오류 확인)
-	bool CheckSyntaxErrorOracle(const std::string& szSql);
-	bool CheckSyntaxErrorMySQL(const std::string& szSql);
-	bool CheckSyntaxErrorSQLServer(const std::string& szSql);
-	bool CheckSyntaxErrorPostgreSQL(const std::string& szSql);
-	bool CheckSyntaxErrorDB2(const std::string& szSql);
+	// 반환값: 빈 문자열 = 오류 없음 / 비어있지 않으면 ANTLR4 오류 메시지
+	std::string CheckSyntaxErrorOracle(const std::string& szSql);
+	std::string CheckSyntaxErrorMySQL(const std::string& szSql);
+	std::string CheckSyntaxErrorSQLServer(const std::string& szSql);
+	std::string CheckSyntaxErrorPostgreSQL(const std::string& szSql);
+	std::string CheckSyntaxErrorDB2(const std::string& szSql);
 };
