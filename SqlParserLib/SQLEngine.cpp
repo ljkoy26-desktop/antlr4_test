@@ -3690,6 +3690,261 @@ InsertInfo SQLEngine::GetInsertInfo(int nIndex)
 	return stResult;
 }
 
+// [GSP: TSelectSqlStatement.getResultColumnList() 대응]
+// n번째 SELECT 문장의 컬럼 목록 반환 (별칭 없는 항목 포함)
+std::vector<SelectColumnInfo> SQLEngine::GetSelectColumns(int nIndex)
+{
+	std::vector<SelectColumnInfo> vecResult;
+
+	if (nIndex < 0 || nIndex >= static_cast<int>(m_vecStatements.size()))
+		return vecResult;
+
+	const SqlStatementInfo& stmtInfo = m_vecStatements[nIndex];
+	if (stmtInfo.type != SqlStatementType::SELECT_STATEMENT)
+		return vecResult;
+
+	const std::string&     szSql    = stmtInfo.sqlText;
+	std::vector<TokenInfo> vecTok   = TokenizeQuery(szSql, stmtInfo.nDatabaseType);
+	const size_t           nTokCnt  = vecTok.size();
+
+	// ── 헬퍼 람다 ────────────────────────────────────────────────────
+	auto fnSkip = [](const TokenInfo& t) -> bool
+	{
+		return t.role == TokenRole::WHITESPACE || t.role == TokenRole::COMMENT;
+	};
+	auto fnIdent = [](const TokenInfo& t) -> bool
+	{
+		return t.role == TokenRole::IDENTIFIER
+			|| t.role == TokenRole::COLUMN_NAME
+			|| t.role == TokenRole::TABLE_NAME
+			|| t.role == TokenRole::ALIAS_NAME
+			|| t.role == TokenRole::FUNCTION_NAME
+			|| t.role == TokenRole::SCHEMA_NAME;
+	};
+	auto fnUpper = [](const std::string& s) -> std::string
+	{
+		std::string r = s;
+		std::transform(r.begin(), r.end(), r.begin(), ::toupper);
+		return r;
+	};
+
+	// ── 1. SELECT 위치 및 컬럼 목록 끝 위치 탐색 ─────────────────────
+	size_t nSelectIdx = SIZE_MAX;
+	size_t nListEnd   = nTokCnt;
+	int    nDepth     = 0;
+
+	for (size_t i = 0; i < nTokCnt; i++)
+	{
+		const TokenInfo& tok = vecTok[i];
+		if (fnSkip(tok))
+			continue;
+
+		if (tok.role == TokenRole::SEPARATOR_PAREN_OPEN)
+		{
+			++nDepth;
+			continue;
+		}
+		if (tok.role == TokenRole::SEPARATOR_PAREN_CLOSE)
+		{
+			--nDepth;
+			continue;
+		}
+		if (nDepth != 0)
+			continue;
+
+		// depth 0 에서만 처리
+		if (tok.role == TokenRole::KEYWORD_SELECT && nSelectIdx == SIZE_MAX)
+		{
+			nSelectIdx = i;
+			continue;
+		}
+
+		if (nSelectIdx != SIZE_MAX)
+		{
+			std::string sUp = fnUpper(tok.text);
+			bool bStop = tok.role == TokenRole::KEYWORD_FROM
+				|| sUp == "WHERE"     || sUp == "GROUP"  || sUp == "ORDER"
+				|| sUp == "HAVING"    || sUp == "LIMIT"  || sUp == "FETCH"
+				|| sUp == "UNION"     || sUp == "INTERSECT"
+				|| sUp == "EXCEPT"    || sUp == "MINUS"
+				|| tok.role == TokenRole::SEPARATOR_SEMICOLON;
+
+			if (bStop)
+			{
+				nListEnd = i;
+				break;
+			}
+		}
+	}
+
+	if (nSelectIdx == SIZE_MAX)
+		return vecResult;
+
+	// ── 2. DISTINCT / ALL / TOP N 건너뛰기 ───────────────────────────
+	size_t nStart = nSelectIdx + 1;
+	{
+		size_t i = nStart;
+		while (i < nListEnd && fnSkip(vecTok[i]))
+			++i;
+
+		if (i < nListEnd)
+		{
+			std::string sUp = fnUpper(vecTok[i].text);
+			if (sUp == "DISTINCT" || sUp == "ALL")
+			{
+				nStart = i + 1;
+			}
+			else if (sUp == "TOP")  // SQL Server TOP N
+			{
+				++i;
+				while (i < nListEnd && fnSkip(vecTok[i]))
+					++i;
+				if (i < nListEnd)
+					++i;  // 숫자 건너뜀
+				nStart = i;
+			}
+		}
+	}
+
+	// ── 3. 컬럼 목록을 콤마(depth 0)로 분리 ─────────────────────────
+	nDepth = 0;
+	std::vector<std::vector<size_t>> vecItems;
+	std::vector<size_t>              curItem;
+
+	for (size_t i = nStart; i < nListEnd; i++)
+	{
+		const TokenInfo& tok = vecTok[i];
+
+		if (tok.role == TokenRole::SEPARATOR_PAREN_OPEN)
+		{
+			++nDepth;
+			curItem.push_back(i);
+		}
+		else if (tok.role == TokenRole::SEPARATOR_PAREN_CLOSE)
+		{
+			--nDepth;
+			curItem.push_back(i);
+		}
+		else if (nDepth == 0 && tok.role == TokenRole::SEPARATOR_COMMA)
+		{
+			vecItems.push_back(curItem);
+			curItem.clear();
+		}
+		else
+		{
+			curItem.push_back(i);
+		}
+	}
+	if (!curItem.empty())
+		vecItems.push_back(curItem);
+
+	// ── 4. 각 아이템 파싱 ────────────────────────────────────────────
+	for (const auto& item : vecItems)
+	{
+		// 공백·주석 제외 인덱스 수집
+		std::vector<size_t> m;
+		for (size_t idx : item)
+		{
+			if (!fnSkip(vecTok[idx]))
+				m.push_back(idx);
+		}
+		if (m.empty())
+			continue;
+
+		SelectColumnInfo info;
+		size_t nExprEnd = m.size();  // 표현식 토큰 끝 (exclusive)
+
+		// ── 4a. 별칭 감지 ──────────────────────────────────────────
+		if (m.size() >= 2)
+		{
+			const TokenInfo& tLast    = vecTok[m.back()];
+			const TokenInfo& tSecLast = vecTok[m[m.size() - 2]];
+
+			if (fnUpper(tSecLast.text) == "AS" && fnIdent(tLast))
+			{
+				// 명시적 AS alias
+				info.szAlias = tLast.text;
+				nExprEnd     = m.size() - 2;
+			}
+			else if (fnIdent(tLast)
+				&& tSecLast.role != TokenRole::SEPARATOR_DOT)
+			{
+				// 묵시적 alias (AS 없음)
+				// dot 뒤 ident는 한정된 컬럼명이므로 별칭 아님
+				bool bImpl = fnIdent(tSecLast)
+					|| tSecLast.role == TokenRole::SEPARATOR_PAREN_CLOSE
+					|| tSecLast.role == TokenRole::LITERAL_STRING
+					|| tSecLast.role == TokenRole::LITERAL_NUMBER
+					|| tSecLast.role == TokenRole::LITERAL_INTEGER
+					|| tSecLast.role == TokenRole::LITERAL_FLOAT;
+				if (bImpl)
+				{
+					info.szAlias = tLast.text;
+					nExprEnd     = m.size() - 1;
+				}
+			}
+		}
+
+		if (nExprEnd == 0)
+			continue;
+
+		// ── 4b. 표현식 텍스트 구성 (원본 SQL 문자 위치 기반) ────────
+		{
+			size_t nCStart = vecTok[m[0]].startIndex;
+			size_t nCStop  = vecTok[m[nExprEnd - 1]].stopIndex;
+			if (nCStart < szSql.size()
+				&& nCStop  < szSql.size()
+				&& nCStop  >= nCStart)
+			{
+				info.szExpression = szSql.substr(nCStart, nCStop - nCStart + 1);
+			}
+			else
+			{
+				// 폴백: 토큰 텍스트 직접 연결
+				for (size_t k = 0; k < nExprEnd; k++)
+					info.szExpression += vecTok[m[k]].text;
+			}
+		}
+
+		// ── 4c. 한정자(szPrefixTable) / 단순 컬럼명(szColumn) 탐지 ─
+		if (nExprEnd >= 3
+			&& vecTok[m[1]].role == TokenRole::SEPARATOR_DOT)
+		{
+			// "a.b" 또는 "a.*" 패턴
+			info.szPrefixTable = vecTok[m[0]].text;
+			if (nExprEnd == 3)
+				info.szColumn = vecTok[m[2]].text;
+		}
+		else if (nExprEnd == 1)
+		{
+			const TokenInfo& t0 = vecTok[m[0]];
+			if (fnIdent(t0) || t0.text == "*")
+				info.szColumn = t0.text;
+		}
+
+		vecResult.push_back(info);
+	}
+
+	return vecResult;
+}
+
+// [GSP: GetOriginColumnsOfAlias 대응]
+// n번째 SELECT 문장에서 별칭이 있는 컬럼만 반환
+std::vector<SelectColumnInfo> SQLEngine::GetSelectColumnAliases(int nIndex)
+{
+	std::vector<SelectColumnInfo> vecAll = GetSelectColumns(nIndex);
+	std::vector<SelectColumnInfo> vecResult;
+	vecResult.reserve(vecAll.size());
+
+	for (const auto& info : vecAll)
+	{
+		if (!info.szAlias.empty())
+			vecResult.push_back(info);
+	}
+
+	return vecResult;
+}
+
 // [GSP: isTableDetermined 대응]
 // 해당 컬럼 참조의 테이블이 결정되었는지 반환
 bool SQLEngine::IsTableDetermined(const ColumnRefInfo& stCol)

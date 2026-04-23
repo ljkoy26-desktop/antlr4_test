@@ -121,7 +121,16 @@ struct SQLPARSERLIB_API ColumnRefInfo
 	std::string szResolvedTable;   // 결정된 테이블명 (bTableDetermined=true 시)
 };
 
-// 2-3. DB 종류 식별자
+// 2-3. SELECT 결과 컬럼 정보 (별칭 · 표현식 · 한정자 포함)
+struct SQLPARSERLIB_API SelectColumnInfo
+{
+	std::string szAlias;        // 별칭 (AS alias 또는 묵시적 alias)
+	std::string szExpression;   // 컬럼 표현식 전체 (table.col / func() / * 등)
+	std::string szPrefixTable;  // 한정자 (table.col → table 부분, 없으면 빈 문자열)
+	std::string szColumn;       // 단순 컬럼명 (단일 ident / * 인 경우, 그 외 빈 문자열)
+};
+
+// 2-4. DB 종류 식별자
 enum class DatabaseType
 {
 	DB_ORACLE     = 0,
@@ -325,6 +334,16 @@ public:
 	// n번째 INSERT 문장의 컬럼명 / 값 / 서브쿼리 정보 반환
 	// INSERT가 아니면 빈 InsertInfo 반환
 	InsertInfo GetInsertInfo(int nIndex);
+
+	// [GSP: TSelectSqlStatement.getResultColumnList() 대응]
+	// n번째 SELECT 문장의 컬럼 목록 반환 (별칭 없는 항목 포함)
+	// SELECT 문이 아니거나 범위 초과 시 빈 벡터 반환
+	std::vector<SelectColumnInfo> GetSelectColumns(int nIndex);
+
+	// [GSP: GetOriginColumnsOfAlias 대응]
+	// n번째 SELECT 문장에서 별칭(AS 명시 또는 묵시적)이 있는 컬럼만 반환
+	// 반환 형식: {szAlias, szExpression, szPrefixTable, szColumn}
+	std::vector<SelectColumnInfo> GetSelectColumnAliases(int nIndex);
 
 	// -------------------------------------------------------
 	// [편의 함수] 외부에서 vector를 직접 넘겨 메타정보 조회

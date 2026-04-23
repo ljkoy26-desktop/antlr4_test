@@ -223,6 +223,27 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 		}
 
 		// -------------------------------------------------------
+		// SELECT 컬럼 별칭 정보 (SELECT 문장에만 해당)
+		// [GSP: GetOriginColumnsOfAlias 대응]
+		// -------------------------------------------------------
+		if (stInfo.type == SqlStatementType::SELECT_STATEMENT)
+		{
+			std::vector<SelectColumnInfo> vecSelCols =
+				m_oSQLEngine.GetSelectColumnAliases(stInfo.index);
+			AddTraceLog(_T("  [SELECT 컬럼(별칭 있는 것) %d개]"), (int)vecSelCols.size());
+			for (const SelectColumnInfo& stSel : vecSelCols)
+			{
+				CString strAlias(stSel.szAlias.c_str());
+				CString strExpr(stSel.szExpression.c_str());
+				CString strPrefix(stSel.szPrefixTable.c_str());
+				AddTraceLog(_T("    Alias=%-15s Expr=%-20s PrefixTable=%s"),
+					strAlias,
+					strExpr,
+					strPrefix.IsEmpty() ? _T("-") : strPrefix);
+			}
+		}
+
+		// -------------------------------------------------------
 		// 문장별 서브쿼리 (stInfo.vecSubQueries)
 		// -------------------------------------------------------
 		AddTraceLog(_T("  [서브쿼리 %d개]"), (int)stInfo.vecSubQueries.size());
