@@ -955,12 +955,42 @@ CString CWVSqlParser::GetErrMessage()
 	return (LPCSTR)getError().c_str();
 }
 
-// [마이그레이션 스텁] SELECT 결과 컬럼 별칭→원본컬럼 매핑
-// Antlr4 기반 파서에서는 SELECT AST 표현식 트리 미지원 → 빈 맵 반환
+// [GSP→Antlr4] SELECT 결과 컬럼 별칭→원본컬럼 매핑
+// GSP: stmt.getResultColumnList() + cell.getAliasClause() / getExpr() / getPrefixTable()
+// Antlr4: SQLEngine::GetSelectColumnAliases() 사용
 void CWVSqlParser::GetOriginColumnsOfAlias(std::multimap<TOString, Object>& mapOrgColumn)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetOriginColumnsOfAlias()   ========= \n"));
-	// 미지원: mapOrgColumn 비어있는 채로 반환
+
+	if (GetStatementCount() == 0)
+		return;
+
+	if (GetSqlType(0) != SqlTypeQuery)
+		return;
+
+	try
+	{
+		std::vector<SelectColumnInfo> vecCols = m_oSQLEngine.GetSelectColumnAliases(0);
+
+		for (const SelectColumnInfo& stSel : vecCols)
+		{
+			// object[0]=alias, object[1]=expression, object[2]=prefixTable
+			TOString szAlias(CA2T(stSel.szAlias.c_str(),      CP_UTF8));
+			TOString szExpr (CA2T(stSel.szExpression.c_str(), CP_UTF8));
+			TOString szTable(CA2T(stSel.szPrefixTable.c_str(), CP_UTF8));
+
+			szAlias.MakeUpper();
+			szExpr.MakeUpper();
+			szTable.MakeUpper();
+
+			Object object = { szAlias, szExpr, szTable };
+			mapOrgColumn.insert(std::make_pair(szAlias, object));
+		}
+	}
+	catch (std::exception& e)
+	{
+		_error << L"Exception: " << CA2W(e.what(), CP_UTF8);
+	}
 }
 
 // [GSP→Antlr4] UPDATE SET 절 col=val 쌍 목록 반환
