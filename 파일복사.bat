@@ -13,6 +13,7 @@ echo [복사 중] TestMFCDlg 파일...
 xcopy "%BASE_DIR%\TestMFC\TestMFCDlg.h" "%DEST_DIR%\TestMFC\" /y
 xcopy "%BASE_DIR%\TestMFC\TestMFCDlg.cpp" "%DEST_DIR%\TestMFC\" /y
 xcopy "%BASE_DIR%\TestMFC\TestMFC.vcxproj" "%DEST_DIR%\TestMFC\" /y
+xcopy "%BASE_DIR%\Include\antlr4\framework.h" "%DEST_DIR%\Include\antlr4\" /y
 
 :: 2. SqlParserLib 폴더 파일 복사
 echo [복사 중] SQLEngine 파일...

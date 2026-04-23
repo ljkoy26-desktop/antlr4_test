@@ -3,7 +3,7 @@
 #include <vector>
 
 // SqlParserLib DLL 매크로
-#include "../SqlParserLib/framework.h"
+#include "../include/antlr4/framework.h"
 
 // 1. 유형 정의 (Dlg 클래스 안에 있던 것을 이리로 이동)
 

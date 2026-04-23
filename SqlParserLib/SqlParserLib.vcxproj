@@ -174,7 +174,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="framework.h" />
+    <ClInclude Include="..\Include\antlr4\framework.h" />
     <ClInclude Include="Source\DB2\Db2Lexer.h" />
     <ClInclude Include="Source\DB2\Db2Parser.h" />
     <ClInclude Include="Source\DB2\Db2ParserBaseVisitor.h" />
