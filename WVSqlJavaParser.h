@@ -24,7 +24,8 @@
 #include <stdexcept>
 #include <algorithm>
 
-#include "../src_core/SqlParserLib/SQLEngine.h"
+// #include "../src_core/SqlParserLib/SQLEngine.h"
+#include "../include/antlr4/SQLEngine.h"
 
 enum DB_TYPE
 {
@@ -68,7 +69,7 @@ enum EM_MAKESELECT_RESULT { RT_SUCCESS = 0, RT_PARSE_FAIL, RT_NOT_SUPPORT_INSERT
 class SO_SQL_PARSER_EXT_CLASS CWVSqlParser
 {
 public:
-	// void dev();
+	void dev();
 	
 	CWVSqlParser();
 	CWVSqlParser(int databaseType, bool bUppercase = true);
@@ -86,7 +87,11 @@ public:
 	bool MakeUpdateAfterData(std::vector< std::vector<TOString> >& afterData);
 	bool MakeUpdateBeforeData(std::vector< std::vector<TOString> >& afterData);
 //
+	bool IsParse();
 	bool Parse(LPCTSTR sqlText);
+
+
+
 ////	void Clear();
 	EM_MAKESELECT_RESULT MakeSelectStmt(LPCTSTR sqlText, TOString& strSelect);
 	EM_MAKESELECT_RESULT MakeSelectAfterStmt(LPCTSTR sqlText, TOString& strSelect);
@@ -156,11 +161,13 @@ protected:
 //
 //	//jvm::global<gudusoft::gsqlparser::TGSqlParser> m_parser;
 	int m_dbType;
+	DatabaseType m_emAntlrDBType;
 	bool m_bUppercase;
 	// std::wstring m_wstrsql; // 한개의 SQL 문장을 담는 멤버 변수로 보여집니다.
 	std::string m_strsql;
 	std::vector<std::set<std::vector<TOString>> > m_objects; // 실제로 sql statement 목록을 담는 함수로 보여집니다. ( m_oSQLEngine과 동작 유사해보임 , 굳이 안가지고 있어도 될거같은 변수임 )
 	std::wstringstream _error;
+	std::string m_sLastError;
 	// std::stringstream _error;
 };
 //
