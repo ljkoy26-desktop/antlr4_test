@@ -112,432 +112,395 @@ void CWVSqlParser::dev()
 		TRACE(_T("\n===== [2] GetAllObjects / GetAllTargetObjects =====\n"));
 		initParser(DB_TYPE::tstORACLE);
 
-		sql = _T("begin ")
-			_T("update emp set a=1 where 1=0; ")
-			_T("end ");
-		//sql = _T("select e.*, e.*, RSDN_RGST_NO as ea from \"고객식별자_NEW\" e;");
-		Parse(sql);
-		{
-			std::multimap<TOString, Object > mapColumns;
-			GetOriginColumnsOfAlias(mapColumns);
-
-			debugObjects(GetAllObjects(0));
-			debugObjects(GetAllTargetObjects(0));
-
-		}
-
-		sql = _T("SELECT substr(RSDN_RGST_NO, 6) as rr FROM MKKIM.고객식별자_NEW;");
-		Parse(sql);
-		{
-			std::multimap<TOString, Object > mapColumns;
-			GetOriginColumnsOfAlias(mapColumns);
-		}
-
-		sql = _T("SELECT substr(RSDN_RGST_NO, 6) FROM MKKIM.고객식별자_NEW;");
-		Parse(sql);
-		{
-			std::multimap<TOString, Object > mapColumns;
-			GetOriginColumnsOfAlias(mapColumns);
-		}
-
 		sql = _T(
-			"update\n"
-			"scott.emp\n"
-			"set\n"
-			"comm = case\n"
-			"when length(round(comm)) < 4 then comm * 10\n"
-			"when length(round(comm)) > 4 then comm / 10\n"
-			"when length(round(comm)) = 4 then round(comm)\n"
-			"else 1000\n"
-			"end\n"
-			"where\n"
-			"sals > 3000 \n"
-			"and comm is not null\n"
-			"and band = (select band from sys.emp where comm is not null)"
-		);
-		
-		Parse(sql);
-		debugObjects(GetAllObjects(0));
-		debugObjects(GetAllTargetObjects(0));
-
-		sql = _T(
-			"select count(*) from scott.emp where ename is not null\n"
+			"UPDATE scott.source s SET s.name = '한글', no = 10\n"
+			" WHERE s.top IN (\n"
+			"  SELECT top FROM scott2.target\n"
+			"  INNER JOIN dest ON target.no = dest.target\n"
+			"  WHERE xx = s.no\n"
+			" );\n"
 		);
 		Parse(sql);
 		debugObjects(GetAllObjects(0));
 		debugObjects(GetAllTargetObjects(0));
 
-
-		sql = _T("INSERT INTO ")
-			_T("  \"SYS\".\"SCOTT_EMP\" ( ")
-			_T("    \"A_EMPNO\", ")
-			_T("    \"A_ENAME\", ")
-			_T("    \"A_JOB\", ")
-			_T("    \"A_MGR\", ")
-			_T("    \"A_HIREDATE\", ")
-			_T("    \"A_SAL\", ")
-			_T("    \"A_COMM\", ")
-			_T("    \"A_DEPTNO\", ")
-			_T("    \"A_TS\", ")
-			_T("    \"B_EMPNO\", ")
-			_T("    \"B_ENAME\", ")
-			_T("    \"B_JOB\", ")
-			_T("    \"B_MGR\", ")
-			_T("    \"B_HIREDATE\", ")
-			_T("    \"B_SAL\", ")
-			_T("    \"B_COMM\", ")
-			_T("    \"B_DEPTNO\", ")
-			_T("    \"B_TS\", ")
-			_T("    \"C_EMPNO\", ")
-			_T("    \"C_ENAME\", ")
-			_T("    \"C_JOB\", ")
-			_T("    \"C_MGR\", ")
-			_T("    \"C_HIREDATE\", ")
-			_T("    \"C_SAL\", ")
-			_T("    \"C_COMM\", ")
-			_T("    \"C_DEPTNO\", ")
-			_T("    \"C_TS\", ")
-			_T("    \"D_EMPNO\", ")
-			_T("    \"D_ENAME\", ")
-			_T("    \"D_JOB\", ")
-			_T("    \"D_MGR\", ")
-			_T("    \"D_HIREDATE\", ")
-			_T("    \"D_SAL\", ")
-			_T("    \"D_COMM\", ")
-			_T("    \"D_DEPTNO\", ")
-			_T("    \"D_TS\" ")
-			_T("  ) ")
-			_T("VALUES ")
-			_T("  ( ")
-			_T("    8261, ")
-			_T("    'eJOJaRWvELPqehLYPHpyXwzIPffNCtTIMhzkGvbSDPtFWITHngsxLIWUzqfvyCcVBKlONrHxeqFD', ")
-			_T("    'uUngGA', ")
-			_T("    379, ")
-			_T("    TO_DATE('2018/04/09', 'YYYY/MM/DD'), ")
-			_T("    81034.77, ")
-			_T("    89185.41, ")
-			_T("    21, ")
-			_T("    TO_DATE('2020/04/24', 'YYYY/MM/DD'), ")
-			_T("    6374, ")
-			_T("    'uEpdjrGveSsEekmndiCHjPGzOejChZDaCQQkMvillhfGk', ")
-			_T("    'ps', ")
-			_T("    2111, ")
-			_T("    TO_DATE('2016/01/14', 'YYYY/MM/DD'), ")
-			_T("    71738.69, ")
-			_T("    68843.17, ")
-			_T("    96, ")
-			_T("    TO_DATE('2015/04/23', 'YYYY/MM/DD'), ")
-			_T("    6732, ")
-			_T("    'AxUuQBrJtVPArYKsFEpOQRQNXJWbalfPFKzEfUKMlwJNqpati', ")
-			_T("    'GNwVaM', ")
-			_T("    7962, ")
-			_T("    TO_DATE('2012/09/25', 'YYYY/MM/DD'), ")
-			_T("    49836.97, ")
-			_T("    60565.55, ")
-			_T("    23, ")
-			_T("    TO_DATE('2017/01/29', 'YYYY/MM/DD'), ")
-			_T("    1095, ")
-			_T("    'JGRLzljYUfUlTXKvzJGybvocXPyl', ")
-			_T("    'GrzynTroP', ")
-			_T("    6331, ")
-			_T("    TO_DATE('2017/08/25', 'YYYY/MM/DD'), ")
-			_T("    38515.43, ")
-			_T("    80846.87, ")
-			_T("    26, ")
-			_T("    TO_DATE('2012/05/16', 'YYYY/MM/DD') ")
-			_T("  ) ");
-		
-		Parse(sql);
-		debugObjects(GetAllObjects(0));
-		debugObjects(GetAllTargetObjects(0));
-
-		ret = MakeSelectStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("\n[MakeSelectStmt]\n %s\n"), strSelect);
-
-		ret = MakeSelectAfterStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("\n[MakeSelectAfterStmt]\n %s\n"), strSelect);
-
-		TRACE(_T(" ========= 변경전후 쿼리 테스트   ========= \n"));
-		//sql = _T(
-		//	"MERGE INTO CSSADM.TB_EL_DEVC_MSTR A \n"
-		//	"USING CHLEE.TB_EL_DEVC_MSTR_BY_SB_TMP PARTITION(P_003269) B -- EDIT[이관번호] \n"
-		//	"ON(A.DEVC_NO = B.DEVC_NO) \n"
-		//	"WHEN MATCHED THEN \n"
-		//	"UPDATE \n"
-		//	"SET \n"
-		//	"A.DEVC_POSN_BIZBR_CD = B.LATER_AS_DLR_CD --소속 대리점 \n"
-		//	",A.RMKS_CNTNT = '대리점교체[2021.01.01][2021년 홈개통AS 권역이관(협력사/자회사)요청][홈개통AS현장지원팀-2012-0029]' \n"
-		//	",A.SYS_UPDATE_DATE = SYSDATE\n"
-		//);
-		sql = _T("merge into pm_user2 ")
-			_T("using emp ")
-			_T("on (USER_ID = TO_CHAR(EMPNO)) ")
-			_T("when matched then ")
-			_T("update set  USER_NAME = ename ")
-			_T("when not matched then ")
-			_T("insert (user_id, user_name) ")
-			_T("values (TO_CHAR(EMPNO), ename) ");
-
-		Parse(sql);
-		ret = MakeSelectStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("\n[MakeSelectStmt]\n %s\n"), strSelect);
-
-		sql = _T("merge into MKKIM.PM_USER2 T ")
-			_T("using mkkim.pm_user S ")
-			_T("on (S.USER_ID = T.USER_ID) ")
-			_T("when not matched then ")
-			_T("    insert (t.user_id, t.user_name) ")
-			_T("    values (s.user_id, '박상은') ");
-
-		Parse(sql);
-
-		ret = MakeSelectStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("\n[MakeSelectStmt]\n %s\n"), strSelect);
-
-		ret = MakeSelectAfterStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("\n[MakeSelectAfterStmt]\n %s\n"), strSelect);
-
-		sql = _T(" INSERT INTO dbo.EmployeeSales ")
-			_T(" SELECT 'SELECT', sp.BusinessEntityID, c.LastName, sp.SalesYTD ")
-			_T(" FROM Sales.SalesPerson AS sp ")
-			_T(" INNER JOIN Person.Person AS c ")
-			_T(" ON sp.BusinessEntityID = c.BusinessEntityID ")
-			_T(" WHERE sp.BusinessEntityID LIKE '2%' ")
-			_T(" ORDER BY sp.BusinessEntityID, c.LastName ");
-		TRACE(_T("[Parse] %s\n"), sql);
-		ret = MakeSelectAfterStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectAfterStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("[MakeSelectAfterStmt] %s\n"), strSelect);
-
-		TRACE(" ========= set=where조건 테스트   ========= \n");
-		sql = _T(
-			"update\n"
-			"scott.emp\n"
-			"set\n"
-			"comm = case\n"
-			"when length(round(comm)) < 4 then comm * 10\n"
-			"when length(round(comm)) > 4 then comm / 10\n"
-			"when length(round(comm)) = 4 then round(comm)\n"
-			"else 1000\n"
-			"end\n"
-			"where\n"
-			"sals > 3000 \n"
-			"and comm is not null\n"
-		);
-		if (!IsIncludeWhereInSet(sql))
-		{
-			TRACE(_T("IsIncludeWhereInSet 실패\n"));
-			return;
-		}
-		ret = MakeSelectStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("[MakeSelectStmt] %s\n"), strSelect);
-
-		ret = MakeSelectAfterStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectAfterStmt 실패\n"));
-			return;
-		}
-		TRACE(_T("[MakeSelectAfterStmt] %s\n"), strSelect);
-
-		sql = _T(
-			"insert into emp;"
-		);
-		CheckSyntax(DB_TYPE::tstORACLE, sql);
-		TRACE(_T("[CheckSyntax] \n%s\n%s\n"), sql, GetErrMessage());
-
-		TRACE(_T(" ========= target object 추출 테스트   ========= \n"));
-		/*"select name from emp, dept;\n"*/
-		//"UPDATE scott.source s SET s.name='한글', no=10\n"
-		//" WHERE s.top IN (\n"
-		//"  SELECT top FROM scott2.target INNER JOIN dest ON target.no=dest.target WHERE xx=s.no\n"
-		//" );\n"
-	//"INSERT INTO Production.UnitMeasure (Name, UnitMeasureCode,ModifiedDate) \n"
-	//	"VALUES(N'Square Yards', N'Y2', GETDATE()); "
-
+		// UPDATE (inline view)
 		sql = _T(
 			"UPDATE "
 			"( "
-			"    SELECT A.LGT_SELNG_AMT, "
-			"           ROUND(b.fix_SELNG_AMT / 1000) AS AMT "
-			"      FROM CSSADM.TB_MK_ENPR_CUST_MS_INFO A, "
-			"           CSSADM.TB_MK_CUST_MS_MON_IF_02 B "
+			"    SELECT A.LGT_SELNG_AMT, ROUND(b.fix_SELNG_AMT / 1000) AS AMT "
+			"      FROM CSSADM.TB_MK_ENPR_CUST_MS_INFO A, CSSADM.TB_MK_CUST_MS_MON_IF_02 B "
 			"     WHERE A.SELNG_YYMM = '202011' "
-			"       AND A.SELNG_YYMM = B.BASE_YYMM(+) "
-			"       AND A.SELNG_UNIT_BIS_CD = B.SELNG_UNIT_SVC_CD(+) "
 			") SET LGT_SELNG_AMT = AMT ;"
 		);
 		Parse(sql);
 		debugObjects(GetAllObjects(0));
 		debugObjects(GetAllTargetObjects(0));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
 
-		TRACE(_T(" ========= TEST   ========= \n"));
+	// ──────────────────────────────────────────────────────────────────
+	// [3] GetOriginColumnsOfAlias
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [3] GetOriginColumnsOfAlias =====\n"));
+		initParser(DB_TYPE::tstORACLE);
 
-		sql = _T("                       SELECT * FROM (" \
-			"                               SELECT tax_rates.* FROM" \
-			"                                       wp_woocommerce_tax_rates as tax_rates" \
-			"                               LEFT OUTER JOIN" \
-			"                                       wp_woocommerce_tax_rate_locations as locations ON tax_rates.tax_rate_id = locations.tax_rate_id" \
-			"                               LEFT OUTER JOIN" \
-			"                                       wp_woocommerce_tax_rate_locations as locations2 ON tax_rates.tax_rate_id = locations2.tax_rate_id" \
-			"                               WHERE" \
-			"                                       tax_rate_country IN ( 'GB', '' )" \
-			"                                       AND tax_rate_state IN ( '', '' )" \
-			"                                       AND tax_rate_class = ''" \
-			"                                       AND" \
-			"                                       (" \
-			"                                               (" \
-			"                                                       locations.location_type IS NULL" \
-			"                                               )" \
-			"                                               OR" \
-			"                                               (" \
-			"                                                       locations.location_type = 'postcode'" \
-			"                                                       AND locations.location_code IN ('*','')" \
-			"                                                       AND locations2.location_type = 'city'" \
-			"                                                       AND locations2.location_code = ''" \
-			"                                               )" \
-			"                                               OR" \
-			"                                               (" \
-			"                                                       locations.location_type = 'postcode'" \
-			"                                                       AND locations.location_code IN ('*','')" \
-			"                                                       AND 0 = (" \
-			"                                                               SELECT COUNT(*) FROM wp_woocommerce_tax_rate_locations as sublocations" \
-			"                                                               WHERE sublocations.location_type = 'city'" \
-			"                                                               AND sublocations.tax_rate_id = tax_rates.tax_rate_id" \
-			"                                                       )" \
-			"                                               )" \
-			"                                               OR" \
-			"                                               (" \
-			"                                                       locations.location_type = 'city'" \
-			"                                                       AND locations.location_code = ''" \
-			"                                                       AND 0 = (" \
-			"                                                               SELECT COUNT(*) FROM wp_woocommerce_tax_rate_locations as sublocations" \
-			"                                                               WHERE sublocations.location_type = 'postcode'" \
-			"                                                               AND sublocations.tax_rate_id = tax_rates.tax_rate_id" \
-			"                                                       )" \
-			"                                               )" \
-			"                                       )" \
-			"                               GROUP BY" \
-			"                                       tax_rate_id" \
-			"                               ORDER BY" \
-			"                                       tax_rate_priority, tax_rate_order" \
-			"                       ) as ordered_taxes" \
-			"                       GROUP BY" \
-			"                               tax_rate_priority");
+		sql = _T("SELECT e.empno AS eno, e.ename AS nm, substr(e.sal, 1) AS sal FROM scott.emp e;");
 		Parse(sql);
-		debugObjects(GetAllObjects(0));
-		debugObjects(GetAllTargetObjects(0));
 
+		std::multimap<TOString, Object> mapColumns;
+		GetOriginColumnsOfAlias(mapColumns);
+		TRACE(_T("[GetOriginColumnsOfAlias] 결과 %d개\n"), (int)mapColumns.size());
+		for (auto& kv : mapColumns)
+		{
+			const Object& obj = kv.second;
+			TRACE(_T("  alias=%-15s  expr=%-20s  table=%s\n"),
+				(obj.size() > 0 ? (LPCTSTR)obj[0] : _T("")),
+				(obj.size() > 1 ? (LPCTSTR)obj[1] : _T("")),
+				(obj.size() > 2 ? (LPCTSTR)obj[2] : _T("")));
+		}
 
-		TRACE(_T(" ========= Make Hash 테스트   ========= \n"));
+		// 별칭 없는 경우 - 결과 0개 확인
+		sql = _T("SELECT substr(col, 6) FROM MKKIM.tbl;");
+		Parse(sql);
+		mapColumns.clear();
+		GetOriginColumnsOfAlias(mapColumns);
+		TRACE(_T("[GetOriginColumnsOfAlias - 별칭없음] 결과 %d개 (0이어야 정상)\n"), (int)mapColumns.size());
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [4] GetInsertValues
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [4] GetInsertValues =====\n"));
+		TOString sqlInsert = _T("INSERT INTO emp (empno, ename, sal) VALUES (1001, 'HONG', 3000)");
+		std::vector<TOString> vecCols;
+		std::vector<TOString> vecVals;
+
+		if (GetInsertValues(sqlInsert, vecCols, vecVals))
+		{
+			TRACE(_T("[GetInsertValues] 컬럼 %d개 / 값 %d개\n"),
+				(int)vecCols.size(), (int)vecVals.size());
+			for (size_t i = 0; i < vecCols.size() && i < vecVals.size(); i++)
+				TRACE(_T("  [%d] %s = %s\n"), (int)i, vecCols[i], vecVals[i]);
+		}
+		else
+		{
+			TRACE(_T("[GetInsertValues] 실패\n"));
+		}
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [5] MakeSelectStmt / MakeSelectAfterStmt (UPDATE)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [5] MakeSelectStmt / MakeSelectAfterStmt (UPDATE) =====\n"));
+		initParser(DB_TYPE::tstORACLE);
+
 		sql = _T(
-			"insert into 테이블 values ('김민경');"
+			"UPDATE scott.emp\n"
+			"SET comm = CASE WHEN sal > 3000 THEN sal * 0.1 ELSE 500 END\n"
+			"WHERE deptno = 10 AND ename IS NOT NULL"
 		);
-		TRACE(_T("%s\n"), sql);
-		ASSERT(MakeHash1(sql).Compare(_T("30A02298808BE1AC5F694745754829722DD7BC292186CF07B1DDF4FA411FE370")) == 0);
+		Parse(sql);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		// INSERT INTO … SELECT
+		sql = _T(
+			"INSERT INTO dbo.EmployeeSales"
+			" SELECT sp.BusinessEntityID, c.LastName, sp.SalesYTD"
+			" FROM Sales.SalesPerson AS sp"
+			" INNER JOIN Person.Person AS c ON sp.BusinessEntityID = c.BusinessEntityID"
+			" WHERE sp.BusinessEntityID LIKE '2%'"
+		);
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt - INSERT..SELECT] ret=%d\n%s\n"), (int)ret, strSelect);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [6] MakeAfterSelect4Merge / MERGE 문 MakeSelectStmt
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [6] MakeAfterSelect4Merge / MERGE =====\n"));
+		initParser(DB_TYPE::tstORACLE);
 
 		sql = _T(
-			"insert into "
-			"			at2adm.tb_cm_email_batch_mail_info( "
-			"				batch_id, "
-			"				email_dv_cd, "
-			"				to_email, "
-			"				use_yn, "
-			"				sys_create_date, "
-			"				operator_id "
-			"			) "
-			"			values "
-			"			( "
-			"				'PIMDB1180M', "
-			"				'T', "
-			"				'melisasr@lguplus.co.kr', "
-			"				'Y', "
-			"				sysdate, "
-			"				'박새롬' "
-			"			) "
+			"MERGE INTO pm_user2 T "
+			"USING emp S "
+			"ON (T.USER_ID = TO_CHAR(S.EMPNO)) "
+			"WHEN MATCHED THEN "
+			"  UPDATE SET T.USER_NAME = S.ENAME "
+			"WHEN NOT MATCHED THEN "
+			"  INSERT (T.USER_ID, T.USER_NAME) VALUES (TO_CHAR(S.EMPNO), S.ENAME)"
 		);
-		TRACE(_T("%s\n"), sql);
-		ASSERT(MakeHash1(sql).Compare(_T("162BBDAA67ADD489E3626DBF8A13514C5979381EB1B6F90D6AF31A103965693C")) == 0);
+		Parse(sql);
 
+		ret = MakeAfterSelect4Merge(sql, strSelect);
+		TRACE(_T("[MakeAfterSelect4Merge] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt-MERGE] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt-MERGE] ret=%d\n%s\n"), (int)ret, strSelect);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [7] MakeBeforeData / MakeAfterData
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [7] MakeBeforeData / MakeAfterData =====\n"));
+		initParser(DB_TYPE::tstORACLE);
+
+		sql = _T("UPDATE scott.emp SET sal = sal * 1.1, comm = 500 WHERE deptno = 20");
+
+		std::vector<std::vector<TOString>> data;
+		bool bOk = MakeBeforeData(sql, data);
+		DevPrint2D(data, bOk ? _T("MakeBeforeData 성공") : _T("MakeBeforeData 실패"));
+
+		data.clear();
+		bOk = MakeAfterData(sql, data);
+		DevPrint2D(data, bOk ? _T("MakeAfterData 성공") : _T("MakeAfterData 실패"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [8] MakeInsertAfterData / MakeDeleteBeforeData
+	//     MakeUpdateAfterData / MakeUpdateBeforeData
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [8] Make*Data 계열 =====\n"));
+		initParser(DB_TYPE::tstORACLE);
+
+		std::vector<std::vector<TOString>> data;
+
+		// INSERT After
+		sql = _T("INSERT INTO scott.emp (empno, ename, sal, deptno) VALUES (9999, 'TESTUSER', 2500, 30)");
+		Parse(sql);
+		data.clear();
+		MakeInsertAfterData(data);
+		DevPrint2D(data, _T("MakeInsertAfterData"));
+
+		// DELETE Before
+		sql = _T("DELETE FROM scott.emp WHERE deptno = 30 AND sal < 1000");
+		Parse(sql);
+		data.clear();
+		MakeDeleteBeforeData(data);
+		DevPrint2D(data, _T("MakeDeleteBeforeData"));
+
+		// UPDATE After / Before
+		sql = _T("UPDATE scott.emp SET sal = 3500, comm = 100 WHERE empno = 7839");
+		Parse(sql);
+
+		data.clear();
+		MakeUpdateAfterData(data);
+		DevPrint2D(data, _T("MakeUpdateAfterData"));
+
+		data.clear();
+		MakeUpdateBeforeData(data);
+		DevPrint2D(data, _T("MakeUpdateBeforeData"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [9] IsIncludeWhereInSet (CString 버전 / UINT 버전)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [9] IsIncludeWhereInSet =====\n"));
+		initParser(DB_TYPE::tstORACLE);
+
+		// CString 버전 - WHERE 있음
+		sql = _T(
+			"UPDATE scott.emp\n"
+			"SET comm = CASE WHEN sal > 3000 THEN sal * 0.1 ELSE 500 END\n"
+			"WHERE deptno = 10\n"
+		);
+		TRACE(_T("[IsIncludeWhereInSet(CString) - WHERE있음] %s\n"),
+			IsIncludeWhereInSet(sql) ? _T("true") : _T("false"));
+
+		// CString 버전 - WHERE 없음
+		sql = _T("UPDATE scott.emp SET comm = 0");
+		TRACE(_T("[IsIncludeWhereInSet(CString) - WHERE없음] %s\n"),
+			IsIncludeWhereInSet(sql) ? _T("true") : _T("false"));
+
+		// UINT 버전
+		sql = _T("UPDATE scott.emp SET comm = 100 WHERE sal > 2000");
+		Parse(sql);
+		TRACE(_T("[IsIncludeWhereInSet(UINT=0)] %s\n"),
+			IsIncludeWhereInSet(0U) ? _T("true") : _T("false"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [10] SeparateSQL
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [10] SeparateSQL =====\n"));
 
 		sql = _T(
-			"/*1번*/\n"
-			"select * --line comment\n"
-			"	from emp /*abc*/ "
-			"where ename = 'job';"
+			"SELECT * FROM emp WHERE deptno = 10;\n"
+			"UPDATE emp SET sal = 3000 WHERE empno = 7839;\n"
+			"DELETE FROM emp WHERE sal < 1000;"
 		);
-		TRACE(_T("%s\n"), sql);
-		CString s1 = MakeHash1(sql);
+		std::vector<CString> vecSqls = SeparateSQL(DB_TYPE::tstORACLE, sql);
+		TRACE(_T("[SeparateSQL] %d개 분리\n"), (int)vecSqls.size());
+		for (size_t i = 0; i < vecSqls.size(); i++)
+			TRACE(_T("  [%d] %s\n"), (int)i, vecSqls[i]);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [11] CheckSyntax / GetErrMessage
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [11] CheckSyntax / GetErrMessage =====\n"));
+
+		// 정상 문장
+		sql = _T("SELECT * FROM scott.emp WHERE empno = 7839");
+		TRACE(_T("[CheckSyntax] 정상SQL=%s  msg='%s'\n"),
+			CheckSyntax(DB_TYPE::tstORACLE, sql) ? _T("오류없음") : _T("오류있음"),
+			GetErrMessage());
+
+		// 오류 문장
+		sql = _T("sel1ect * from scott.emp");
+		TRACE(_T("[CheckSyntax] 오류SQL=%s\n  msg='%s'\n"),
+			CheckSyntax(DB_TYPE::tstORACLE, sql) ? _T("오류없음") : _T("오류있음"),
+			GetErrMessage());
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [12] MakeHash1 / MakeHash2
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [12] MakeHash1 / MakeHash2 =====\n"));
+
+		// 기준값 검증
+		ASSERT(MakeHash1(_T("update scott.emp set empno = 1111 where empno = 1112"))
+			.Compare(_T("220D08037355EB61DE6990AEF5BF007F7D47F5F3347FB5E483CAE7EFAC9F51F6")) == 0);
+		// 공백/세미콜론 달라도 동일 해시
+		ASSERT(MakeHash1(_T("update scott.emp set empno = 1111    \n\n\n\n\n\n where empno = 1112;"))
+			.Compare(_T("220D08037355EB61DE6990AEF5BF007F7D47F5F3347FB5E483CAE7EFAC9F51F6")) == 0);
+		TRACE(_T("[MakeHash1] 기준값 검증 OK\n"));
+
+		// 주석 달라도 동일 해시
+		CString sH1 = MakeHash1(_T("/*주석A*/ select * from emp where ename = 'job'"));
+		CString sH2 = MakeHash1(_T("/* 주석B */ select   *\n from emp where ename = 'job';"));
+		TRACE(_T("[MakeHash1] 주석무관 동일여부: %s\n"), sH1 == sH2 ? _T("동일 (정상)") : _T("다름"));
+
+		// MakeHash2 (DB 타입 명시 버전)
+		sql = _T("SELECT * FROM scott.emp WHERE deptno = 10");
+		CString sHash1 = MakeHash1(sql);
+		CString sHash2 = MakeHash2(DB_TYPE::tstORACLE, sql);
+		TRACE(_T("[MakeHash1] %s\n"), sHash1);
+		TRACE(_T("[MakeHash2] %s\n"), sHash2);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [13] RemoveComment1 / RemoveComment2
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [13] RemoveComment1 / RemoveComment2 =====\n"));
+
 		sql = _T(
-			"/*2번*/\n"
-			"select * -- modify comment \n"
-			"	\t from emp /*abcdefg*/ \n\n"
-			"where ename = 'job'"
+			"/*블록주석*/\n"
+			"select * -- 라인주석\n"
+			"from emp /* 인라인주석 */ where ename = 'job';"
 		);
-		TRACE(_T("%s\n"), sql);
-		CString s2 = MakeHash1(sql);
-		ASSERT(s1 == s2);
+		TRACE(_T("[원본]          %s\n"), sql);
+		TRACE(_T("[RemoveComment1] %s\n"), RemoveComment1(sql));
+		TRACE(_T("[RemoveComment2] %s\n"), RemoveComment2(DB_TYPE::tstORACLE, sql));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [14] Formatter
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [14] Formatter =====\n"));
+		initParser(DB_TYPE::tstORACLE);
 
 		sql = _T(
-			"update emp \n"
-			"set 11=11 \n"
-			"where 12=12;"
+			"select e.empno,e.ename,d.dname from scott.emp e"
+			" inner join scott.dept d on e.deptno=d.deptno where e.sal>2000"
 		);
-		TRACE(_T("%s\n"), sql);
-		CString sss = MakeHash1(sql);
+		Parse(sql);
+		CString sFormatted = Formatter();
+		TRACE(_T("[Formatter] '%s'\n"),
+			sFormatted.IsEmpty() ? _T("(미지원/빈값)") : sFormatted);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+	}
 
-
-		ASSERT(MakeHash1(_T("update scott.emp set empno = 1111 where empno = 1112")).Compare(_T("220D08037355EB61DE6990AEF5BF007F7D47F5F3347FB5E483CAE7EFAC9F51F6")) == 0);
-		ASSERT(MakeHash1(_T("update scott.emp set empno = 1111    \n\n\n\n\n\n where empno = 1112;")).Compare(_T("220D08037355EB61DE6990AEF5BF007F7D47F5F3347FB5E483CAE7EFAC9F51F6")) == 0);
-		ASSERT(MakeHash1(_T("WITH TEST AS ( \n"
-			"SELECT \n"
-			"* \n"
-			"FROM scott.emp \n"
-			"WHERE empno BETWEEN 1000 and 9999 \n"
-			"AND EXISTS(SELECT 1 FROM scott.emp) \n"
-			") \n"
-			"SELECT \n"
-			"* \n"
-			"FROM scott.dept d \n"
-			"INNER JOIN TEST t ON d.deptno = t.deptno")).Compare(_T("83DBDC83D7B11AAF1DC47E6B8C2B4C4BD7F1039DEB69852AD2FDBEDDAABB210E")) == 0);
-
-
-		TRACE(" ========= mysql replace 구문 테스트   ========= \n");
+	// ──────────────────────────────────────────────────────────────────
+	// [15] MySQL REPLACE 구문
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [15] MySQL REPLACE =====\n"));
 		initParser(DB_TYPE::tstMySQL);
+
 		sql = _T(
 			"REPLACE INTO cities\n"
 			"SET id = 4,\n"
@@ -545,24 +508,19 @@ void CWVSqlParser::dev()
 			"population = 1768980;\n"
 		);
 		Parse(sql);
+
 		ret = MakeSelectStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
+		TRACE(_T("[MakeSelectStmt-REPLACE] ret=%d\n%s\n"), (int)ret, strSelect);
+
 		ret = MakeSelectAfterStmt(sql, strSelect);
-		if (RT_PARSE_FAIL == ret)
-		{
-			TRACE(_T("MakeSelectStmt 실패\n"));
-			return;
-		}
+		TRACE(_T("[MakeSelectAfterStmt-REPLACE] ret=%d\n%s\n"), (int)ret, strSelect);
 	}
-	catch (exception& e)
+	catch (std::exception& e)
 	{
-		TRACE(_T("An exception occurred: %s"), e.what()/*CA2T(e.what(), CP_UTF8)*/);
+		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
 	}
 
+	TRACE(_T("\n ========= CWVSqlParser::dev() END ========= \n"));
 }
 
 
