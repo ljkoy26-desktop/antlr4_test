@@ -877,10 +877,11 @@ std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText
 	
 	std::vector<CString> ret;
 
-	if (m_oSQLEngine.GetStatementCount() == 0)
-		initParser(databaseType);
+	initParser(databaseType);
 
 	m_strsql = CT2A(sqlText);
+	m_oSQLEngine.Parse(m_strsql, (int)m_emAntlrDBType);
+
 	const std::vector<SqlStatementInfo>& vec = m_oSQLEngine.GetStatements();
 
 	int nSQLCount = vec.size();
