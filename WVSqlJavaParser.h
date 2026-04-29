@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #ifdef SO_SQL_PARSER_EXT_DLL
 #define SO_SQL_PARSER_EXT_CLASS _declspec(dllexport)
@@ -8,7 +8,7 @@
 
 
 
-#include "SOCommon/SOCommon.h" // CString °ü·Ã ÂüÁ¶°¡ Æ²¾îÁü... TOString
+#include "SOCommon/SOCommon.h" // CString ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Æ²ï¿½ï¿½ï¿½ï¿½... TOString
 
 
 
@@ -29,7 +29,7 @@
 
 enum DB_TYPE
 {
-//	2024-06-07 192.168.79.116 Server È®ÀÎ °á°ú
+//	2024-06-07 192.168.79.116 Server È®ï¿½ï¿½ ï¿½ï¿½ï¿½
 //	select * from torange.symbolcode where category_id=55000 and category_name = 'db_type'
 	tstNone = 0,
 	tstORACLE = 21,
@@ -70,7 +70,8 @@ class SO_SQL_PARSER_EXT_CLASS CWVSqlParser
 {
 public:
 	void dev();
-	
+	void dev2();
+
 	CWVSqlParser();
 	CWVSqlParser(int databaseType, bool bUppercase = true);
 	~CWVSqlParser();
@@ -105,7 +106,7 @@ public:
 	CString        MakeHash1(LPCTSTR sqlText);
 	CString        MakeHash2(int databaseType, LPCTSTR sqlText);
 	CString		  RemoveComment1(LPCTSTR sqlText);
-	CString		  RemoveComment2(int databaseType, LPCTSTR sqlText);		// single sql ±ÇÀå
+	CString		  RemoveComment2(int databaseType, LPCTSTR sqlText);		// single sql ï¿½ï¿½ï¿½ï¿½
 //
 	UINT	 GetStatementCount();
 	TOString GetStatementText(UINT idx);
@@ -125,7 +126,7 @@ protected:
 	void destroyParser();
 //
 	bool traverseSql(UINT idx);
-//	void traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt); // sqlengine¿¡ À§ÀÓ..?
+//	void traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt); // sqlengineï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½..?
 // 
 	TOString getTable(UINT idx);
 	TOString getWhere(UINT idx);
@@ -156,16 +157,16 @@ protected:
 protected:
 //
 //
-	// SQLEngine ÀÎ½ºÅÏ½º ¸â¹öº¯¼ö - Parse() ÈÄ ¸ÞÅ¸Á¤º¸ Á¶È¸¿¡ »ç¿ë
+	// SQLEngine ï¿½Î½ï¿½ï¿½Ï½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ - Parse() ï¿½ï¿½ ï¿½ï¿½Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ï¿½ï¿½ ï¿½ï¿½ï¿½
 	SQLEngine m_oSQLEngine;
 //
 //	//jvm::global<gudusoft::gsqlparser::TGSqlParser> m_parser;
 	int m_dbType;
 	DatabaseType m_emAntlrDBType;
 	bool m_bUppercase;
-	// std::wstring m_wstrsql; // ÇÑ°³ÀÇ SQL ¹®ÀåÀ» ´ã´Â ¸â¹ö º¯¼ö·Î º¸¿©Áý´Ï´Ù.
+	// std::wstring m_wstrsql; // ï¿½Ñ°ï¿½ï¿½ï¿½ SQL ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½.
 	std::string m_strsql;
-	std::vector<std::set<std::vector<TOString>> > m_objects; // ½ÇÁ¦·Î sql statement ¸ñ·ÏÀ» ´ã´Â ÇÔ¼ö·Î º¸¿©Áý´Ï´Ù. ( m_oSQLEngine°ú µ¿ÀÛ À¯»çÇØº¸ÀÓ , ±»ÀÌ ¾È°¡Áö°í ÀÖ¾îµµ µÉ°Å°°Àº º¯¼öÀÓ )
+	std::vector<std::set<std::vector<TOString>> > m_objects; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ sql statement ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ ï¿½Ô¼ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ï´ï¿½. ( m_oSQLEngineï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Øºï¿½ï¿½ï¿½ , ï¿½ï¿½ï¿½ï¿½ ï¿½È°ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¾îµµ ï¿½É°Å°ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ )
 	std::wstringstream _error;
 	std::string m_sLastError;
 	// std::stringstream _error;

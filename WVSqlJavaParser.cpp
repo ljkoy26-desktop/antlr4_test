@@ -101,7 +101,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -139,7 +139,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -174,7 +174,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -201,7 +201,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -238,7 +238,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -271,7 +271,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -294,7 +294,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -336,7 +336,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -369,7 +369,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -391,7 +391,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -415,7 +415,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -447,7 +447,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -468,7 +468,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -490,7 +490,7 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	// ──────────────────────────────────────────────────────────────────
@@ -517,10 +517,286 @@ void CWVSqlParser::dev()
 	}
 	catch (std::exception& e)
 	{
-		TRACE(_T("[예외] %s\n"), CA2T(e.what(), CP_UTF8));
+		TRACE(_T("[예외] %hs\n"), e.what());
 	}
 
 	TRACE(_T("\n ========= CWVSqlParser::dev() END ========= \n"));
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// dev2() : GetOriginColumnsOfAlias 전용 테스트
+//   반환 구조: multimap<alias, Object>
+//     Object[0] = alias (대문자)
+//     Object[1] = expression (대문자)
+//     Object[2] = prefixTable (대문자)
+// ──────────────────────────────────────────────────────────────────────────────
+void CWVSqlParser::dev2()
+{
+	TRACE(_T("\n ========= CWVSqlParser::dev2() START ========= \n"));
+
+	CStringW sql;
+	std::multimap<TOString, Object> map;
+
+	// 공통 출력 람다 대신 매크로 스타일 헬퍼
+	auto PrintAlias = [&](LPCTSTR szLabel)
+	{
+		TRACE(_T("\n----- %s  (결과 %d개) -----\n"), szLabel, (int)map.size());
+		for (auto& kv : map)
+		{
+			const Object& o = kv.second;
+			TRACE(_T("  alias=%-20s  expr=%-30s  table=%s\n"),
+				(o.size() > 0 ? (LPCTSTR)o[0] : _T("")),
+				(o.size() > 1 ? (LPCTSTR)o[1] : _T("")),
+				(o.size() > 2 ? (LPCTSTR)o[2] : _T("")));
+		}
+	};
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-01 : 단순 컬럼 별칭 (테이블 접두사 포함)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT e.empno AS eno, e.ename AS nm, e.sal AS salary FROM scott.emp e");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-01 단순 컬럼 별칭 (테이블 접두사 포함)"));
+		// 기대: eno→e.empno/EMP, nm→e.ename/EMP, salary→e.sal/EMP
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-01 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-02 : 함수 표현식 별칭
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT SUBSTR(ename, 1, 3) AS short_name, UPPER(job) AS job_upper, NVL(comm, 0) AS comm_val FROM scott.emp");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-02 함수 표현식 별칭"));
+		// 기대: short_name→SUBSTR(ename,1,3), job_upper→UPPER(job), comm_val→NVL(comm,0)
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-02 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-03 : 별칭 없는 컬럼만 있는 경우 → 결과 0개
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT empno, ename, sal FROM scott.emp WHERE deptno = 10");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-03 별칭 없음 (0개 기대)"));
+		ASSERT(map.size() == 0);
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-03 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-04 : 별칭 혼합 (일부 컬럼은 별칭 없음)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT e.empno, e.ename AS nm, e.sal AS salary, e.deptno FROM scott.emp e");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-04 별칭 혼합 (nm, salary 2개 기대)"));
+		ASSERT(map.size() == 2);
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-04 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-05 : JOIN - 두 테이블 컬럼에 각각 별칭
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T(
+			"SELECT e.empno AS emp_id, e.ename AS emp_name, d.dname AS dept_name "
+			"FROM scott.emp e "
+			"INNER JOIN scott.dept d ON e.deptno = d.deptno"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-05 INNER JOIN 두 테이블 별칭"));
+		// 기대: emp_id/emp_name → emp 테이블, dept_name → dept 테이블
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-05 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-06 : 산술 표현식 별칭
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT sal * 12 AS annual_sal, sal + NVL(comm, 0) AS total_income FROM scott.emp");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-06 산술 표현식 별칭"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-06 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-07 : CASE 표현식 별칭
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T(
+			"SELECT empno, "
+			"CASE WHEN sal >= 3000 THEN 'HIGH' WHEN sal >= 1500 THEN 'MID' ELSE 'LOW' END AS grade "
+			"FROM scott.emp"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-07 CASE 표현식 별칭 (grade 1개 기대)"));
+		ASSERT(map.size() == 1);
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-07 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-08 : 서브쿼리를 포함한 SELECT (외부 쿼리 별칭만 추출)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T(
+			"SELECT e.empno AS eid, e.ename AS ename, "
+			"(SELECT d.dname FROM scott.dept d WHERE d.deptno = e.deptno) AS dept_nm "
+			"FROM scott.emp e"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-08 스칼라 서브쿼리 별칭"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-08 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-09 : AS 키워드 없이 별칭 지정 (공백 별칭)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT e.empno eid, e.ename nm, e.sal salary FROM scott.emp e");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-09 AS 없는 별칭 (공백 별칭)"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-09 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-10 : MySQL DB 타입 - 집계함수 별칭
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstMySQL);
+		sql = _T(
+			"SELECT deptno, COUNT(*) AS cnt, SUM(sal) AS total_sal, AVG(sal) AS avg_sal "
+			"FROM emp GROUP BY deptno"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-10 MySQL 집계함수 별칭"));
+		// 기대: cnt, total_sal, avg_sal 3개
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-10 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-11 : MSSQL DB 타입
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstMSSQL);
+		sql = _T(
+			"SELECT TOP 10 e.EmployeeID AS emp_id, e.LastName AS last_nm, "
+			"ISNULL(e.MiddleName, '') AS mid_nm "
+			"FROM HumanResources.Employee e ORDER BY e.EmployeeID"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-11 MSSQL TOP/ISNULL 별칭"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-11 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-12 : PostgreSQL DB 타입
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstPostgreSQL);
+		sql = _T(
+			"SELECT u.user_id AS uid, u.username AS uname, COALESCE(u.email, 'N/A') AS email_addr "
+			"FROM public.users u WHERE u.is_active = true"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-12 PostgreSQL COALESCE 별칭"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-12 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-13 : 인라인 뷰(FROM 서브쿼리) - 외부 쿼리 별칭 추출
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T(
+			"SELECT v.eid AS emp_id, v.total AS total_sal "
+			"FROM (SELECT empno AS eid, sal + NVL(comm, 0) AS total FROM scott.emp) v "
+			"WHERE v.total > 2000"
+		);
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-13 인라인 뷰(FROM 서브쿼리) 외부 별칭"));
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-13 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-14 : SELECT * 인 경우 → 결과 0개
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("SELECT * FROM scott.emp WHERE sal > 1000");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-14 SELECT * (0개 기대)"));
+		ASSERT(map.size() == 0);
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-14 예외] %hs\n"), e.what()); }
+
+	// ──────────────────────────────────────────────────────────────────
+	// TC-15 : SELECT 문이 아닌 경우(UPDATE) → 결과 0개
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		initParser(DB_TYPE::tstORACLE);
+		sql = _T("UPDATE scott.emp SET sal = sal * 1.1 WHERE deptno = 10");
+		Parse(sql);
+		map.clear();
+		GetOriginColumnsOfAlias(map);
+		PrintAlias(_T("TC-15 UPDATE 문 (0개 기대)"));
+		ASSERT(map.size() == 0);
+	}
+	catch (std::exception& e) { TRACE(_T("[TC-15 예외] %hs\n"), e.what()); }
+
+	TRACE(_T("\n ========= CWVSqlParser::dev2() END ========= \n"));
 }
 
 

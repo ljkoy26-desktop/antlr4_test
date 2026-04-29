@@ -3392,6 +3392,7 @@ std::string SQLEngine::GetWhereClauseText(int nIndex)
 			break;
 
 		szResult += vecTokens[i].text;
+		szResult += ' ';
 	}
 
 	// 후행 공백 제거
