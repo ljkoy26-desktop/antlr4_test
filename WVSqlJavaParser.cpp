@@ -856,7 +856,7 @@ bool CWVSqlParser::doParse(LPCTSTR sqlText)
 {
 	m_oSQLEngine.Clear();
 
-	m_strsql = CT2A(sqlText);
+	m_strsql = CT2A(sqlText, CP_UTF8);
 
 	bool bParse = m_oSQLEngine.Parse(m_strsql, (int)m_emAntlrDBType);
 
@@ -879,7 +879,7 @@ std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText
 
 	initParser(databaseType);
 
-	m_strsql = CT2A(sqlText);
+	m_strsql = CT2A(sqlText, CP_UTF8);
 	m_oSQLEngine.Parse(m_strsql, (int)m_emAntlrDBType);
 
 	const std::vector<SqlStatementInfo>& vec = m_oSQLEngine.GetStatements();
@@ -899,7 +899,7 @@ bool CWVSqlParser::CheckSyntax(int databaseType, LPCTSTR sqlText)
 	TRACE(_T(" ========= CWVSqlParser::CheckSyntax databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
 
 	SQLEngine engine;
-	std::string sql = CT2A(sqlText);
+	std::string sql = CT2A(sqlText, CP_UTF8);
 	m_sLastError.clear();
 
 	bool bReturn = engine.Parse(sql, (int)m_emAntlrDBType);
@@ -927,7 +927,7 @@ CString CWVSqlParser::MakeHash1(LPCTSTR sqlText)
 		if (m_oSQLEngine.GetStatementCount() == 0)
 			initParser(m_dbType);
 
-		m_strsql = CT2A(sqlText);
+		m_strsql = CT2A(sqlText, CP_UTF8);
 
 		BCRYPT_ALG_HANDLE hAlg = NULL;
 		BCRYPT_HASH_HANDLE hHash = NULL;
@@ -1047,7 +1047,7 @@ CString CWVSqlParser::RemoveComment1(LPCTSTR sqlText)
 	try
 	{
 		SQLEngine engine;
-		std::string sql = CT2A(sqlText);
+		std::string sql = CT2A(sqlText, CP_UTF8);
 		if (!engine.Parse(sql, (int)m_emAntlrDBType))
 			return _T("");
 
