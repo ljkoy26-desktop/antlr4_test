@@ -21,6 +21,11 @@ xcopy "%BASE_DIR%\SqlParserLib\SQLEngine.h" "%DEST_DIR%\SqlParserLib\" /y
 xcopy "%BASE_DIR%\SqlParserLib\SQLEngine.cpp" "%DEST_DIR%\SqlParserLib\" /y
 xcopy "%BASE_DIR%\SqlParserLib\SqlParserLib.vcxproj" "%DEST_DIR%\SqlParserLib\" /y
 
+:: 3. wv sql parser cpp , h 복사
+echo [복사 중] sql parser 파일...
+xcopy "%BASE_DIR%\WVSqlJavaParser.h" "%DEST_DIR%\" /y
+xcopy "%BASE_DIR%\WVSqlJavaParser.cpp" "%DEST_DIR%\" /y
+
 echo.
 echo 모든 파일 복사가 완료되었습니다!
 pause

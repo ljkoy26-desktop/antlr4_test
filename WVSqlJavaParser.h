@@ -8,7 +8,7 @@
 
 
 
-#include "SOCommon/SOCommon.h" // CString ���� ������ Ʋ����... TOString
+#include "SOCommon/SOCommon.h" // CString 관련 참조가 틀어짐... TOString
 
 
 
@@ -29,8 +29,8 @@
 
 enum DB_TYPE
 {
-//	2024-06-07 192.168.79.116 Server Ȯ�� ���
-//	select * from torange.symbolcode where category_id=55000 and category_name = 'db_type'
+	//	2024-06-07 192.168.79.116 Server 확인 결과
+	//	select * from torange.symbolcode where category_id=55000 and category_name = 'db_type'
 	tstNone = 0,
 	tstORACLE = 21,
 	tstDB2 = 22,
@@ -64,22 +64,52 @@ enum DB_TYPE
 	tstTDV = 128,
 };
 
-enum EM_MAKESELECT_RESULT { RT_SUCCESS = 0, RT_PARSE_FAIL, RT_NOT_SUPPORT_INSERT_TYPE, RT_INSERT_SHOW_AFTERDATA, RT_EMPTY_TABLE_NAME, RT_DELETE, RT_UPDATE};
+enum EM_MAKESELECT_RESULT { RT_SUCCESS = 0, RT_PARSE_FAIL, RT_NOT_SUPPORT_INSERT_TYPE, RT_INSERT_SHOW_AFTERDATA, RT_EMPTY_TABLE_NAME, RT_DELETE, RT_UPDATE };
+
+/* sqlformatter */
+class CWVSQLFormatOption
+{
+public:
+	bool m_bKeywordRightAlign;
+	bool m_bLeadingComma;
+	int	 m_nKeywordCase;
+	bool m_bMultiLine;
+	bool m_bIndent;
+
+public:
+	CWVSQLFormatOption()
+	{
+		m_bKeywordRightAlign = true;
+		m_bLeadingComma = false;
+		m_nKeywordCase = 0;
+		m_bMultiLine = false;
+		m_bIndent = true;
+	}
+
+	const CWVSQLFormatOption& operator=(CWVSQLFormatOption& p_optSQLFormatter)
+	{
+		m_bKeywordRightAlign = p_optSQLFormatter.m_bKeywordRightAlign;
+		m_bLeadingComma = p_optSQLFormatter.m_bLeadingComma;
+		m_nKeywordCase = p_optSQLFormatter.m_nKeywordCase;
+		m_bMultiLine = p_optSQLFormatter.m_bMultiLine;
+		m_bIndent = p_optSQLFormatter.m_bIndent;
+
+		return *this;
+	}
+};
 
 class SO_SQL_PARSER_EXT_CLASS CWVSqlParser
 {
-public:
-	void dev();
-	void dev2();
 
+public:
 	CWVSqlParser();
 	CWVSqlParser(int databaseType, bool bUppercase = true);
 	~CWVSqlParser();
 
 	typedef std::vector<TOString> Object;
 	enum SqlType { SqlTypeUnknown, SqlTypeQuery, SqlTypeDML, SqlTypeDDL, SqlTypeDCL, SqlTypePLSQL, SqlTypeETC };
-	enum SqlCommand { SqlCmdUnknown, SqlSelect, SqlInsert, SqlUpdate, SqlDelete, SqlMerge};
-//
+	enum SqlCommand { SqlCmdUnknown, SqlSelect, SqlInsert, SqlUpdate, SqlDelete, SqlMerge };
+	//
 public:
 	bool MakeBeforeData(LPCTSTR sqlText, std::vector< std::vector<TOString> >& data);
 	bool MakeAfterData(LPCTSTR sqlText, std::vector< std::vector<TOString> >& data);
@@ -87,9 +117,9 @@ public:
 	bool MakeDeleteBeforeData(std::vector< std::vector<TOString> >& afterData);
 	bool MakeUpdateAfterData(std::vector< std::vector<TOString> >& afterData);
 	bool MakeUpdateBeforeData(std::vector< std::vector<TOString> >& afterData);
-//
-	bool IsParse();
-	bool Parse(LPCTSTR sqlText);
+	//
+	bool IsParse(); // Pass
+	bool Parse(LPCTSTR sqlText); // Pass
 
 
 
@@ -99,46 +129,45 @@ public:
 	EM_MAKESELECT_RESULT MakeAfterSelect4Merge(LPCTSTR sqlText, TOString& strSelect);
 	bool IsIncludeWhereInSet(CString sqlText);
 	bool IsIncludeWhereInSet(UINT idx);
-	std::vector<CString>  SeparateSQL	(int databaseType, LPCTSTR sqlText);
-	CString Formatter();
+	std::vector<CString>  SeparateSQL(int databaseType, LPCTSTR sqlText);
+	CString Formatter2();
 	//
 	bool           CheckSyntax(int databaseType, LPCTSTR sqlText);
 	CString        MakeHash1(LPCTSTR sqlText);
 	CString        MakeHash2(int databaseType, LPCTSTR sqlText);
 	CString		  RemoveComment1(LPCTSTR sqlText);
-	CString		  RemoveComment2(int databaseType, LPCTSTR sqlText);		// single sql ����
+	CString		  RemoveComment2(int databaseType, LPCTSTR sqlText);		// single sql 권장
 //
-	UINT	 GetStatementCount();
-	TOString GetStatementText(UINT idx);
-	TOString GetSqlCommand(UINT idx);
+	UINT	 GetStatementCount(); // Pass
+	TOString GetStatementText(UINT idx); // Pass
+	TOString GetSqlCommand(UINT idx);  // Pass
 	SqlType  GetSqlType(UINT idx);
-	std::set<std::vector<TOString>>& GetAllObjects(UINT idx);
-	std::set<std::vector<TOString>>  GetAllTargetObjects(UINT idx);
-	void GetOriginColumnsOfAlias(std::multimap<TOString, std::vector<TOString> >& mapOrgColumns);
-	bool GetInsertValues(TOString sqlInsert, std::vector<TOString>& columns, std::vector<TOString>& values);
+	std::set<std::vector<TOString>>& GetAllObjects(UINT idx); // Pass
+	std::set<std::vector<TOString>>  GetAllTargetObjects(UINT idx); // Pass
+	void GetOriginColumnsOfAlias(std::multimap<TOString, std::vector<TOString> >& mapOrgColumns); // Pass
+	bool GetInsertValues(TOString sqlInsert, std::vector<TOString>& columns, std::vector<TOString>& values); // Pass
 //
 	CString GetErrMessage();
-//
-//
+	//
+	//
 protected:
 	bool initParser(int databaseType);
 	bool doParse(LPCTSTR sqlText);
 	void destroyParser();
-//
+	//
 	bool traverseSql(UINT idx);
-//	void traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt); // sqlengine�� ����..?
-// 
+	//	void traverseSql(UINT idx, gudusoft::gsqlparser::TCustomSqlStatement stmt); // sqlengine에 위임..?
+	// 
 	TOString getTable(UINT idx);
 	TOString getWhere(UINT idx);
 	TOString getSelectColumnsForUpdate(UINT idx);
 	EM_MAKESELECT_RESULT getSelectStmtForInsert(TOString& ckSelect);
 	std::vector<std::pair<CString, CString>> getWhereInColumn(UINT idx);
 	std::vector<std::pair<CString, CString>> getSetInColumn(UINT idx);
-// 
-	// std::set<std::vector<TOString>> setObject(nodes::TTable table);
+	// 
+		// std::set<std::vector<TOString>> setObject(nodes::TTable table);
 	std::set<std::vector<TOString>> setObject(SqlStatementInfo stmtInfo);
-	
-	void debugObjects(std::set<Object> objects);
+
 	bool isUpdateStmt(UINT idx);
 	bool isInsertStmt(UINT idx);
 	bool isDeleteStmt(UINT idx);
@@ -148,25 +177,38 @@ protected:
 
 	// bool hasMatchedClasuse(bool bMatched, gudusoft::gsqlparser::nodes::TMergeWhenClause & node); //???
 	bool hasMatchedClasuse(bool bMatched);
-	
-//
-////	BOOL FindIndexOfDML();
-//	void clearError() { _error.str(std::wstring()); }
+
+	//
+	////	BOOL FindIndexOfDML();
+	//	void clearError() { _error.str(std::wstring()); }
 	std::string getError();
-//
+
+
+
+public:
+	/* 테스트를 위한 함수  */
+
+	void dev();
+	void dev2();
+	void debugObjects(std::set<Object> objects);
+
+
+
+
+	//
 protected:
-//
-//
-	// SQLEngine �ν��Ͻ� ������� - Parse() �� ��Ÿ���� ��ȸ�� ���
+	//
+	//
+		// SQLEngine 인스턴스 멤버변수 - Parse() 후 메타정보 조회에 사용
 	SQLEngine m_oSQLEngine;
-//
-//	//jvm::global<gudusoft::gsqlparser::TGSqlParser> m_parser;
+	//
+	//	//jvm::global<gudusoft::gsqlparser::TGSqlParser> m_parser;
 	int m_dbType;
 	DatabaseType m_emAntlrDBType;
 	bool m_bUppercase;
-	// std::wstring m_wstrsql; // �Ѱ��� SQL ������ ��� ��� ������ �������ϴ�.
+	// std::wstring m_wstrsql; // 한개의 SQL 문장을 담는 멤버 변수로 보여집니다.
 	std::string m_strsql;
-	std::vector<std::set<std::vector<TOString>> > m_objects; // ������ sql statement ����� ��� �Լ��� �������ϴ�. ( m_oSQLEngine�� ���� �����غ��� , ���� �Ȱ����� �־ �ɰŰ��� ������ )
+	std::vector<std::set<std::vector<TOString>> > m_objects; // 실제로 sql statement 목록을 담는 함수로 보여집니다. ( m_oSQLEngine과 동작 유사해보임 , 굳이 안가지고 있어도 될거같은 변수임 )
 	std::wstringstream _error;
 	std::string m_sLastError;
 	// std::stringstream _error;

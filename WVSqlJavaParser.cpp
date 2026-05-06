@@ -484,7 +484,7 @@ void CWVSqlParser::dev()
 			" inner join scott.dept d on e.deptno=d.deptno where e.sal>2000"
 		);
 		Parse(sql);
-		CString sFormatted = Formatter();
+		CString sFormatted = Formatter2();
 		TRACE(_T("[Formatter] '%s'\n"),
 			sFormatted.IsEmpty() ? _T("(미지원/빈값)") : sFormatted);
 	}
@@ -989,9 +989,9 @@ CString CWVSqlParser::MakeHash1(LPCTSTR sqlText)
 			int nTemp = nStrLen;
 			if (nStrLen > MAXIMUM_REPARSE_DATA_BUFFER_SIZE - 1)
 			{
-				CString strTemp;
-				strTemp.Format(_T("CWVSqlParser::MakeHash - Too much token -[%d]"), nStrLen);
-				WVTRACE(strTemp);
+				//CString strTemp;
+				//strTemp.Format(_T("CWVSqlParser::MakeHash - Too much token -[%d]"), nStrLen);				
+				//WVTRACE(strTemp);
 				nTemp = MAXIMUM_REPARSE_DATA_BUFFER_SIZE - 1;
 			}
 			*token = delim;
@@ -1892,7 +1892,7 @@ bool CWVSqlParser::isSelectStmt(UINT idx)
 }
 
 // [마이그레이션 스텁] SQL 포매터 - Antlr4 기반 파서 미지원
-CString CWVSqlParser::Formatter()
+CString CWVSqlParser::Formatter2()
 {
 	TRACE(_T(" ========= CWVSqlParser::Formatter()   ========= \n"));
 	return _T("");
