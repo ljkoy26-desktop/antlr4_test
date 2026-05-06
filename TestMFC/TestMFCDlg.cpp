@@ -142,7 +142,7 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
 
 	// CString(유니코드) -> std::string(멀티바이트) 변환
-	std::string sqlQueries = CT2A(strInput);
+	std::string sqlQueries = CT2A(strInput, CP_UTF8);
 
 	if (sqlQueries.empty())
 	{
@@ -319,7 +319,7 @@ void CTestMFCDlg::Tokenize(int nDatabaseType)
 	GetDlgItemText(IDC_EDIT_SQL, strInput);
 
 	// MFC CString -> 표준 std::string 변환
-	std::string sqlQuery = CT2A(strInput);
+	std::string sqlQuery = CT2A(strInput, CP_UTF8);
 
 	if (sqlQuery.empty()) {
 		AfxMessageBox(_T("SQL을 입력해주세요."));
