@@ -147,15 +147,15 @@ enum class DatabaseType
 };
 
 struct SqlStatementInfo {
-	int index;
-	SqlStatementType type;
-	std::string sqlText;
-	size_t startLine;
-	size_t startColumn;
-	bool bHasError;             // 문법 오류 여부
-	std::string szParseErrorMsg; // 문법 오류 메시지 (bHasError=true 시 ANTLR4 오류 내용)
-	int nDatabaseType;    // 파싱에 사용된 DB 타입 (DatabaseType enum 값)
-	bool bHasSubQuery;    // 서브쿼리 존재 여부
+	int                index         = 0;
+	SqlStatementType   type          = SqlStatementType::UNKNOWN;
+	std::string        sqlText;
+	int                startLine     = -1;   // -1 = 위치 정보 없음 (파싱 실패 등)
+	int                startColumn   = -1;   // -1 = 위치 정보 없음
+	bool               bHasError     = false;
+	std::string        szParseErrorMsg;
+	int                nDatabaseType = -1;   // DatabaseType enum 값, -1 = 미설정
+	bool               bHasSubQuery  = false;
 	std::vector<SqlStatementInfo> vecSubQueries; // 서브쿼리 목록
 	std::vector<TableRefInfo>  vecTableRefs;   // [GSP: getTableList] 이 문장의 테이블 참조 목록
 	std::vector<ColumnRefInfo> vecColumnRefs;  // [GSP: getLinkedColumns] 이 문장의 컬럼 참조 목록

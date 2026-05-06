@@ -43,8 +43,8 @@ SqlStatementInfo BuildSubQueryInfoFromCtx(
 		auto* pStop  = pCtx->getStop();
 		if (pStart && pStop)
 		{
-			sub.startLine   = pStart->getLine();
-			sub.startColumn = pStart->getCharPositionInLine();
+			sub.startLine   = static_cast<int>(pStart->getLine());
+			sub.startColumn = static_cast<int>(pStart->getCharPositionInLine());
 			size_t nStart   = pStart->getStartIndex();
 			size_t nStop    = pStop->getStopIndex();
 			if (nStart != (size_t)-1 && nStop != (size_t)-1 && nStop >= nStart)
@@ -500,8 +500,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
 					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
-					stInfo.startLine   = nStmtStartLine;
-					stInfo.startColumn = nStmtStartCol;
+					stInfo.startLine   = static_cast<int>(nStmtStartLine);
+					stInfo.startColumn = static_cast<int>(nStmtStartCol);
 					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
 					results.push_back(stInfo);
 					bInStmt = false;
@@ -523,8 +523,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
 					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
-					stInfo.startLine   = nStmtStartLine;
-					stInfo.startColumn = nStmtStartCol;
+					stInfo.startLine   = static_cast<int>(nStmtStartLine);
+					stInfo.startColumn = static_cast<int>(nStmtStartCol);
 					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
 					results.push_back(stInfo);
 					bInStmt = false;
@@ -1124,8 +1124,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
 					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
-					stInfo.startLine   = nStmtStartLine;
-					stInfo.startColumn = nStmtStartCol;
+					stInfo.startLine   = static_cast<int>(nStmtStartLine);
+					stInfo.startColumn = static_cast<int>(nStmtStartCol);
 					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
 					results.push_back(stInfo);
 					bInStmt = false;
@@ -1145,8 +1145,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
 					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
-					stInfo.startLine   = nStmtStartLine;
-					stInfo.startColumn = nStmtStartCol;
+					stInfo.startLine   = static_cast<int>(nStmtStartLine);
+					stInfo.startColumn = static_cast<int>(nStmtStartCol);
 					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
 					results.push_back(stInfo);
 					bInStmt = false;
@@ -1367,8 +1367,8 @@ SqlStatementInfo SQLEngine::GetQueryAtMySQL(const std::string& sqlQueries, size_
 			antlr4::Token* stopToken = simpleStmt->getStop();
 
 			if (startToken && stopToken) {
-				info.startLine = startToken->getLine();
-				info.startColumn = startToken->getCharPositionInLine();
+				info.startLine = static_cast<int>(startToken->getLine());
+				info.startColumn = static_cast<int>(startToken->getCharPositionInLine());
 
 				size_t startIdx = startToken->getStartIndex();
 				size_t stopIdx = stopToken->getStopIndex();
@@ -1646,8 +1646,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 				antlr4::Token* startToken = batchLevel->getStart();
 				antlr4::Token* stopToken = batchLevel->getStop();
 				if (startToken && stopToken) {
-					info.startLine = startToken->getLine();
-					info.startColumn = startToken->getCharPositionInLine();
+					info.startLine = static_cast<int>(startToken->getLine());
+					info.startColumn = static_cast<int>(startToken->getCharPositionInLine());
 					size_t startIdx = startToken->getStartIndex();
 					size_t stopIdx = stopToken->getStopIndex();
 					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
@@ -1679,8 +1679,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 				antlr4::Token* startToken = sqlClauses->getStart();
 				antlr4::Token* stopToken = sqlClauses->getStop();
 				if (startToken && stopToken) {
-					info.startLine = startToken->getLine();
-					info.startColumn = startToken->getCharPositionInLine();
+					info.startLine = static_cast<int>(startToken->getLine());
+					info.startColumn = static_cast<int>(startToken->getCharPositionInLine());
 					size_t startIdx = startToken->getStartIndex();
 					size_t stopIdx = stopToken->getStopIndex();
 					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
@@ -2083,8 +2083,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 			antlr4::Token* startToken = stmtCtx->getStart();
 			antlr4::Token* stopToken = stmtCtx->getStop();
 			if (startToken && stopToken) {
-				info.startLine = startToken->getLine();
-				info.startColumn = startToken->getCharPositionInLine();
+				info.startLine = static_cast<int>(startToken->getLine());
+				info.startColumn = static_cast<int>(startToken->getCharPositionInLine());
 				size_t startIdx = startToken->getStartIndex();
 				size_t stopIdx = stopToken->getStopIndex();
 				if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
@@ -2611,8 +2611,8 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 			antlr4::Token* pStopToken = sqlStmt->getStop();
 			if (pStartToken && pStopToken)
 			{
-				info.startLine = pStartToken->getLine();
-				info.startColumn = pStartToken->getCharPositionInLine();
+				info.startLine = static_cast<int>(pStartToken->getLine());
+				info.startColumn = static_cast<int>(pStartToken->getCharPositionInLine());
 				size_t nStartIdx = pStartToken->getStartIndex();
 				size_t nStopIdx = pStopToken->getStopIndex();
 				if (nStartIdx != (size_t)-1 && nStopIdx != (size_t)-1 && nStopIdx >= nStartIdx)
