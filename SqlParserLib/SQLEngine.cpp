@@ -28,7 +28,7 @@ void CollectSubQueryContextsDeep(antlr4::tree::ParseTree* pNode, std::vector<TCt
 
 // 파스 트리 컨텍스트에서 SqlStatementInfo 서브쿼리 정보 생성
 SqlStatementInfo BuildSubQueryInfoFromCtx(
-	antlr4::ParserRuleContext* pCtx, const std::string& sqlSource, int nSubIndex)
+	antlr4::ParserRuleContext* pCtx, antlr4::ANTLRInputStream& inputStream, int nSubIndex)
 {
 	SqlStatementInfo sub;
 	sub.index        = nSubIndex;
@@ -48,7 +48,7 @@ SqlStatementInfo BuildSubQueryInfoFromCtx(
 			size_t nStart   = pStart->getStartIndex();
 			size_t nStop    = pStop->getStopIndex();
 			if (nStart != (size_t)-1 && nStop != (size_t)-1 && nStop >= nStart)
-				sub.sqlText = sqlSource.substr(nStart, nStop - nStart + 1);
+				sub.sqlText = inputStream.getText(misc::Interval((ssize_t)nStart, (ssize_t)nStop));
 		}
 	}
 	return sub;
@@ -499,7 +499,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 				{
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
-					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
 					stInfo.startLine   = nStmtStartLine;
 					stInfo.startColumn = nStmtStartCol;
 					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
@@ -522,7 +522,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 				{
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
-					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
 					stInfo.startLine   = nStmtStartLine;
 					stInfo.startColumn = nStmtStartCol;
 					stInfo.type        = IdentifySqlTypeOracle(stInfo.sqlText);
@@ -543,7 +543,30 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 			nLastStopChar = pTok->getStopIndex();
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& e)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = std::string("tokenization error: ") + e.what();
+			results.push_back(stErr);
+		}
+	}
+	catch (...)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = "unknown exception during tokenization";
+			results.push_back(stErr);
+		}
+	}
 
 	for (auto& stInfo : results)
 	{
@@ -592,7 +615,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesOracle(const std::s
 						pAnc = pAnc->parent;
 					}
 					if (bHasSubqueryAncestor)
-						stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, stInfo.sqlText, nSubIdx++));
+						stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, subInput, nSubIdx++));
 				}
 				stInfo.bHasSubQuery = !stInfo.vecSubQueries.empty();
 			}
@@ -1100,7 +1123,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 				{
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
-					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
 					stInfo.startLine   = nStmtStartLine;
 					stInfo.startColumn = nStmtStartCol;
 					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
@@ -1121,7 +1144,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 				{
 					SqlStatementInfo stInfo;
 					stInfo.index       = nIndex++;
-					stInfo.sqlText     = sqlQueries.substr(nStmtStartChar, nLastStopChar - nStmtStartChar + 1);
+					stInfo.sqlText     = input.getText(misc::Interval((ssize_t)nStmtStartChar, (ssize_t)nLastStopChar));
 					stInfo.startLine   = nStmtStartLine;
 					stInfo.startColumn = nStmtStartCol;
 					stInfo.type        = IdentifySqlTypeMySQL(stInfo.sqlText);
@@ -1142,7 +1165,30 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 			nLastStopChar = pTok->getStopIndex();
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& e)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = std::string("tokenization error: ") + e.what();
+			results.push_back(stErr);
+		}
+	}
+	catch (...)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = "unknown exception during tokenization";
+			results.push_back(stErr);
+		}
+	}
 
 	for (auto& stInfo : results)
 	{
@@ -1175,7 +1221,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesMySQL(const std::st
 				stInfo.bHasSubQuery = !vecSubCtxs.empty();
 				int nSubIdx = 1;
 				for (auto* pSub : vecSubCtxs)
-					stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, stInfo.sqlText, nSubIdx++));
+					stInfo.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, subInput, nSubIdx++));
 			}
 		}
 		catch (...) {}
@@ -1327,7 +1373,7 @@ SqlStatementInfo SQLEngine::GetQueryAtMySQL(const std::string& sqlQueries, size_
 				size_t startIdx = startToken->getStartIndex();
 				size_t stopIdx = stopToken->getStopIndex();
 				if (startIdx != INVALID_INDEX && stopIdx != INVALID_INDEX && stopIdx >= startIdx) {
-					info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+					info.sqlText = input.getText(misc::Interval((ssize_t)startIdx, (ssize_t)stopIdx));
 				}
 			}
 		}
@@ -1605,7 +1651,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 					size_t startIdx = startToken->getStartIndex();
 					size_t stopIdx = stopToken->getStopIndex();
 					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
-						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+						info.sqlText = input.getText(misc::Interval((ssize_t)startIdx, (ssize_t)stopIdx));
 					}
 				}
 				// [SQLServer] batchLevel subquery collection
@@ -1615,7 +1661,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 					info.bHasSubQuery = !vecSubCtxs.empty();
 					int nSubIdx = 1;
 					for (auto* pSub : vecSubCtxs)
-						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, input, nSubIdx++));
 				}
 
 				results.push_back(info);
@@ -1638,7 +1684,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 					size_t startIdx = startToken->getStartIndex();
 					size_t stopIdx = stopToken->getStopIndex();
 					if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
-						info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+						info.sqlText = input.getText(misc::Interval((ssize_t)startIdx, (ssize_t)stopIdx));
 					}
 				}
 				// [SQLServer] sqlClauses 서브쿼리 수집
@@ -1648,14 +1694,37 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesSQLServer(const std
 					info.bHasSubQuery = !vecSubCtxs.empty();
 					int nSubIdx = 1;
 					for (auto* pSub : vecSubCtxs)
-						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+						info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, input, nSubIdx++));
 				}
 
 				results.push_back(info);
 			}
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& e)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = std::string("tokenization error: ") + e.what();
+			results.push_back(stErr);
+		}
+	}
+	catch (...)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = "unknown exception during tokenization";
+			results.push_back(stErr);
+		}
+	}
 
 	for (auto& stInfo : results)
 	{
@@ -2019,7 +2088,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 				size_t startIdx = startToken->getStartIndex();
 				size_t stopIdx = stopToken->getStopIndex();
 				if (startIdx != (size_t)-1 && stopIdx != (size_t)-1 && stopIdx >= startIdx) {
-					info.sqlText = sqlQueries.substr(startIdx, stopIdx - startIdx + 1);
+					info.sqlText = input.getText(misc::Interval((ssize_t)startIdx, (ssize_t)stopIdx));
 				}
 			}
 			// 서브쿼리 수집
@@ -2029,13 +2098,36 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesPostgreSQL(const st
 				info.bHasSubQuery = !vecSubCtxs.empty();
 				int nSubIdx = 1;
 				for (auto* pSub : vecSubCtxs)
-					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, input, nSubIdx++));
 			}
 
 			results.push_back(info);
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& e)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = std::string("tokenization error: ") + e.what();
+			results.push_back(stErr);
+		}
+	}
+	catch (...)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = "unknown exception during tokenization";
+			results.push_back(stErr);
+		}
+	}
 
 	for (auto& stInfo : results)
 	{
@@ -2525,7 +2617,7 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 				size_t nStopIdx = pStopToken->getStopIndex();
 				if (nStartIdx != (size_t)-1 && nStopIdx != (size_t)-1 && nStopIdx >= nStartIdx)
 				{
-					info.sqlText = sqlQueries.substr(nStartIdx, nStopIdx - nStartIdx + 1);
+					info.sqlText = input.getText(misc::Interval((ssize_t)nStartIdx, (ssize_t)nStopIdx));
 				}
 			}
 			// 서브쿼리 수집
@@ -2535,13 +2627,36 @@ std::vector<SqlStatementInfo> SQLEngine::ParseMultipleQueriesDB2(const std::stri
 				info.bHasSubQuery = !vecSubCtxs.empty();
 				int nSubIdx = 1;
 				for (auto* pSub : vecSubCtxs)
-					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, sqlQueries, nSubIdx++));
+					info.vecSubQueries.push_back(BuildSubQueryInfoFromCtx(pSub, input, nSubIdx++));
 			}
 
 			results.push_back(info);
 		}
 	}
-	catch (...) {}
+	catch (const std::exception& e)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = std::string("tokenization error: ") + e.what();
+			results.push_back(stErr);
+		}
+	}
+	catch (...)
+	{
+		if (results.empty() && !sqlQueries.empty())
+		{
+			SqlStatementInfo stErr;
+			stErr.index           = 1;
+			stErr.sqlText         = sqlQueries;
+			stErr.bHasError       = true;
+			stErr.szParseErrorMsg = "unknown exception during tokenization";
+			results.push_back(stErr);
+		}
+	}
 
 	for (auto& stInfo : results)
 	{
