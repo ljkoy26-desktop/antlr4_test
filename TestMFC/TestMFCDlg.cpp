@@ -270,7 +270,7 @@ void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()
 void CTestMFCDlg::OnBnClickedButtonMultiParseOracle()
 {
 	AddTraceLog(_T("===== Oracle 복합 쿼리 파싱 시작 ====="));
-	MultiParse((int)DatabaseType::DB_MYSQL);
+	MultiParse((int)DatabaseType::DB_ORACLE);
 }
 void CTestMFCDlg::OnBnClickedButtonMultiParseSQLServer()
 {
