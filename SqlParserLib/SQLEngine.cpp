@@ -3200,15 +3200,15 @@ std::string SQLEngine::CheckSyntaxErrorOracle(const std::string& szSql)
 		parser.sql_script();
 		return oErrListener.m_szErrorMsg;  // 빈 문자열 = 오류 없음
 	}
-	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
-	catch (const std::exception& e)
-	{
-		return std::string("Standard Exception: ") + e.what();
-	}
 	// 2. ANTLR 전용 런타임 예외 (필요시)
 	catch (const antlr4::RuntimeException& e)
 	{
 		return std::string("ANTLR Runtime Exception: ") + e.what();
+	}
+	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
+	catch (const std::exception& e)
+	{
+		return std::string("Standard Exception: ") + e.what();
 	}
 	// 3. 마지막 보루 (여전히 알 수 없는 에러인 경우)
 	catch (...)
@@ -3241,15 +3241,15 @@ std::string SQLEngine::CheckSyntaxErrorMySQL(const std::string& szSql)
 		parser.query();
 		return oErrListener.m_szErrorMsg;  // 빈 문자열 = 오류 없음
 	}
-	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
-	catch (const std::exception& e)
-	{
-		return std::string("Standard Exception: ") + e.what();
-	}
 	// 2. ANTLR 전용 런타임 예외 (필요시)
 	catch (const antlr4::RuntimeException& e)
 	{
 		return std::string("ANTLR Runtime Exception: ") + e.what();
+	}
+	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
+	catch (const std::exception& e)
+	{
+		return std::string("Standard Exception: ") + e.what();
 	}
 	// 3. 마지막 보루 (여전히 알 수 없는 에러인 경우)
 	catch (...)
@@ -3276,15 +3276,15 @@ std::string SQLEngine::CheckSyntaxErrorSQLServer(const std::string& szSql)
 		parser.tsql_file();
 		return oErrListener.m_szErrorMsg;
 	}
-	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
-	catch (const std::exception& e)
-	{
-		return std::string("Standard Exception: ") + e.what();
-	}
 	// 2. ANTLR 전용 런타임 예외 (필요시)
 	catch (const antlr4::RuntimeException& e)
 	{
 		return std::string("ANTLR Runtime Exception: ") + e.what();
+	}
+	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
+	catch (const std::exception& e)
+	{
+		return std::string("Standard Exception: ") + e.what();
 	}
 	// 3. 마지막 보루 (여전히 알 수 없는 에러인 경우)
 	catch (...)
@@ -3311,15 +3311,15 @@ std::string SQLEngine::CheckSyntaxErrorPostgreSQL(const std::string& szSql)
 		parser.root();
 		return oErrListener.m_szErrorMsg;
 	}
-	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
-	catch (const std::exception& e)
-	{
-		return std::string("Standard Exception: ") + e.what();
-	}
 	// 2. ANTLR 전용 런타임 예외 (필요시)
 	catch (const antlr4::RuntimeException& e)
 	{
 		return std::string("ANTLR Runtime Exception: ") + e.what();
+	}
+	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
+	catch (const std::exception& e)
+	{
+		return std::string("Standard Exception: ") + e.what();
 	}
 	// 3. 마지막 보루 (여전히 알 수 없는 에러인 경우)
 	catch (...)
@@ -3346,15 +3346,15 @@ std::string SQLEngine::CheckSyntaxErrorDB2(const std::string& szSql)
 		parser.db2_file();
 		return oErrListener.m_szErrorMsg;
 	}
-	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
-	catch (const std::exception& e)
-	{
-		return std::string("Standard Exception: ") + e.what();
-	}
 	// 2. ANTLR 전용 런타임 예외 (필요시)
 	catch (const antlr4::RuntimeException& e)
 	{
 		return std::string("ANTLR Runtime Exception: ") + e.what();
+	}
+	// 1. 표준 예외 잡기 (대부분의 런타임 에러)
+	catch (const std::exception& e)
+	{
+		return std::string("Standard Exception: ") + e.what();
 	}
 	// 3. 마지막 보루 (여전히 알 수 없는 에러인 경우)
 	catch (...)
