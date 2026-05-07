@@ -3657,9 +3657,9 @@ std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nInd
 		if (eRole == TokenRole::WHITESPACE)
 		{
 			if (bInCol && !szCol.empty())
-				szCol += tok.text;
+				szCol += tok.text + " ";
 			else if (!bInCol && !szVal.empty())
-				szVal += tok.text;
+				szVal += tok.text + " ";
 			continue;
 		}
 
@@ -3669,9 +3669,9 @@ std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nInd
 			--nDepth;
 
 		if (bInCol)
-			szCol += tok.text;
+			szCol += tok.text + " ";
 		else
-			szVal += tok.text;
+			szVal += tok.text + " ";
 	}
 
 	fnCommit(); // 마지막 쌍 처리
