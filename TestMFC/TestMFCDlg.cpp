@@ -9,6 +9,14 @@
 #define new DEBUG_NEW
 #endif
 
+// UTF-8 std::string → CString(UTF-16) 변환 헬퍼
+// MFC 유니코드 빌드에서 CString(char*) 생성자는 CP_ACP를 사용하므로
+// UTF-8 문자열은 반드시 이 함수를 통해 변환해야 한글이 올바르게 표시됩니다.
+static CString Utf8ToCStr(const std::string& szUtf8)
+{
+	return CString(CA2W(szUtf8.c_str(), CP_UTF8));
+}
+
 CTestMFCDlg::CTestMFCDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_TestMFC_DIALOG, pParent)
 {
@@ -181,12 +189,12 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 
 		AddTraceLog(_T("===== [%d번째 문장] 유형: %s / 오류: %s ====="),
 			stInfo.index,
-			CString(stdType.c_str()),
+			Utf8ToCStr(stdType),
 			stInfo.bHasError ? _T("있음") : _T("없음"));
 		AddTraceLog(_T("  위치: Line %d, Column %d"), (int)stInfo.startLine, (int)stInfo.startColumn);
-		AddTraceLog(_T("  SQL: %s"), CString(stdSql.c_str()));
+		AddTraceLog(_T("  SQL: %s"), Utf8ToCStr(stdSql));
 		if (stInfo.bHasError && !stInfo.szParseErrorMsg.empty())
-			AddTraceLog(_T("  오류 메시지: %s"), CString(stInfo.szParseErrorMsg.c_str()));
+			AddTraceLog(_T("  오류 메시지: %s"), Utf8ToCStr(stInfo.szParseErrorMsg));
 
 		// -------------------------------------------------------
 		// 문장별 테이블 참조 (stInfo.vecTableRefs)
@@ -194,10 +202,10 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 		AddTraceLog(_T("  [테이블 참조 %d개]"), (int)stInfo.vecTableRefs.size());
 		for (const TableRefInfo& stRef : stInfo.vecTableRefs)
 		{
-			CString strDB(stRef.szDatabase.c_str());
-			CString strSchema(stRef.szSchema.c_str());
-			CString strTable(stRef.szTable.c_str());
-			CString strAlias(stRef.szAlias.c_str());
+			CString strDB     = Utf8ToCStr(stRef.szDatabase);
+			CString strSchema = Utf8ToCStr(stRef.szSchema);
+			CString strTable  = Utf8ToCStr(stRef.szTable);
+			CString strAlias  = Utf8ToCStr(stRef.szAlias);
 			AddTraceLog(_T("    DB=%-10s Schema=%-10s Table=%-15s Alias=%s"),
 				strDB.IsEmpty()     ? _T("-") : strDB,
 				strSchema.IsEmpty() ? _T("-") : strSchema,
@@ -211,9 +219,9 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 		AddTraceLog(_T("  [컬럼 참조 %d개]"), (int)stInfo.vecColumnRefs.size());
 		for (const ColumnRefInfo& stCol : stInfo.vecColumnRefs)
 		{
-			CString strQual(stCol.szQualifier.c_str());
-			CString strCol(stCol.szColumn.c_str());
-			CString strResolved(stCol.szResolvedTable.c_str());
+			CString strQual     = Utf8ToCStr(stCol.szQualifier);
+			CString strCol      = Utf8ToCStr(stCol.szColumn);
+			CString strResolved = Utf8ToCStr(stCol.szResolvedTable);
 			BOOL bDetermined = SQLEngine::IsTableDetermined(stCol) ? TRUE : FALSE;
 			AddTraceLog(_T("    한정자=%-10s 컬럼=%-15s 테이블결정=%s (->%s)"),
 				strQual.IsEmpty()    ? _T("-") : strQual,
@@ -233,9 +241,9 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 			AddTraceLog(_T("  [SELECT 컬럼(별칭 있는 것) %d개]"), (int)vecSelCols.size());
 			for (const SelectColumnInfo& stSel : vecSelCols)
 			{
-				CString strAlias(stSel.szAlias.c_str());
-				CString strExpr(stSel.szExpression.c_str());
-				CString strPrefix(stSel.szPrefixTable.c_str());
+				CString strAlias  = Utf8ToCStr(stSel.szAlias);
+				CString strExpr   = Utf8ToCStr(stSel.szExpression);
+				CString strPrefix = Utf8ToCStr(stSel.szPrefixTable);
 				AddTraceLog(_T("    Alias=%-15s Expr=%-20s PrefixTable=%s"),
 					strAlias,
 					strExpr,
@@ -255,7 +263,7 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 			AddTraceLog(_T("    Line %d, Col %d: %s"),
 				(int)stSub.startLine,
 				(int)stSub.startColumn,
-				CString(subSql.c_str()));
+				Utf8ToCStr(subSql));
 		}
 
 		AddTraceLog(_T(""));
@@ -347,7 +355,7 @@ void CTestMFCDlg::Tokenize(int nDatabaseType)
 	int i(0);
 	for (const auto& tok : tokens) {
 		// [변경점] 엔진에서 넘어온 std::string 데이터들을 CString으로 변환
-		CString strText(tok.text.c_str());
+		CString strText = Utf8ToCStr(tok.text);
 		CString strType(tok.tokenType.c_str());
 
 		// m_oSQLEngine.TokenRoleToString은 이제 std::string을 반환합니다.
