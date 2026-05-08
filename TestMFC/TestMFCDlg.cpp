@@ -160,7 +160,7 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 
 	m_oSQLEngine.Clear();
 	m_oSQLEngine.Parse(sqlQueries, nDatabaseType);
-
+	
 	int nSQLCount     = m_oSQLEngine.GetStatementCount();
 	int nTokenCount   = m_oSQLEngine.GetTokenCount();
 	int nErrorCount   = m_oSQLEngine.GetParseErrorCount();
@@ -252,6 +252,29 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 		}
 
 		// -------------------------------------------------------
+		// INSERT 분해 정보 (INSERT 문장에만 해당)
+		// -------------------------------------------------------
+		if (stInfo.type == SqlStatementType::INSERT_STATEMENT)
+		{
+			InsertInfo stInsert = m_oSQLEngine.GetInsertInfo(stInfo.index);
+			AddTraceLog(_T("  [INSERT 정보]"));
+			if (!stInsert.vecColumns.empty())
+			{
+				AddTraceLog(_T("    컬럼 (%d개):"), (int)stInsert.vecColumns.size());
+				for (const std::string& szCol : stInsert.vecColumns)
+					AddTraceLog(_T("      %s"), Utf8ToCStr(szCol));
+			}
+			if (!stInsert.vecValues.empty())
+			{
+				AddTraceLog(_T("    값 (%d개):"), (int)stInsert.vecValues.size());
+				for (const std::string& szVal : stInsert.vecValues)
+					AddTraceLog(_T("      %s"), Utf8ToCStr(szVal));
+			}
+			if (!stInsert.szSubQuery.empty())
+				AddTraceLog(_T("    서브쿼리: %s"), Utf8ToCStr(stInsert.szSubQuery));
+		}
+
+		// -------------------------------------------------------
 		// 문장별 서브쿼리 (stInfo.vecSubQueries)
 		// -------------------------------------------------------
 		AddTraceLog(_T("  [서브쿼리 %d개]"), (int)stInfo.vecSubQueries.size());
@@ -268,6 +291,9 @@ void CTestMFCDlg::MultiParse(int nDatabaseType)
 
 		AddTraceLog(_T(""));
 	}
+
+	// m_oSQLEngine.GetSetPairs(0);
+	//m_oSQLEngine.GetInsertInfo(0);
 }
 
 void CTestMFCDlg::OnBnClickedButtonMultiParseMySQL()

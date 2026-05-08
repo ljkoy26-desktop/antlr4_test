@@ -3657,9 +3657,9 @@ std::vector<std::pair<std::string, std::string>> SQLEngine::GetSetPairs(int nInd
 		if (eRole == TokenRole::WHITESPACE)
 		{
 			if (bInCol && !szCol.empty())
-				szCol += tok.text + " ";
+				szCol += tok.text;
 			else if (!bInCol && !szVal.empty())
-				szVal += tok.text + " ";
+				szVal += tok.text;
 			continue;
 		}
 
@@ -3845,11 +3845,37 @@ InsertInfo SQLEngine::GetInsertInfo(int nIndex)
 	// INSERT INTO … SELECT 서브쿼리 처리
 	else if (nPos < nCount && vecTokens[nPos].role == TokenRole::KEYWORD_SELECT)
 	{
+		// 공백 토큰이 필터링되어 있으므로, 토큰 사이 공백 삽입 여부를 역할 기반으로 판단
+		auto fnNeedSpaceBefore = [](TokenRole ePrev, TokenRole eCurr) -> bool
+		{
+			// 현재 토큰 앞에 공백 불필요: .  ,  )  ;
+			if (eCurr == TokenRole::SEPARATOR_DOT
+				|| eCurr == TokenRole::SEPARATOR_COMMA
+				|| eCurr == TokenRole::SEPARATOR_PAREN_CLOSE
+				|| eCurr == TokenRole::SEPARATOR_SEMICOLON)
+				return false;
+			// 이전 토큰 뒤에 공백 불필요: .  (
+			if (ePrev == TokenRole::SEPARATOR_DOT
+				|| ePrev == TokenRole::SEPARATOR_PAREN_OPEN)
+				return false;
+			return true;
+		};
+
+		TokenRole ePrevRole = TokenRole::UNKNOWN;
+		bool bFirst = true;
+
 		for (int i = nPos; i < nCount; ++i)
 		{
-			if (vecTokens[i].role == TokenRole::SEPARATOR_SEMICOLON)
+			const TokenInfo& tok = vecTokens[i];
+			if (tok.role == TokenRole::SEPARATOR_SEMICOLON)
 				break;
-			stResult.szSubQuery += vecTokens[i].text;
+
+			if (!bFirst && fnNeedSpaceBefore(ePrevRole, tok.role))
+				stResult.szSubQuery += ' ';
+
+			stResult.szSubQuery += tok.text;
+			ePrevRole = tok.role;
+			bFirst = false;
 		}
 
 		while (!stResult.szSubQuery.empty()
