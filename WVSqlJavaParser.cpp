@@ -243,6 +243,7 @@ void CWVSqlParser::dev()
 
 	// ──────────────────────────────────────────────────────────────────
 	// [6] MakeAfterSelect4Merge / MERGE 문 MakeSelectStmt
+	// 3개 문장의 리턴값이 전부 동일한 상태
 	// ──────────────────────────────────────────────────────────────────
 	try
 	{
@@ -260,11 +261,11 @@ void CWVSqlParser::dev()
 		);
 		Parse(sql);
 
-		ret = MakeAfterSelect4Merge(sql, strSelect);
-		TRACE(_T("[MakeAfterSelect4Merge] ret=%d\n%s\n"), (int)ret, strSelect);
-
 		ret = MakeSelectStmt(sql, strSelect);
 		TRACE(_T("[MakeSelectStmt-MERGE] ret=%d\n%s\n"), (int)ret, strSelect);
+		
+		ret = MakeAfterSelect4Merge(sql, strSelect);
+		TRACE(_T("[MakeAfterSelect4Merge] ret=%d\n%s\n"), (int)ret, strSelect);
 
 		ret = MakeSelectAfterStmt(sql, strSelect);
 		TRACE(_T("[MakeSelectAfterStmt-MERGE] ret=%d\n%s\n"), (int)ret, strSelect);
@@ -1974,17 +1975,167 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeAfterSelect4Merge(LPCTSTR sqlText, TOStri
 
 	if (!isMergeStmt(0) || bMatched || !bNotMatched)
 	{
-		// MATCHED 절 있음 → 일반 SELECT (MakeSelectStmt MERGE 분기 재진입 방지를 위해 직접 구성)
-		UINT idx = 0;
-		TOString sTable = getTable(idx);
-		if (sTable.IsEmpty()) return RT_EMPTY_TABLE_NAME;
+		// MATCHED 절 있음 →
+		// SELECT {targetAlias}.* FROM {targetTable} {targetAlias} JOIN {sourceTable} {sourceAlias} ON {condition}
+		const auto& stmts = m_oSQLEngine.GetStatements();
+		if (stmts.empty())
+			return RT_EMPTY_TABLE_NAME;
 
-		strSelect.Format(L"SELECT * FROM %s", (LPCWSTR)sTable);
-		TOString sWhere = getWhere(idx);
-		if (!sWhere.IsEmpty())
+		std::string szSql   = stmts[0].sqlText;
+		std::string szUpper = szSql;
+		std::transform(szUpper.begin(), szUpper.end(), szUpper.begin(), ::toupper);
+
+		// 단어 경계 기준 문자 판별
+		auto fnIsWC = [](unsigned char c) -> bool
+		{
+			return std::isalnum(c) || c == '_' || c == '$' || c == '#';
+		};
+		// 단어 경계 기준으로 키워드 위치 찾기
+		auto fnFind = [&](const std::string& kw, size_t nPos) -> size_t
+		{
+			while ((nPos = szUpper.find(kw, nPos)) != std::string::npos)
+			{
+				bool bL = (nPos == 0 || !fnIsWC((unsigned char)szUpper[nPos - 1]));
+				size_t nE = nPos + kw.size();
+				bool bR = (nE >= szUpper.size() || !fnIsWC((unsigned char)szUpper[nE]));
+				if (bL && bR) return nPos;
+				++nPos;
+			}
+			return std::string::npos;
+		};
+		// 공백 건너뜀
+		auto fnSkip = [&](size_t p) -> size_t
+		{
+			while (p < szSql.size() && std::isspace((unsigned char)szSql[p])) ++p;
+			return p;
+		};
+		// 식별자 (스키마.테이블 포함) 읽기
+		auto fnReadId = [&](size_t p) -> std::pair<std::string, size_t>
+		{
+			size_t nStart = p;
+			while (p < szSql.size() && (fnIsWC((unsigned char)szSql[p]) || szSql[p] == '.'))
+				++p;
+			return std::make_pair(szSql.substr(nStart, p - nStart), p);
+		};
+		// AS 키워드 건너뜀 (있을 경우)
+		auto fnSkipAS = [&](size_t p) -> size_t
+		{
+			if (p + 1 < szUpper.size()
+				&& szUpper[p] == 'A' && szUpper[p + 1] == 'S'
+				&& (p + 2 >= szUpper.size() || !fnIsWC((unsigned char)szUpper[p + 2])))
+				return fnSkip(p + 2);
+			return p;
+		};
+
+		std::string szTargetTable, szTargetAlias;
+		std::string szSourceTable, szSourceAlias;
+		std::string szOnCond;
+
+		// INTO → 대상 테이블·별칭
+		size_t posInto = fnFind("INTO", 0);
+		if (posInto != std::string::npos)
+		{
+			size_t p = fnSkip(posInto + 4);
+			std::pair<std::string, size_t> tp = fnReadId(p);
+			szTargetTable = tp.first;
+			p = fnSkipAS(fnSkip(tp.second));
+			if (p < szSql.size() && fnIsWC((unsigned char)szSql[p]))
+			{
+				std::pair<std::string, size_t> ap = fnReadId(p);
+				std::string szU = ap.first;
+				std::transform(szU.begin(), szU.end(), szU.begin(), ::toupper);
+				if (szU != "USING" && szU != "ON" && szU != "WHEN")
+					szTargetAlias = ap.first;
+			}
+		}
+
+		if (szTargetTable.empty())
+			return RT_EMPTY_TABLE_NAME;
+
+		// USING → 소스 테이블·별칭 (서브쿼리 형태 제외)
+		size_t posUsing = fnFind("USING", 0);
+		if (posUsing != std::string::npos)
+		{
+			size_t p = fnSkip(posUsing + 5);
+			if (p < szSql.size() && szSql[p] != '(')
+			{
+				std::pair<std::string, size_t> tp = fnReadId(p);
+				szSourceTable = tp.first;
+				p = fnSkipAS(fnSkip(tp.second));
+				if (p < szSql.size() && fnIsWC((unsigned char)szSql[p]))
+				{
+					std::pair<std::string, size_t> ap = fnReadId(p);
+					std::string szU = ap.first;
+					std::transform(szU.begin(), szU.end(), szU.begin(), ::toupper);
+					if (szU != "ON" && szU != "WHEN")
+						szSourceAlias = ap.first;
+				}
+			}
+		}
+
+		// ON → 조건 추출 (외곽 괄호 제거)
+		size_t posOn = fnFind("ON", 0);
+		if (posOn != std::string::npos)
+		{
+			size_t p = fnSkip(posOn + 2);
+			if (p < szSql.size() && szSql[p] == '(')
+			{
+				int nDepth = 1;
+				++p;
+				size_t nCondStart = p;
+				while (p < szSql.size() && nDepth > 0)
+				{
+					if      (szSql[p] == '(') ++nDepth;
+					else if (szSql[p] == ')') --nDepth;
+					if (nDepth > 0) ++p;
+				}
+				szOnCond = szSql.substr(nCondStart, p - nCondStart);
+			}
+			else
+			{
+				size_t posWhen = fnFind("WHEN", p);
+				size_t nCondEnd = (posWhen != std::string::npos) ? posWhen : szSql.size();
+				szOnCond = szSql.substr(p, nCondEnd - p);
+			}
+			// 앞뒤 공백 제거
+			while (!szOnCond.empty() && std::isspace((unsigned char)szOnCond.front()))
+				szOnCond.erase(szOnCond.begin());
+			while (!szOnCond.empty() && std::isspace((unsigned char)szOnCond.back()))
+				szOnCond.pop_back();
+		}
+
+		// SELECT 구문 조립
+		strSelect = L"SELECT ";
+		if (szTargetAlias.empty())
+		{
+			strSelect.Append(L"*");
+		}
+		else
+		{
+			strSelect.Append(CA2W(szTargetAlias.c_str(), CP_UTF8));
+			strSelect.Append(L".*");
+		}
+		strSelect.Append(L" FROM ");
+		strSelect.Append(CA2W(szTargetTable.c_str(), CP_UTF8));
+		if (!szTargetAlias.empty())
 		{
 			strSelect.Append(L" ");
-			strSelect.Append(sWhere);
+			strSelect.Append(CA2W(szTargetAlias.c_str(), CP_UTF8));
+		}
+		if (!szSourceTable.empty())
+		{
+			strSelect.Append(L" JOIN ");
+			strSelect.Append(CA2W(szSourceTable.c_str(), CP_UTF8));
+			if (!szSourceAlias.empty())
+			{
+				strSelect.Append(L" ");
+				strSelect.Append(CA2W(szSourceAlias.c_str(), CP_UTF8));
+			}
+			if (!szOnCond.empty())
+			{
+				strSelect.Append(L" ON ");
+				strSelect.Append(CA2W(szOnCond.c_str(), CP_UTF8));
+			}
 		}
 		return RT_SUCCESS;
 	}
