@@ -238,8 +238,10 @@ protected:
 public:
 	/* 테스트를 위한 함수  */
 
-	// 개발/테스트용 내부 함수: 주요 API를 일괄 검증
-	void dev();
+	// 개발/테스트용 내부 함수: Oracle DB 타입으로 주요 API를 일괄 검증
+	void devOracle1();
+	// 개발/테스트용 내부 함수: MySQL DB 타입으로 주요 API를 일괄 검증
+	void devMySQL1();
 	// 개발/테스트용 내부 함수: GetOriginColumnsOfAlias를 다양한 패턴으로 검증
 	void dev2();
 	// 디버그용: Object 집합 내용을 TRACE로 출력 (column, table, schema, db)

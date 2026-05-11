@@ -76,9 +76,9 @@ static void DevPrint2D(const std::vector<std::vector<TOString>>& data, LPCTSTR s
 }
 
 // 개발/테스트용 내부 함수: Parse, GetAllObjects 등 주요 API를 일괄 검증
-void CWVSqlParser::dev()
+void CWVSqlParser::devOracle1()
 {
-	TRACE(_T("\n ========= CWVSqlParser::dev() START ========= \n"));
+	TRACE(_T("\n ========= CWVSqlParser::devOracle1() START ========= \n"));
 
 	CStringW              sql;
 	TOString              strSelect;
@@ -527,6 +527,468 @@ void CWVSqlParser::dev()
 	}
 
 	TRACE(_T("\n ========= CWVSqlParser::dev() END ========= \n"));
+}
+
+// 개발/테스트용 내부 함수: MySQL DB 타입으로 Parse, MakeSelectStmt 등 주요 API를 일괄 검증
+// - MySQL 전용 구문(REPLACE, ON DUPLICATE KEY UPDATE, LIMIT, backtick 식별자) 포함
+void CWVSqlParser::devMySQL1()
+{
+	TRACE(_T("\n ========= CWVSqlParser::devMySQL1() START ========= \n"));
+
+	CStringW              sql;
+	TOString              strSelect;
+	EM_MAKESELECT_RESULT  ret;
+
+	// ──────────────────────────────────────────────────────────────────
+	// [1] Parse / IsParse / GetStatementCount / GetStatementText / GetSqlCommand
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [1] Parse / IsParse / GetStatementCount / GetStatementText / GetSqlCommand =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T("SELECT `e`.`emp_id`, `e`.`first_name` FROM `employees` AS `e` WHERE `e`.`dept_id` = 10 LIMIT 5;");
+		Parse(sql);
+
+		TRACE(_T("[IsParse] %s\n"), IsParse() ? _T("true") : _T("false"));
+		TRACE(_T("[GetStatementCount] %d\n"), GetStatementCount());
+
+		for (UINT i = 0; i < GetStatementCount(); i++)
+		{
+			TRACE(_T("[GetStatementText(%u)] %s\n"), i, GetStatementText(i));
+			TRACE(_T("[GetSqlCommand(%u)]    %s\n"), i, GetSqlCommand(i));
+		}
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [2] GetAllObjects / GetAllTargetObjects
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [2] GetAllObjects / GetAllTargetObjects =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		// MySQL 스타일 UPDATE ... JOIN
+		sql = _T(
+			"UPDATE orders o\n"
+			"INNER JOIN customers c ON o.customer_id = c.id\n"
+			"SET o.discount = 0.1, o.updated_at = NOW()\n"
+			"WHERE c.country = 'KR' AND o.status = 'pending';\n"
+		);
+		Parse(sql);
+		debugObjects(GetAllObjects(0));
+		debugObjects(GetAllTargetObjects(0));
+
+		// 서브쿼리 포함 SELECT
+		sql = _T(
+			"SELECT p.prod_id, p.prod_name, s.total_qty\n"
+			"FROM products p\n"
+			"INNER JOIN (SELECT prod_id, SUM(qty) AS total_qty FROM sales GROUP BY prod_id) s\n"
+			"  ON p.prod_id = s.prod_id\n"
+			"WHERE p.category_id = 3;\n"
+		);
+		Parse(sql);
+		debugObjects(GetAllObjects(0));
+		debugObjects(GetAllTargetObjects(0));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [3] GetOriginColumnsOfAlias
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [3] GetOriginColumnsOfAlias =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T(
+			"SELECT e.emp_id AS eid,"
+			"       CONCAT(e.first_name, ' ', e.last_name) AS fullname,"
+			"       IFNULL(e.bonus, 0) AS bonus_amt"
+			" FROM employees e;"
+		);
+		Parse(sql);
+
+		std::multimap<TOString, Object> mapColumns;
+		GetOriginColumnsOfAlias(mapColumns);
+		TRACE(_T("[GetOriginColumnsOfAlias] 결과 %d개\n"), (int)mapColumns.size());
+		for (auto& kv : mapColumns)
+		{
+			const Object& obj = kv.second;
+			TRACE(_T("  alias=%-15s  expr=%-25s  table=%s\n"),
+				(obj.size() > 0 ? (LPCTSTR)obj[0] : _T("")),
+				(obj.size() > 1 ? (LPCTSTR)obj[1] : _T("")),
+				(obj.size() > 2 ? (LPCTSTR)obj[2] : _T("")));
+		}
+
+		// 별칭 없는 경우 - 결과 0개 확인
+		sql = _T("SELECT DATE_FORMAT(created_at, '%Y-%m') FROM orders;");
+		Parse(sql);
+		mapColumns.clear();
+		GetOriginColumnsOfAlias(mapColumns);
+		TRACE(_T("[GetOriginColumnsOfAlias - 별칭없음] 결과 %d개 (0이어야 정상)\n"), (int)mapColumns.size());
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [4] GetInsertValues
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [4] GetInsertValues =====\n"));
+		TOString sqlInsert = _T("INSERT INTO products (prod_id, prod_name, price, stock) VALUES (101, 'Widget', 9.99, 500)");
+		std::vector<TOString> vecCols;
+		std::vector<TOString> vecVals;
+
+		if (GetInsertValues(sqlInsert, vecCols, vecVals))
+		{
+			TRACE(_T("[GetInsertValues] 컬럼 %d개 / 값 %d개\n"),
+				(int)vecCols.size(), (int)vecVals.size());
+			for (size_t i = 0; i < vecCols.size() && i < vecVals.size(); i++)
+				TRACE(_T("  [%d] %s = %s\n"), (int)i, vecCols[i], vecVals[i]);
+		}
+		else
+		{
+			TRACE(_T("[GetInsertValues] 실패\n"));
+		}
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [5] MakeSelectStmt / MakeSelectAfterStmt (UPDATE)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [5] MakeSelectStmt / MakeSelectAfterStmt (UPDATE) =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T(
+			"UPDATE employees\n"
+			"SET salary = salary * 1.1, bonus = 500\n"
+			"WHERE dept_id = 20 AND hire_date < '2020-01-01'"
+		);
+		Parse(sql);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		// INSERT INTO … SELECT
+		sql = _T(
+			"INSERT INTO archive_orders (order_id, customer_id, total, order_date)"
+			" SELECT order_id, customer_id, total, order_date"
+			" FROM orders"
+			" WHERE order_date < '2023-01-01'"
+		);
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt - INSERT..SELECT] ret=%d\n%s\n"), (int)ret, strSelect);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [6] REPLACE INTO (MySQL 전용)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [6] REPLACE INTO =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		// REPLACE ... VALUES
+		sql = _T(
+			"REPLACE INTO cities (id, name, population)\n"
+			"VALUES (4, 'Seoul', 9776000);\n"
+		);
+		Parse(sql);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt-REPLACE VALUES] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt-REPLACE VALUES] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		// REPLACE ... SET
+		sql = _T(
+			"REPLACE INTO cities\n"
+			"SET id = 5,\n"
+			"    name = 'Busan',\n"
+			"    population = 3450000;\n"
+		);
+		Parse(sql);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt-REPLACE SET] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt-REPLACE SET] ret=%d\n%s\n"), (int)ret, strSelect);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [7] INSERT ... ON DUPLICATE KEY UPDATE (MySQL 전용)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [7] INSERT ... ON DUPLICATE KEY UPDATE =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T(
+			"INSERT INTO inventory (prod_id, qty, updated_at)\n"
+			"VALUES (1, 100, NOW())\n"
+			"ON DUPLICATE KEY UPDATE qty = qty + 100, updated_at = NOW();\n"
+		);
+		Parse(sql);
+
+		ret = MakeSelectStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectStmt-ON DUPLICATE KEY] ret=%d\n%s\n"), (int)ret, strSelect);
+
+		ret = MakeSelectAfterStmt(sql, strSelect);
+		TRACE(_T("[MakeSelectAfterStmt-ON DUPLICATE KEY] ret=%d\n%s\n"), (int)ret, strSelect);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [8] MakeBeforeData / MakeAfterData
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [8] MakeBeforeData / MakeAfterData =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T("UPDATE orders SET status = 'shipped', updated_at = NOW() WHERE order_id = 42");
+
+		std::vector<std::vector<TOString>> data;
+		bool bOk = MakeBeforeData(sql, data);
+		DevPrint2D(data, bOk ? _T("MakeBeforeData 성공") : _T("MakeBeforeData 실패"));
+
+		data.clear();
+		bOk = MakeAfterData(sql, data);
+		DevPrint2D(data, bOk ? _T("MakeAfterData 성공") : _T("MakeAfterData 실패"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [9] MakeInsertAfterData / MakeDeleteBeforeData
+	//     MakeUpdateAfterData / MakeUpdateBeforeData
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [9] Make*Data 계열 =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		std::vector<std::vector<TOString>> data;
+
+		// INSERT After
+		sql = _T("INSERT INTO employees (emp_id, first_name, last_name, salary, dept_id) VALUES (9999, 'Hong', 'Gildong', 3500000, 10)");
+		Parse(sql);
+		data.clear();
+		MakeInsertAfterData(data);
+		DevPrint2D(data, _T("MakeInsertAfterData"));
+
+		// DELETE Before
+		sql = _T("DELETE FROM orders WHERE status = 'cancelled' AND order_date < '2022-01-01'");
+		Parse(sql);
+		data.clear();
+		MakeDeleteBeforeData(data);
+		DevPrint2D(data, _T("MakeDeleteBeforeData"));
+
+		// UPDATE After / Before
+		sql = _T("UPDATE employees SET salary = 4000000, bonus = 200000 WHERE emp_id = 1001");
+		Parse(sql);
+
+		data.clear();
+		MakeUpdateAfterData(data);
+		DevPrint2D(data, _T("MakeUpdateAfterData"));
+
+		data.clear();
+		MakeUpdateBeforeData(data);
+		DevPrint2D(data, _T("MakeUpdateBeforeData"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [10] IsIncludeWhereInSet (CString 버전 / UINT 버전)
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [10] IsIncludeWhereInSet =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		// CString 버전 - WHERE 있음
+		sql = _T(
+			"UPDATE products\n"
+			"SET price = price * 1.05, updated_at = NOW()\n"
+			"WHERE category_id = 3 AND price > 100\n"
+		);
+		TRACE(_T("[IsIncludeWhereInSet(CString) - WHERE있음] %s\n"),
+			IsIncludeWhereInSet(sql) ? _T("true") : _T("false"));
+
+		// CString 버전 - WHERE 없음
+		sql = _T("UPDATE products SET stock = 0");
+		TRACE(_T("[IsIncludeWhereInSet(CString) - WHERE없음] %s\n"),
+			IsIncludeWhereInSet(sql) ? _T("true") : _T("false"));
+
+		// UINT 버전
+		sql = _T("UPDATE employees SET salary = salary * 1.1 WHERE dept_id = 10");
+		Parse(sql);
+		TRACE(_T("[IsIncludeWhereInSet(UINT=0)] %s\n"),
+			IsIncludeWhereInSet(0U) ? _T("true") : _T("false"));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [11] SeparateSQL
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [11] SeparateSQL =====\n"));
+
+		sql = _T(
+			"SELECT * FROM employees WHERE dept_id = 10;\n"
+			"UPDATE employees SET salary = 3500000 WHERE emp_id = 1001;\n"
+			"DELETE FROM orders WHERE status = 'cancelled';"
+		);
+		std::vector<CString> vecSqls = SeparateSQL(DB_TYPE::tstMySQL, sql);
+		TRACE(_T("[SeparateSQL] %d개 분리\n"), (int)vecSqls.size());
+		for (size_t i = 0; i < vecSqls.size(); i++)
+			TRACE(_T("  [%d] %s\n"), (int)i, vecSqls[i]);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [12] CheckSyntax / GetErrMessage
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [12] CheckSyntax / GetErrMessage =====\n"));
+
+		// 정상 문장
+		sql = _T("SELECT * FROM employees WHERE emp_id = 1001");
+		TRACE(_T("[CheckSyntax] 정상SQL=%s  msg='%s'\n"),
+			CheckSyntax(DB_TYPE::tstMySQL, sql) ? _T("오류없음") : _T("오류있음"),
+			GetErrMessage());
+
+		// 오류 문장
+		sql = _T("sel3ct * from employees");
+		TRACE(_T("[CheckSyntax] 오류SQL=%s\n  msg='%s'\n"),
+			CheckSyntax(DB_TYPE::tstMySQL, sql) ? _T("오류없음") : _T("오류있음"),
+			GetErrMessage());
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [13] MakeHash1 / MakeHash2
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [13] MakeHash1 / MakeHash2 =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		// 공백/세미콜론 달라도 동일 해시
+		CString sH1 = MakeHash1(_T("update employees set salary = 3500000 where emp_id = 1001"));
+		CString sH2 = MakeHash1(_T("update employees set salary = 3500000    \n\n where emp_id = 1001;"));
+		TRACE(_T("[MakeHash1] 공백무관 동일여부: %s\n"), sH1 == sH2 ? _T("동일 (정상)") : _T("다름"));
+		TRACE(_T("[MakeHash1] %s\n"), sH1);
+
+		// 주석 달라도 동일 해시
+		CString sH3 = MakeHash1(_T("/* 주석A */ select * from products where category_id = 1"));
+		CString sH4 = MakeHash1(_T("/* 주석B */ select   *\n from products where category_id = 1;"));
+		TRACE(_T("[MakeHash1] 주석무관 동일여부: %s\n"), sH3 == sH4 ? _T("동일 (정상)") : _T("다름"));
+
+		// MakeHash2 (DB 타입 명시 버전)
+		sql = _T("SELECT * FROM employees WHERE dept_id = 10");
+		CString sHash1 = MakeHash1(sql);
+		CString sHash2 = MakeHash2(DB_TYPE::tstMySQL, sql);
+		TRACE(_T("[MakeHash1] %s\n"), sHash1);
+		TRACE(_T("[MakeHash2] %s\n"), sHash2);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [14] RemoveComment1 / RemoveComment2
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [14] RemoveComment1 / RemoveComment2 =====\n"));
+
+		sql = _T(
+			"/*블록주석*/\n"
+			"SELECT * -- 라인주석\n"
+			"FROM employees /* 인라인주석 */ WHERE emp_id = 1001;"
+		);
+		TRACE(_T("[원본]          %s\n"), sql);
+		TRACE(_T("[RemoveComment1] %s\n"), RemoveComment1(sql));
+		TRACE(_T("[RemoveComment2] %s\n"), RemoveComment2(DB_TYPE::tstMySQL, sql));
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	// ──────────────────────────────────────────────────────────────────
+	// [15] Formatter
+	// ──────────────────────────────────────────────────────────────────
+	try
+	{
+		TRACE(_T("\n===== [15] Formatter =====\n"));
+		initParser(DB_TYPE::tstMySQL);
+
+		sql = _T(
+			"select e.emp_id,e.first_name,d.dept_name from employees e"
+			" inner join departments d on e.dept_id=d.dept_id where e.salary>3000000"
+		);
+		Parse(sql);
+		CString sFormatted = Formatter2();
+		TRACE(_T("[Formatter] '%s'\n"),
+			sFormatted.IsEmpty() ? _T("(미지원/빈값)") : sFormatted);
+	}
+	catch (std::exception& e)
+	{
+		TRACE(_T("[예외] %hs\n"), e.what());
+	}
+
+	TRACE(_T("\n ========= CWVSqlParser::devMySQL1() END ========= \n"));
 }
 
 // 개발/테스트용 내부 함수: GetOriginColumnsOfAlias를 다양한 SQL 패턴으로 검증
