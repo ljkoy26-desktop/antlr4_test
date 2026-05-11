@@ -3,13 +3,16 @@
 #include "outil/UtilFunc.h"
 #include <codecvt>
 
-// #include "WVSqlParser-SqlTypeSet.h"
-// #include "WVSqlParser-TokenType.h"
-
 #include "OUtil/WVUtilTrace.h"
 #include "outil/WVString.h"
 #include "resource.h"
 #include "OrangeMsg.h"
+
+#include "outil/SQLFormatter.h"
+
+
+
+
 
 // Orange DB 타입 정수값을 Antlr4 DatabaseType 열거형으로 변환
 // 예) tstORACLE(21) → DB_ORACLE, tstMSSQL(23) → DB_SQLSERVER
@@ -1963,10 +1966,28 @@ bool CWVSqlParser::isSelectStmt(UINT idx)
 }
 
 // [마이그레이션 스텁] SQL 포매터 - Antlr4 기반 파서 미지원
+// 기본 Orange에 내장된 Formatter 기능 활용 
+
 CString CWVSqlParser::Formatter2()
 {
 	TRACE(_T(" ========= CWVSqlParser::Formatter()   ========= \n"));
-	return _T("");
+
+	if (0 >= GetStatementCount()) 
+		return _T("");
+
+	CString strSQL = m_oSQLEngine.GetStatements().at(0).sqlText.c_str();
+
+	CSQLFormatter form;
+	CString strForm;
+	strForm = form.Format(
+		strSQL,
+		TRUE, /* m_optSQLFormatter.m_bKeywordRightAlign */
+		FALSE, /* m_optSQLFormatter.m_bLeadingComma */
+		FALSE, /* m_optSQLFormatter.m_nKeywordCase*/
+		FALSE, /* m_optSQLFormatter.m_bMultiLine*/
+		TRUE /* m_optSQLFormatter.m_bIndent != 0 */
+	);
+	return strForm;
 }
 
 // [GSP→Antlr4] INSERT 컬럼·값 목록 반환 (서브쿼리 형태면 false)
