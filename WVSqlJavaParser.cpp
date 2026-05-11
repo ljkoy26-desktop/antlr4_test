@@ -2289,8 +2289,6 @@ bool CWVSqlParser::MakeUpdateAfterData(std::vector<std::vector<TOString>>& after
 	std::vector<TOString> columns, values;
 	for (const auto& p : pairs)
 	{
-		columns.push_back(_T("asdasd"));
-
 		columns.push_back(p.first.c_str());
 		values.push_back(p.second.c_str());
 	}
