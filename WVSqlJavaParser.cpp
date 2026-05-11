@@ -11,8 +11,8 @@
 #include "resource.h"
 #include "OrangeMsg.h"
 
-// Orange DB Type -> AntLR DB Type
- 
+// Orange DB 타입 정수값을 Antlr4 DatabaseType 열거형으로 변환
+// 예) tstORACLE(21) → DB_ORACLE, tstMSSQL(23) → DB_SQLSERVER
 static DatabaseType ConvertAntlrDbType(int dbType)
 {
 	// 기존 GSP DB 타입과 유사하게 case문 유지함 
@@ -55,6 +55,7 @@ static DatabaseType ConvertAntlrDbType(int dbType)
 // ──────────────────────────────────────────────────────────────────────────────
 // dev() 내부 공통 헬퍼: 2D 데이터 TRACE 출력
 // ──────────────────────────────────────────────────────────────────────────────
+// 2D 벡터 데이터를 레이블과 함께 TRACE로 출력하는 개발/테스트용 내부 헬퍼
 static void DevPrint2D(const std::vector<std::vector<TOString>>& data, LPCTSTR szLabel)
 {
 	TRACE(_T("[%s] 행수=%d\n"), szLabel, (int)data.size());
@@ -71,6 +72,7 @@ static void DevPrint2D(const std::vector<std::vector<TOString>>& data, LPCTSTR s
 	}
 }
 
+// 개발/테스트용 내부 함수: Parse, GetAllObjects 등 주요 API를 일괄 검증
 void CWVSqlParser::dev()
 {
 	TRACE(_T("\n ========= CWVSqlParser::dev() START ========= \n"));
@@ -524,6 +526,7 @@ void CWVSqlParser::dev()
 	TRACE(_T("\n ========= CWVSqlParser::dev() END ========= \n"));
 }
 
+// 개발/테스트용 내부 함수: GetOriginColumnsOfAlias를 다양한 SQL 패턴으로 검증
 // ──────────────────────────────────────────────────────────────────────────────
 // dev2() : GetOriginColumnsOfAlias 전용 테스트
 //   반환 구조: multimap<alias, Object>
@@ -801,21 +804,27 @@ void CWVSqlParser::dev2()
 }
 
 
+// 기본 생성자: DB 타입 미설정, initParser 별도 호출 필요
 CWVSqlParser::CWVSqlParser()
 {
 }
 
+// DB 타입·대소문자 옵션으로 파서 초기화 (내부적으로 initParser 호출)
+// 예) CWVSqlParser(tstORACLE, true) → Oracle 파서, 대문자 모드
 CWVSqlParser::CWVSqlParser(int databaseType, bool bUppercase)
 	: m_bUppercase(bUppercase)
 {
 	initParser(databaseType);
 }
 
+// 소멸자: destroyParser()를 호출하여 내부 상태 정리
 CWVSqlParser::~CWVSqlParser()
 {
 	destroyParser();
 }
 
+// 내부 _error 스트림을 UTF-8 std::string으로 변환하여 반환
+// 예) 파싱 실패 시 → "Exception: no viable alternative..."
 std::string CWVSqlParser::getError()
 {
 	TRACE(_T(" ========= CWVSqlParser::getError()   ========= \n"));
@@ -836,12 +845,15 @@ static UINT ThrSelfKill(LPVOID sleepms)
 	return 0;
 }
 
+// m_oSQLEngine.Clear()로 파싱 결과·상태를 초기화
 void CWVSqlParser::destroyParser()
 {
 	TRACE(_T(" ========= CWVSqlParser::destroyParser()   ========= \n"));
 	m_oSQLEngine.Clear();
 }
 
+// DB 타입을 설정하고 파서 내부 상태를 초기화
+// 예) initParser(tstMSSQL) → SQL Server 파서로 전환, true 반환
 bool CWVSqlParser::initParser(int databaseType)
 {
 	TRACE(_T(" ========= CWVSqlParser::initParser databaseType [%d]   ========= \n"), databaseType);
@@ -853,6 +865,8 @@ bool CWVSqlParser::initParser(int databaseType)
 	return true;
 }
 
+// SQL 텍스트를 m_oSQLEngine에 파싱, 파싱 오류 시 m_sLastError에 저장
+// 예) doParse("SELECT 1 FROM dual") → true (오류 없음)
 bool CWVSqlParser::doParse(LPCTSTR sqlText)
 {
 	m_oSQLEngine.Clear();
@@ -872,6 +886,8 @@ bool CWVSqlParser::doParse(LPCTSTR sqlText)
 	return bParse;
 }
 
+// 세미콜론 기준으로 SQL 문장을 분리하여 CString 벡터 반환
+// 예) "SELECT 1; SELECT 2;" → {"SELECT 1", "SELECT 2"}
 std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::SeparateSQL databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
@@ -895,6 +911,8 @@ std::vector<CString> CWVSqlParser::SeparateSQL(int databaseType, LPCTSTR sqlText
 	return ret;
 }
 
+// SQL 문법 오류 여부 검사, 오류 시 m_sLastError에 메시지 저장
+// 예) "SELECT * FRM emp" → false (오류), "SELECT 1" → true
 bool CWVSqlParser::CheckSyntax(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::CheckSyntax databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
@@ -917,6 +935,9 @@ bool CWVSqlParser::CheckSyntax(int databaseType, LPCTSTR sqlText)
 
 	return bReturn;
 }
+// 현재 DB 타입으로 SQL을 토큰화한 뒤 SHA-256 해시값(64자 hex) 반환
+// 리터럴·식별자 대소문자 유지, 키워드는 대문자 정규화 후 해시
+// 예) "SELECT * FROM emp" → "3F8A...BC12"
 CString CWVSqlParser::MakeHash1(LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeHash1 sqlText [%s]   ========= \n"), sqlText);
@@ -1023,6 +1044,8 @@ CString CWVSqlParser::MakeHash1(LPCTSTR sqlText)
 	return hash;
 }
 
+// DB 타입을 직접 지정하여 MakeHash1을 호출하는 래퍼
+// 예) MakeHash2(tstMSSQL, "SELECT 1") → SHA-256 CString
 CString CWVSqlParser::MakeHash2(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeHash2 databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
@@ -1039,6 +1062,8 @@ CString CWVSqlParser::MakeHash2(int databaseType, LPCTSTR sqlText)
 	return _T("");
 }
 
+// 현재 DB 타입으로 파싱하여 주석 토큰 제거 후 SQL 텍스트 반환
+// 예) "SELECT 1 -- 주석" → "SELECT 1 "
 CString CWVSqlParser::RemoveComment1(LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::RemoveComment1 sqlText [%s]   ========= \n"), sqlText);
@@ -1075,6 +1100,8 @@ CString CWVSqlParser::RemoveComment1(LPCTSTR sqlText)
 	return (LPTSTR)CW2T(CA2W(result.c_str(), CP_UTF8));
 }
 
+// DB 타입을 직접 지정하여 RemoveComment1을 호출하는 래퍼 (단일 SQL 권장)
+// 예) RemoveComment2(tstORACLE, "SELECT /*주석*/ 1") → "SELECT  1"
 CString CWVSqlParser::RemoveComment2(int databaseType, LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::RemoveComment2 databaseType [%d] sqlText [%s]   ========= \n"), databaseType, sqlText);
@@ -1092,6 +1119,8 @@ CString CWVSqlParser::RemoveComment2(int databaseType, LPCTSTR sqlText)
 	return _T("");
 }
 
+// doParse를 호출하는 public 래퍼: 성공 true, 실패 false
+// 예) Parse("SELECT * FROM emp") → true
 bool CWVSqlParser::Parse(LPCTSTR sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::Parse sqlText [%s]   ========= \n"), sqlText);
@@ -1112,6 +1141,7 @@ bool CWVSqlParser::Parse(LPCTSTR sqlText)
 
 // [GSP→Antlr4 마이그레이션]
 // setObject: SqlStatementInfo의 vecTableRefs/vecColumnRefs를 이용해 Object 집합 생성
+// 예) SELECT e.sal FROM emp e → {{"","EMP","",""}, {"SAL","EMP","",""}}
 std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInfo)
 {
 	TRACE(_T(" ========= CWVSqlParser::setObject()   ========= \n"));
@@ -1186,6 +1216,8 @@ std::set<std::vector<TOString>> CWVSqlParser::setObject(SqlStatementInfo stmtInf
 //	traverseSql(idx);
 //}
 
+// 디버그용: Object 집합 내용을 TRACE로 출력 (column, table, schema, db)
+// 예) {{"SAL","EMP","",""}} → TRACE "[0] [column:SAL] [table: EMP]..."
 void CWVSqlParser::debugObjects(std::set<std::vector<TOString>> objects)
 {
 	TRACE(_T(" ========= CWVSqlParser::debugObjects()   ========= \n"));
@@ -1206,6 +1238,7 @@ void CWVSqlParser::debugObjects(std::set<std::vector<TOString>> objects)
 }
 
 // [GSP→Antlr4 마이그레이션] vecTableRefs/vecColumnRefs 기반 m_objects 채우기
+// 예) idx=0, "SELECT sal FROM emp" → m_objects[0]에 테이블·컬럼 채움
 bool CWVSqlParser::traverseSql(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::traverseSql idx [%d]   ========= \n"), idx);
@@ -1274,6 +1307,8 @@ bool CWVSqlParser::traverseSql(UINT idx)
 	return true;
 }
 
+// Parse() 후 m_oSQLEngine에 저장된 SQL 문장 수 반환
+// 예) "SELECT 1; SELECT 2" 파싱 후 → 2
 UINT CWVSqlParser::GetStatementCount()
 {
 	UINT uCount = (UINT)m_oSQLEngine.GetStatementCount();
@@ -1281,12 +1316,16 @@ UINT CWVSqlParser::GetStatementCount()
 	return uCount;
 }
 
+// Parse() 호출 여부 반환 (destroyParser 이후에는 false)
+// 예) Parse("SELECT 1") 후 → true, destroyParser() 후 → false
 bool CWVSqlParser::IsParse()
 {
 	bool b = m_oSQLEngine.IsParse();
 	TRACE(_T(" ========= CWVSqlParser::IsParse()  [%d] ========= \n"), b);
 	return b;
 }
+// idx번째 SQL 문장의 원본 텍스트를 TOString으로 반환
+// 예) "SELECT 1; UPDATE emp" 파싱 후 GetStatementText(1) → "UPDATE emp"
 TOString CWVSqlParser::GetStatementText(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetStatementText idx [%d]   ========= \n"), idx);
@@ -1297,6 +1336,7 @@ TOString CWVSqlParser::GetStatementText(UINT idx)
 }
 
 // [GSP→Antlr4] 첫 번째 의미 있는 토큰(길이 > 1) 반환
+// 예) "UPDATE emp SET sal=1" → "UPDATE" 반환
 TOString CWVSqlParser::GetSqlCommand(UINT idx)
 {
 
@@ -1326,6 +1366,7 @@ TOString CWVSqlParser::GetSqlCommand(UINT idx)
 }
 
 // [GSP→Antlr4] SqlStatementType → CWVSqlParser::SqlType 매핑
+// 예) SELECT→SqlTypeQuery, UPDATE/INSERT/DELETE/MERGE→SqlTypeDML
 CWVSqlParser::SqlType CWVSqlParser::GetSqlType(UINT idx)
 {
 	CWVSqlParser::SqlType sqlType = SqlTypeUnknown;
@@ -1386,6 +1427,8 @@ CWVSqlParser::SqlType CWVSqlParser::GetSqlType(UINT idx)
 	return sqlType;
 }
 
+// idx번째 문장의 전체 테이블·컬럼 Object 집합 반환 (traverseSql 내부 호출)
+// 예) "SELECT e.sal FROM emp e" → {{"","EMP","",""}, {"SAL","EMP","",""}}
 std::set<CWVSqlParser::Object>& CWVSqlParser::GetAllObjects(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetAllObjects idx [%d]   ========= \n"), idx);
@@ -1402,6 +1445,7 @@ std::set<CWVSqlParser::Object>& CWVSqlParser::GetAllObjects(UINT idx)
 }
 
 // [GSP→Antlr4] DML이면 첫 번째 테이블을 대상 테이블로 반환
+// DML이면 첫 번째 테이블·관련 컬럼만, SELECT이면 traverseSql 결과 전체
 std::set<CWVSqlParser::Object> CWVSqlParser::GetAllTargetObjects(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::GetAllTargetObjects idx [%d]   ========= \n"), idx);
@@ -1463,6 +1507,8 @@ std::set<CWVSqlParser::Object> CWVSqlParser::GetAllTargetObjects(UINT idx)
 	return objects;
 }
 
+// [GSP→Antlr4] DML SQL로부터 변경 대상 조회용 SELECT 문 생성
+// 예) "UPDATE emp SET sal=5000 WHERE id=1" → strSelect="select sal from emp where id=1"
 EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectStmt(LPCTSTR sqlText, TOString& strSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeSelectStmt sqlText [%s]   ========= \n"), sqlText);
@@ -1510,6 +1556,8 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectStmt(LPCTSTR sqlText, TOString& str
 	return RT_SUCCESS;
 }
 
+// [GSP→Antlr4] DML SQL로부터 변경 이후 조회용 SELECT 문 생성
+// 예) "UPDATE emp SET sal=sal*1.1 WHERE id=1" → strSelect="select sal*1.1 as sal from emp where id=1"
 EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString& strSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeSelectAfterStmt sqlText [%s]   ========= \n"), sqlText);
@@ -1579,7 +1627,8 @@ EM_MAKESELECT_RESULT CWVSqlParser::MakeSelectAfterStmt(LPCTSTR sqlText, TOString
 	return RT_SUCCESS;
 }
 
-// UPDATE 문의 SET 컬럼과 WHERE 컬럼이 겹치는지 확인
+// SQL 텍스트를 파싱한 뒤 IsIncludeWhereInSet(0) 호출하는 텍스트 오버로드
+// 예) "UPDATE t SET id=1 WHERE id=1" → true (SET 컬럼이 WHERE에 존재)
 bool CWVSqlParser::IsIncludeWhereInSet(CString sqlText)
 {
 	TRACE(_T(" ========= CWVSqlParser::IsIncludeWhereInSet sqlText [%s]   ========= \n"), sqlText);
@@ -1596,6 +1645,8 @@ bool CWVSqlParser::IsIncludeWhereInSet(CString sqlText)
 	return false;
 }
 
+// UPDATE idx번째 문장에서 SET 절 컬럼이 WHERE 절에도 등장하는지 확인
+// 예) "UPDATE emp SET deptno=20 WHERE deptno=10" → true
 bool CWVSqlParser::IsIncludeWhereInSet(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::IsIncludeWhereInSet idx [%d]   ========= \n"), idx);
@@ -1630,6 +1681,7 @@ bool CWVSqlParser::IsIncludeWhereInSet(UINT idx)
 }
 
 // [GSP→Antlr4] DML 대상 테이블 반환 (별칭 포함)
+// 예) "UPDATE emp e SET ..." → "emp e" (테이블명 + 별칭)
 TOString CWVSqlParser::getTable(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getTable idx [%d]   ========= \n"), idx);
@@ -1657,6 +1709,7 @@ TOString CWVSqlParser::getTable(UINT idx)
 }
 
 // [GSP→Antlr4] UPDATE/DELETE WHERE 절 텍스트 반환
+// 예) "DELETE FROM emp WHERE id=1" → "WHERE id=1"
 TOString CWVSqlParser::getWhere(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getWhere idx [%d]   ========= \n"), idx);
@@ -1674,6 +1727,7 @@ TOString CWVSqlParser::getWhere(UINT idx)
 }
 
 // [GSP→Antlr4] UPDATE SET 절 컬럼명 목록을 콤마 구분 문자열로 반환
+// 예) "UPDATE emp SET sal=1, comm=2" → "sal, comm"
 TOString CWVSqlParser::getSelectColumnsForUpdate(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSelectColumnsForUpdate idx [%d]   ========= \n"), idx);
@@ -1693,6 +1747,7 @@ TOString CWVSqlParser::getSelectColumnsForUpdate(UINT idx)
 }
 
 // [GSP→Antlr4] INSERT 문으로부터 SELECT 문 생성
+// 예) INSERT INTO emp VALUES(1,'John') → "select 1,'John' from dual"
 EM_MAKESELECT_RESULT CWVSqlParser::getSelectStmtForInsert(TOString& sSelect)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSelectStmtForInsert()   ========= \n"));
@@ -1737,6 +1792,8 @@ EM_MAKESELECT_RESULT CWVSqlParser::getSelectStmtForInsert(TOString& sSelect)
 	return RT_PARSE_FAIL;
 }
 
+// m_sLastError(마지막 파싱 오류 메시지)를 CString으로 반환
+// 예) CheckSyntax 실패 후 → "no viable alternative at input 'FRM'"
 CString CWVSqlParser::GetErrMessage()
 {
 	TRACE(_T(" ========= CWVSqlParser::GetErrMessage()   ========= \n"));
@@ -1752,6 +1809,7 @@ CString CWVSqlParser::GetErrMessage()
 	// [GSP→Antlr4] SELECT 결과 컬럼 별칭→원본컬럼 매핑
 	// GSP: stmt.getResultColumnList() + cell.getAliasClause() / getExpr() / getPrefixTable()
 	// Antlr4: SQLEngine::GetSelectColumnAliases() 사용
+	// 예) "SELECT sal AS s FROM emp" → mapOrgColumn["S"]={"S","SAL","EMP"}
 
 void CWVSqlParser::GetOriginColumnsOfAlias(std::multimap<TOString, Object>& mapOrgColumn)
 {
@@ -1790,6 +1848,7 @@ void CWVSqlParser::GetOriginColumnsOfAlias(std::multimap<TOString, Object>& mapO
 }
 
 // [GSP→Antlr4] UPDATE SET 절 col=val 쌍 목록 반환
+// 예) "UPDATE emp SET sal=5000" → {{"sal","5000"}}
 std::vector<std::pair<CString, CString>> CWVSqlParser::getSetInColumn(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getSetInColumn idx [%d]   ========= \n"), idx);
@@ -1811,6 +1870,7 @@ std::vector<std::pair<CString, CString>> CWVSqlParser::getSetInColumn(UINT idx)
 
 // [GSP→Antlr4] WHERE 절에 등장하는 컬럼명 목록 반환
 // WHERE 텍스트를 토큰화하여 비교연산자 앞의 식별자를 컬럼으로 추출
+// 예) "UPDATE emp SET x=1 WHERE id=1" → {{"id",""}}
 std::vector<std::pair<CString, CString>> CWVSqlParser::getWhereInColumn(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::getWhereInColumn idx [%d]   ========= \n"), idx);
@@ -1856,6 +1916,8 @@ std::vector<std::pair<CString, CString>> CWVSqlParser::getWhereInColumn(UINT idx
 	return columList;
 }
 
+// idx번째 문장이 UPDATE 문인지 여부 반환
+// 예) "UPDATE emp SET sal=5000" → true
 bool CWVSqlParser::isUpdateStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isUpdateStmt idx [%d]   ========= \n"), idx);
@@ -1863,6 +1925,8 @@ bool CWVSqlParser::isUpdateStmt(UINT idx)
 	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::UPDATE_STATEMENT;
 }
 
+// idx번째 문장이 INSERT 또는 REPLACE 문인지 여부 반환
+// 예) "INSERT INTO emp VALUES(1)" → true
 bool CWVSqlParser::isInsertStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isInsertStmt idx [%d]   ========= \n"), idx);
@@ -1871,6 +1935,8 @@ bool CWVSqlParser::isInsertStmt(UINT idx)
 	return t == SqlStatementType::INSERT_STATEMENT || t == SqlStatementType::REPLACE_STATEMENT;
 }
 
+// idx번째 문장이 DELETE 문인지 여부 반환
+// 예) "DELETE FROM emp WHERE id=1" → true
 bool CWVSqlParser::isDeleteStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isDeleteStmt idx [%d]   ========= \n"), idx);
@@ -1878,6 +1944,8 @@ bool CWVSqlParser::isDeleteStmt(UINT idx)
 	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::DELETE_STATEMENT;
 }
 
+// idx번째 문장이 MERGE 문인지 여부 반환
+// 예) "MERGE INTO t USING s ON ..." → true
 bool CWVSqlParser::isMergeStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isMergeStmt idx [%d]   ========= \n"), idx);
@@ -1885,6 +1953,8 @@ bool CWVSqlParser::isMergeStmt(UINT idx)
 	return m_oSQLEngine.GetStatementTypeAt((int)idx) == SqlStatementType::MERGE_STATEMENT;
 }
 
+// idx번째 문장이 SELECT 문인지 여부 반환
+// 예) "SELECT * FROM emp" → true
 bool CWVSqlParser::isSelectStmt(UINT idx)
 {
 	TRACE(_T(" ========= CWVSqlParser::isSelectStmt idx [%d]   ========= \n"), idx);
@@ -2226,6 +2296,7 @@ bool CWVSqlParser::hasMatchedClasuse(bool bMatched)
 }
 
 // [GSP→Antlr4] INSERT 후 데이터: [컬럼명 행, 값 행]
+// 예) "INSERT INTO emp(id,name) VALUES(1,'John')" → afterData=[["id","name"],["1","'John'"]]
 bool CWVSqlParser::MakeInsertAfterData(std::vector<std::vector<TOString>>& afterData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeInsertAfterData()   ========= \n"));
@@ -2248,6 +2319,7 @@ bool CWVSqlParser::MakeInsertAfterData(std::vector<std::vector<TOString>>& after
 }
 
 // [GSP→Antlr4] DELETE 이전 데이터: WHERE 조건 텍스트를 [["condition"], [whereText]] 형태로 반환
+// 예) "DELETE FROM emp WHERE id=1" → attachmentData=[["condition"],["WHERE id=1"]]
 bool CWVSqlParser::MakeDeleteBeforeData(std::vector<std::vector<TOString>>& attachmentData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeDeleteBeforeData()   ========= \n"));
@@ -2264,6 +2336,7 @@ bool CWVSqlParser::MakeDeleteBeforeData(std::vector<std::vector<TOString>>& atta
 }
 
 // [GSP→Antlr4] UPDATE 이전 데이터: WHERE 조건 텍스트를 [["condition"], [whereText]] 형태로 반환
+// 예) "UPDATE emp SET sal=1 WHERE id=1" → attachmentData=[["condition"],["WHERE id=1"]]
 bool CWVSqlParser::MakeUpdateBeforeData(std::vector<std::vector<TOString>>& attachmentData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeUpdateBeforeData()   ========= \n"));
@@ -2280,6 +2353,7 @@ bool CWVSqlParser::MakeUpdateBeforeData(std::vector<std::vector<TOString>>& atta
 }
 
 // [GSP→Antlr4] UPDATE 이후 데이터: SET 절 컬럼·값 목록 반환
+// 예) "UPDATE emp SET sal=5000, comm=100" → afterData=[["sal","comm"],["5000","100"]]
 bool CWVSqlParser::MakeUpdateAfterData(std::vector<std::vector<TOString>>& afterData)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeUpdateAfterData()   ========= \n"));
@@ -2301,6 +2375,8 @@ bool CWVSqlParser::MakeUpdateAfterData(std::vector<std::vector<TOString>>& after
 	return true;
 }
 
+// SQL 파싱 후 DELETE→MakeDeleteBeforeData, UPDATE→MakeUpdateBeforeData 위임
+// 예) "DELETE FROM emp WHERE id=1" → data=[["condition"],["WHERE id=1"]]
 bool CWVSqlParser::MakeBeforeData(LPCTSTR sqlText, std::vector< std::vector<TOString> >& data)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeBeforeData sqlText [%s]   ========= \n"), sqlText);
@@ -2315,6 +2391,8 @@ bool CWVSqlParser::MakeBeforeData(LPCTSTR sqlText, std::vector< std::vector<TOSt
 	return false;
 }
 
+// SQL 파싱 후 INSERT→MakeInsertAfterData, UPDATE→MakeUpdateAfterData 위임
+// 예) "INSERT INTO emp VALUES(1,'John')" → data=[[""],["1","'John'"]]
 bool CWVSqlParser::MakeAfterData(LPCTSTR sqlText, std::vector< std::vector<TOString> >& data)
 {
 	TRACE(_T(" ========= CWVSqlParser::MakeAfterData sqlText [%s]   ========= \n"), sqlText);
